@@ -1,0 +1,18 @@
+services:
+
+  auth-ms-db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MS_AUTH_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MS_AUTH_DB_PASSWORD}
+    networks:
+      - auth
+
+  auth-ms:
+    build: ./Dockerfile
+    depends_on:
+      - ms_auth_db
+    networks:
+      - auth
+      - tadsbank

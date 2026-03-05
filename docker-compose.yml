@@ -1,0 +1,9 @@
+include:
+  - path: ./back-end/MS_Auth/docker-compose.yml
+
+networks:
+  tadsbank:
+  auth:
+  cliente:
+  conta:
+  gerente:
