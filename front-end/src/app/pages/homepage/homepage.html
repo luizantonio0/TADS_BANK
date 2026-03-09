@@ -1,22 +1,5 @@
 <div class="landing-container">
-  <header class="header">
-    <div class="container header-content">
-      <div class="logo">
-        <span class="material-symbols-outlined icon-logo">account_balance</span>
-        <span class="logo-text">TADS BANK</span>
-      </div>
-      
-      <nav class="nav-menu">
-        <a class="nav-link">Início</a>
-        <a class="nav-link">Sobre Nós</a>
-      </nav>
-
-      <div class="auth-buttons">
-        <button class="btn btn-secondary">Login</button>
-        <button class="btn btn-primary">Abra sua Conta</button>
-      </div>
-    </div>
-  </header>
+  <app-header></app-header>
 
   <main>
     <section class="hero">
@@ -49,12 +32,12 @@
     <section class="portals">
       <div class="container">
         <div class="section-header">
-          <h2>Acesse sua Conta</h2>
+          <h2 class="text-3xl font-bold">Acesse sua Conta</h2>
           <p>Escolha seu perfil para entrar na plataforma</p>
         </div>
         
-        <div class="portals-grid">
-          <div class="card">
+        <div class="flex flex-col md:flex-row gap-6 justify-center">
+          <div class="card max-w-xl">
             <div class="card-icon">
               <span class="material-symbols-outlined">person</span>
             </div>
@@ -65,7 +48,7 @@
             </div>
           </div>
 
-          <div class="card">
+          <div class="card max-w-xl">
             <div class="card-icon">
               <span class="material-symbols-outlined">badge</span>
             </div>
@@ -76,7 +59,7 @@
             </div>
           </div>
 
-          <div class="card">
+          <div class="card max-w-xl">
             <div class="card-icon">
               <span class="material-symbols-outlined">admin_panel_settings</span>
             </div>
