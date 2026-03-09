@@ -1,13 +1,13 @@
 <header class="header bg-amber-300">
     <div class="m-screen header-content mx-2">
-      <div class="logo">
+      <div class="logo cursor-pointer" [routerLink]="['/']">
         <span class="material-symbols-outlined icon-logo">account_balance</span>
         <span class="logo-text">TADS BANK</span>
       </div>
       
       <nav class="nav-menu">
-        <a class="nav-link max-md:hidden">Início</a>
-        <a class="nav-link max-md:hidden">Sobre Nós</a>
+        <a class="nav-link max-md:hidden" [routerLink]="['/']">Início</a>
+        <a class="nav-link max-md:hidden" [routerLink]="['/sobre-nos']">Sobre Nós</a>
       </nav>
 
       <div class="auth-buttons flex gap-2">
