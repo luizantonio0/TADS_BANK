@@ -1,0 +1,59 @@
+<app-header></app-header>
+
+<main class="w-screen h-main-screen bg-gray-100 p-8 flex justify-center">
+  <div class="w-112 rounded-md bg-white border border-gray-200 shadow-md p-4 h-fit">
+    <h1 class="text-center text-3xl font-extrabold text-primary">Bem vindo!</h1>
+    <p class="text-center mb-4 text-xs text-gray-500">Ficamos felizes em ter você aqui.</p>
+    <p class="mb-4 text-sm text-center">Para começar, realize seu cadastro:</p>
+    <form>
+      <div class="grid gap-x-2 gap-y-2 grid-cols-12">
+        <div class="col-span-12">
+          <label for="nome">Nome</label>
+          <input [(ngModel)]="nome" name="nome" placeholder="Digite seu nome">
+        </div>
+        <div class="col-span-7">
+          <label for="cpf">CPF</label>
+          <input [(ngModel)]="cpf" name="cpf" placeholder="Digite seu CPF">
+        </div>
+        <div class="col-span-5">
+          <label for="salario">Salário</label>
+          <input [(ngModel)]="salario" name="salario" placeholder="Digite seu salário">
+        </div>
+        <div class="col-span-6">
+          <label for="email">E-mail</label>
+          <input [(ngModel)]="email" name="email" placeholder="Digite seu e-mail">
+        </div>
+        <div class="col-span-6">
+          <label for="telefone">Telefone</label>
+          <input [(ngModel)]="telefone" name="telefone" placeholder="Digite seu telefone">
+        </div>
+      </div>
+      <div class="grid gap-x-2 gap-y-2 grid-cols-12 mt-8">
+        <div class="col-span-6">
+          <label for="cep">CEP</label>
+          <input [(ngModel)]="cep" name="cep" placeholder="Digite seu CEP">
+        </div>
+        <div class="col-span-6 flex flex-col justify-end w-fit">
+          <span class="material-symbols-outlined text-primary h-8 border-gray-200 border p-1 rounded-md cursor-pointer bg-gray-100">search</span>
+        </div>
+        <div class="col-span-8">
+          <label for="endereco">Endereço</label>
+          <input [(ngModel)]="cep" name="endereco" placeholder="Digite seu endereço" disabled>
+        </div>
+        <div class="col-span-4">
+          <label for="numero">Número</label>
+          <input name="numero" placeholder="Digite o número" disabled>
+        </div>
+        <div class="col-span-8">
+          <label for="cidade">Cidade</label>
+          <input [(ngModel)]="cidade" name="numero" placeholder="Escolha sua cidade" disabled>
+        </div>
+        <div class="col-span-4">
+          <label for="estado">Estado</label>
+          <input [(ngModel)]="estado" name="estado" placeholder="Escolha seu estado" disabled>
+        </div>
+      </div>
+      <button class="mt-4 h-10">Solicitar cadastro</button>
+    </form>
+  </div>
+</main>

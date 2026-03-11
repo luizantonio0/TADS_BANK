@@ -7,4 +7,13 @@ import { Header } from "../../components/header/header";
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {}
+export class Login {
+
+  email: string = '';
+  password: string = '';
+
+  submit() {
+
+  }
+
+}
