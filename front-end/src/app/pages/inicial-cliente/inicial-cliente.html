@@ -3,26 +3,27 @@
 <modal-transferir [control]="modalTransferirControl" (close)="modalTransferirControl = false"/>
 
 <div class="h-main-screen flex gap-x-16">
-  <div class="h-full items-center flex flex-col justify-center w-2/3">
-    <div class="w-full -mt-16 items-center flex flex-col justify-center">
+  <div class="h-full items-center flex flex-col justify-center w-2/3 py-6">
+    <div style="backdrop-font: blur(4px);"
+      class="w-full bg-[rgba(255,255,255,0.4)] h-full shadow-md items-center rounded-md flex flex-col justify-center">
       <h1 class="text-lg font-light ml-1 mb-2">Olá, {{ currentAccount.name.split(' ')[0]}}</h1>
-      <h1 class="text-8xl" [class.text-red-500]="currentAccount.balance < 0">
+      <h1 class="text-6xl" [class.text-red-600]="currentAccount.balance < 0">
         {{ currentAccount.balance | currency: 'BRL' }}
       </h1>
-      <div class="grid grid-cols-4 gap-2 w-2/3 mt-2">
-        <button class="h-14 text-lg! items-center gap-x-1 flex justify-center" (click)="modalSacarControl = true">
+      <div class="grid grid-cols-4 gap-2 mt-2">
+        <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalSacarControl = true">
           <span class="material-symbols-outlined">arrow_upward</span>
           Sacar
         </button>
-        <button class="h-14 text-lg! items-center gap-x-1 flex justify-center" (click)="modalDepositarControl = true">
+        <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalDepositarControl = true">
           <span class="material-symbols-outlined">arrow_downward</span>
           Depositar
         </button>
-        <button class="h-14 text-lg! items-center gap-x-1 flex justify-center" (click)="modalTransferirControl = true">
+        <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalTransferirControl = true">
           <span class="material-symbols-outlined">compare_arrows</span>
           Transferir
         </button>
-        <button class="h-14 text-lg! items-center gap-x-1 flex justify-center" >
+        <button class="h-12 text-md! items-center gap-x-1 flex justify-center w-36" >
           <span class="material-symbols-outlined">edit</span>
           Alterar perfil
         </button>

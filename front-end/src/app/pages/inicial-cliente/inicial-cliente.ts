@@ -18,7 +18,7 @@ export class InicialCliente {
 
   currentAccount = {
     name: 'Victor Hugo',
-    balance: -1003
+    balance: 43737554357
   }
 
 }
