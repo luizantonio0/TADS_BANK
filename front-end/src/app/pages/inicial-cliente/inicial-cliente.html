@@ -4,29 +4,39 @@
 
 <div class="h-main-screen flex gap-x-16">
   <div class="h-full items-center flex flex-col justify-center w-2/3 py-6">
-    <div style="backdrop-font: blur(4px);"
-      class="w-full bg-[rgba(255,255,255,0.4)] h-full shadow-md items-center rounded-md flex flex-col justify-center">
-      <h1 class="text-lg font-light ml-1 mb-2">Olá, {{ currentAccount.name.split(' ')[0]}}</h1>
-      <h1 class="text-6xl" [class.text-red-600]="currentAccount.balance < 0">
-        {{ currentAccount.balance | currency: 'BRL' }}
-      </h1>
-      <div class="grid grid-cols-4 gap-2 mt-2">
-        <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalSacarControl = true">
-          <span class="material-symbols-outlined">arrow_upward</span>
-          Sacar
-        </button>
-        <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalDepositarControl = true">
-          <span class="material-symbols-outlined">arrow_downward</span>
-          Depositar
-        </button>
-        <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalTransferirControl = true">
-          <span class="material-symbols-outlined">compare_arrows</span>
-          Transferir
-        </button>
-        <button class="h-12 text-md! items-center gap-x-1 flex justify-center w-36" >
-          <span class="material-symbols-outlined">edit</span>
-          Alterar perfil
-        </button>
+    <div class="h-full w-full mb-4">
+      <div style="backdrop-font: blur(4px);"
+           class="w-full bg-[rgba(255,255,255,0.4)] h-full shadow-md items-center rounded-md flex flex-col justify-center">
+        <h1 class="text-lg font-light ml-1 mb-2">Olá, {{ currentAccount.name.split(' ')[0]}}</h1>
+        <h1 class="text-6xl" [class.text-red-600]="currentAccount.balance < 0">
+          {{ currentAccount.balance | currency: 'BRL' }}
+        </h1>
+        <div class="grid grid-cols-4 gap-2 mt-2">
+          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalSacarControl = true">
+            <span class="material-symbols-outlined">arrow_upward</span>
+            Sacar
+          </button>
+          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalDepositarControl = true">
+            <span class="material-symbols-outlined">arrow_downward</span>
+            Depositar
+          </button>
+          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalTransferirControl = true">
+            <span class="material-symbols-outlined">compare_arrows</span>
+            Transferir
+          </button>
+          <button class="h-12 text-md! items-center gap-x-1 flex justify-center w-36" >
+            <span class="material-symbols-outlined">edit</span>
+            Alterar perfil
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-x-4 w-full">
+      <div class="bg-white w-full rounded-md py-8 flex gap-x-2 shadow-md">
+        <span class="material-symbols-outlined text-primary scale-150">finance</span>
+      </div>
+      <div class="bg-white w-full rounded-md py-8 flex gap-x-2 shadow-md">
+        <span class="material-symbols-outlined text-primary">finance</span>
       </div>
     </div>
   </div>
