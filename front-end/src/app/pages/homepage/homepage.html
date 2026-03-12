@@ -1,70 +1,70 @@
-<div class="landing-container">
+<div class="font-sans bg-[#f5f7f8] text-[#0f172a] min-h-screen">
   <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-text">
-          <div class="badge">
-            <span class="dot"></span>
+    <section class="py-20">
+      <div class="max-w-[1200px] mx-auto px-5 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#002d61]/10 text-[#002d61] rounded-full text-xs font-bold mb-6">
+            <span class="w-2 h-2 bg-[#002d61] rounded-full"></span>
             Sistema Bancário Distribuído
           </div>
-          <h1 class="hero-title">
+          <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4">
             O Banco do TADS (pois é...)
           </h1>
-          <div class="hero-actions">
-            <button class="btn btn-primary btn-large">
-              <span class="material-symbols-outlined">person_add</span> Abra sua Conta
+          <div class="flex flex-col sm:flex-row gap-4 mt-8">
+            <button class="px-8 py-4 bg-[#002d61] text-white rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 transition-all duration-200 hover:bg-[#002d61]/90 cursor-pointer border-none">
+              <span class="material-symbols-outlined text-2xl">person_add</span> Abra sua Conta
             </button>
-            <button class="btn btn-outline btn-large">
-              <span class="material-symbols-outlined">login</span> Acesse o Sistema
+            <button class="px-8 py-4 bg-white border border-[#e2e8f0] text-[#0f172a] rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 transition-all duration-200 hover:bg-slate-50 cursor-pointer">
+              <span class="material-symbols-outlined text-2xl">login</span> Acesse o Sistema
             </button>
           </div>
         </div>
-        <div class="hero-image-container">
-          <div class="hero-image-placeholder">
-            <span class="material-symbols-outlined">image</span>
+        <div>
+          <div class="aspect-video bg-[#e2e8f0] rounded-2xl flex items-center justify-center shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]">
+            <span class="material-symbols-outlined text-4xl text-slate-400">image</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="portals">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="text-3xl font-bold">Acesse sua Conta</h2>
-          <p>Escolha seu perfil para entrar na plataforma</p>
+    <section class="py-16 bg-white">
+      <div class="max-w-[1200px] mx-auto px-5">
+        <div class="text-center mb-10">
+          <h2 class="text-3xl font-bold text-[#0f172a] mb-2">Acesse sua Conta</h2>
+          <p class="text-[#64748b]">Escolha seu perfil para entrar na plataforma</p>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-6 justify-center">
-          <div class="card max-w-xl">
-            <div class="card-icon">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center">
+          <div class="p-8 border border-[#e2e8f0] rounded-2xl transition-all duration-300 cursor-pointer hover:border-[#002d61] hover:-translate-y-1">
+            <div class="w-12 h-12 bg-[#002d61]/10 text-[#002d61] flex items-center justify-center rounded-lg mb-6">
               <span class="material-symbols-outlined">person</span>
             </div>
-            <h3>Cliente</h3>
-            <p>Gerencie suas finanças pessoais, pagamentos e transferências com facilidade.</p>
-            <div class="card-footer">
-              Entrar como Cliente <span class="material-symbols-outlined">arrow_forward</span>
+            <h3 class="text-xl font-bold mb-2">Cliente</h3>
+            <p class="text-[#64748b] leading-relaxed">Gerencie suas finanças pessoais, pagamentos e transferências com facilidade.</p>
+            <div class="mt-6 text-[#002d61] font-bold flex items-center gap-1">
+              Entrar como Cliente <span class="material-symbols-outlined text-xl">arrow_forward</span>
             </div>
           </div>
 
-          <div class="card max-w-xl">
-            <div class="card-icon">
+          <div class="p-8 border border-[#e2e8f0] rounded-2xl transition-all duration-300 cursor-pointer hover:border-[#002d61] hover:-translate-y-1">
+            <div class="w-12 h-12 bg-[#002d61]/10 text-[#002d61] flex items-center justify-center rounded-lg mb-6">
               <span class="material-symbols-outlined">badge</span>
             </div>
-            <h3>Gerente</h3>
-            <p>Acesse sua carteira de clientes, aprove novas contas e realize gestões estratégicas.</p>
-            <div class="card-footer">
-              Portal do Gerente <span class="material-symbols-outlined">arrow_forward</span>
+            <h3 class="text-xl font-bold mb-2">Gerente</h3>
+            <p class="text-[#64748b] leading-relaxed">Acesse sua carteira de clientes, aprove novas contas e realize gestões estratégicas.</p>
+            <div class="mt-6 text-[#002d61] font-bold flex items-center gap-1">
+              Portal do Gerente <span class="material-symbols-outlined text-xl">arrow_forward</span>
             </div>
           </div>
 
-          <div class="card max-w-xl">
-            <div class="card-icon">
+          <div class="p-8 border border-[#e2e8f0] rounded-2xl transition-all duration-300 cursor-pointer hover:border-[#002d61] hover:-translate-y-1">
+            <div class="w-12 h-12 bg-[#002d61]/10 text-[#002d61] flex items-center justify-center rounded-lg mb-6">
               <span class="material-symbols-outlined">admin_panel_settings</span>
             </div>
-            <h3>Administrador</h3>
-            <p>Visão global do sistema, controle operacional e gerenciamento de microsserviços.</p>
-            <div class="card-footer">
-              Painel Administrativo <span class="material-symbols-outlined">arrow_forward</span>
+            <h3 class="text-xl font-bold mb-2">Administrador</h3>
+            <p class="text-[#64748b] leading-relaxed">Visão global do sistema, controle operacional e gerenciamento de microsserviços.</p>
+            <div class="mt-6 text-[#002d61] font-bold flex items-center gap-1">
+              Painel Administrativo <span class="material-symbols-outlined text-xl">arrow_forward</span>
             </div>
           </div>
         </div>
