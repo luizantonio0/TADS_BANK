@@ -32,7 +32,7 @@ public class Cliente {
 
     private BigDecimal salario;
     @Column(length = 8)
-    private String CEP;
+    private String cep;
     @Column(length = 30)
     private String cidade;
     @Column(length = 2)
@@ -45,7 +45,7 @@ public class Cliente {
         this.nome = clienteRequestDTO.nome();
         this.telefone = clienteRequestDTO.telefone();
         this.salario = clienteRequestDTO.salario();
-        this.CEP = clienteRequestDTO.CEP();
+        this.cep = clienteRequestDTO.CEP();
         this.cidade = clienteRequestDTO.cidade();
         this.estado = clienteRequestDTO.estado();
     }
