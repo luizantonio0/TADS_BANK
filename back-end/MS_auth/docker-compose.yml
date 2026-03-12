@@ -4,8 +4,9 @@ services:
     image: mongo
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MS_AUTH_DB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MS_AUTH_DB_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
     networks:
       - auth
 

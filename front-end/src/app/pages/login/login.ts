@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Header } from "../../components/header/header";
 import {
   FormBuilder,
   FormGroup,
@@ -11,7 +10,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [Header, FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './login.html'
 })
 export class Login {

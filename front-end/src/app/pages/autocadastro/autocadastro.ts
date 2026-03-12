@@ -8,10 +8,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-autocadastro',
-  imports: [ReactiveFormsModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule, NgxMaskDirective],
   templateUrl: './autocadastro.html',
 })
 export class Autocadastro {

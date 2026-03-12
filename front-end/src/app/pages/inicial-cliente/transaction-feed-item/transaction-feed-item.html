@@ -1,0 +1,38 @@
+<div>
+    <div class="flex items-center mb-3">
+        @if (transaction.type === 'transfer') {
+            @if(transaction.destination!.account_number == accountNumber) {
+            <span class="material-symbols-outlined text-blue-500">arrow_downward</span>
+            <div class="ms-3">
+                <p class="text-sm font-medium">{{ transaction.origin!.account_name }}</p>
+                <p class="text-xs text-gray-400">Transferência recebida - {{ transaction.date | date: 'dd/MM/yyyy - HH:mm' }}</p>
+            </div>
+            } @else {
+            <span class="material-symbols-outlined text-red-400">arrow_upward</span>
+            <div class="ms-3">
+                <p class="text-sm font-medium">{{ transaction.destination!.account_name }}</p>
+                <p class="text-xs text-gray-400">Transferência enviada - {{ transaction.date | date: 'dd/MM/yyyy - HH:mm' }}</p>
+            </div>
+            }
+        } @else if (transaction.type === 'deposit'){
+            <span class="material-symbols-outlined text-blue-500">arrow_downward</span>
+            <div class="ms-3">
+                <p class="text-sm font-medium">Depósito em caixa eletrônico</p>
+                <p class="text-xs text-gray-400">Depósito - {{ transaction.date | date: 'dd/MM/yyyy - HH:mm' }}</p>
+            </div>
+        } @else if (transaction.type === 'withdraw'){
+            <span class="material-symbols-outlined text-red-400">arrow_upward</span>
+            <div class="ms-3">
+                <p class="text-sm font-medium">Saque em caixa eletrônico</p>
+                <p class="text-xs text-gray-400">Saque - {{ transaction.date | date: 'dd/MM/yyyy - HH:mm' }}</p>
+            </div>
+        }
+        <div class="ms-auto font-semibold text-sm" 
+            [class.text-blue-500]="transaction.type === 'deposit' || transaction.destination?.account_number == accountNumber" 
+            [class.text-red-400]="transaction.type === 'withdraw' || transaction.origin?.account_number == accountNumber">
+            @if (transaction.type === 'withdraw' || transaction.origin?.account_number == accountNumber) {
+                -
+            }{{ transaction.amount | currency:'BRL' }}
+        </div>
+    </div>
+</div>

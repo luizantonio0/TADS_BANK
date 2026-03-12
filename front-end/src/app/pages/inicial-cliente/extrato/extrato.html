@@ -1,0 +1,57 @@
+<div class="h-full w-full relative border-gray-200 border rounded-md bg-gray-50 flex flex-col overflow-hidden">
+    @if(isFiltroTooltipVisible) {
+    <div class="absolute right-8 shadow-md bg-white rounded-md border border-primary h-fit w-64 top-13 z-10
+            before:content-[''] before:absolute before:-top-2 before:right-4 
+            before:border-l-8 before:border-l-transparent 
+            before:border-r-8 before:border-r-transparent 
+            before:border-b-8 before:border-b-primary
+            after:content-[''] after:absolute after:-top-1.75 after:right-4 
+            after:border-l-8 after:border-l-transparent 
+            after:border-r-8 after:border-r-transparent 
+            after:border-b-8 after:border-b-white">
+        <div class="p-2 text-sm text-gray-700">
+            <h3 class="font-semibold">Filtrar extrato</h3>
+            <form [formGroup]="formFiltroData" (ngSubmit)="aplicarFiltro()" class="mt-2">
+                <label for="de">De</label>
+                <input formControlName="dataDe" name="de" type="date" placeholder="Data de">
+                <label class="mt-2" for="ate">Até</label>
+                <input formControlName="dataAte" name="ate" type="date" placeholder="Data até">
+                <button class="mt-2 w-full" type="submit">Filtrar</button>
+            </form>
+        </div>
+    </div>
+    }
+
+    <div class="h-12 px-6 items-center flex justify-between border-b border-b-gray-200 bg-gray-100 flex-none">
+        <p class="font-semibold">Extrato</p>
+        <button (click)="toggleFiltroTooltip($event)" class="text-white flex items-center gap-x-1 px-2 h-8">
+            <p class="font-semibold">Filtrar</p>
+            <span class="material-symbols-outlined text-sm">calendar_today</span>
+        </button>
+    </div>
+
+    <div class="p-6 overflow-y-auto flex-1 min-h-0">
+        @for (group of transactionGroups; track group.day) {
+        <div class="mb-6">
+            <div class="flex items-center w-full mb-4">
+                <span class="whitespace-nowrap text-xs font-semibold text-gray-500">
+                    {{ group.day | date: "MMMM, dd" | titlecase }}
+                </span>
+                <div class="ms-2 h-px flex-1 bg-gray-200"></div>
+                <span class="whitespace-nowrap text-xs font-semibold text-gray-500 ml-2">
+                    Saldo do dia: <span [class.text-red-400]="group.balance < 0"
+                        [class.text-blue-500]="group.balance >= 0">{{
+                        group.balance | currency:'BRL' }}</span>
+                </span>
+            </div>
+            @for(item of group.transactions; track item.uuid) {
+            <transaction-feed-item [transaction]="item" [accountNumber]="currentAccount.account_number" />
+            } @empty {
+            <p class="text-sm text-gray-500">Nenhuma transação nesse dia.</p>
+            }
+        </div>
+        } @empty {
+        <div class="text-center text-gray-400 py-10">Nenhum item encontrado.</div>
+        }
+    </div>
+</div>

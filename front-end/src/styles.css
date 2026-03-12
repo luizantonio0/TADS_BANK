@@ -6,6 +6,8 @@
   --color-primary: #562be3;
   --font-sans: "Google Sans", ui-sans-serif, system-ui, sans-serif;
   --spacing-main-screen: calc(100vh - 64px);
+  --background-image-cliente: url('/bg-cliente.png');
+  --background-image-login: url('/bg-login.png');
 }
 
 body {
@@ -39,4 +41,34 @@ input:not(:placeholder-shown) {
 
 button, input, optgroup, select, textarea {
   font-family: inherit;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.3s ease-out forwards;
+}
+
+.animate-toast-out {
+  animation: toast-out 0.3s ease-in forwards;
 }

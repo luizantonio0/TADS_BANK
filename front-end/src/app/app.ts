@@ -1,12 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { Footer } from './components/footer/footer';
 import { Header } from './components/header/header';
+import { ToastContainerComponent } from './components/toast/toast';
 import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, Header],
+  imports: [RouterOutlet, ToastContainerComponent, Header],
   templateUrl: './app.html'
 })
 export class App {
@@ -14,12 +14,18 @@ export class App {
   protected readonly title = signal('front-end');
 
   isHome = false;
+  isClienteInicial = false;
+  isAutocadastro = false;
+  isLogin = false;
 
   constructor(private router: Router) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         this.isHome = event.url === '/' || event.urlAfterRedirects === '/';
+        this.isLogin = event.url === '/login' || event.urlAfterRedirects === '/login';
+        this.isAutocadastro = event.url === '/autocadastro' || event.urlAfterRedirects === '/autocadastro';
+        this.isClienteInicial = event.url === '/cliente' || event.urlAfterRedirects === '/cliente';
       });
   }
 

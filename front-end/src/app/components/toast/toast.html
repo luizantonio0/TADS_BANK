@@ -1,0 +1,17 @@
+<div class="fixed top-5 right-5 z-100 flex flex-col gap-3">
+    @for (toast of toastService.toasts(); track toast.id) {
+    <div class="flex items-center justify-between py-3 px-4 rounded-md shadow-lg border-l-4 min-w-75 bg-white text-gray-800 transition-all"
+        [class.animate-toast-in]="!toast.isLeaving" [class.animate-toast-out]="toast.isLeaving"
+        [class.border-green-500]="toast.type === 'success'" [class.border-red-500]="toast.type === 'error'">
+        <div class="flex gap-x-2 items-center">
+            @if(toast.type === 'success') {
+            <span class="text-sm text-green-400 font-thin material-symbols-outlined">check_circle</span>
+            }
+            @if(toast.type === 'error') {
+            <span class="text-sm text-red-400 font-thin material-symbols-outlined">cancel</span>
+            }
+            <span class="font-normal text-sm">{{ toast.message }}</span>
+        </div>
+    </div>
+    }
+</div>

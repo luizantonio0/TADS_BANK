@@ -1,0 +1,18 @@
+@if(control) {
+<div class="fixed left-0 top-0 w-screen h-screen items-center flex justify-center bg-[rgba(0,0,0,0.3)] z-40" style="backdrop-filter: blur(4px)" (click)="onClose()">
+    <div class="z-50 bg-white w-fit h-fit rounded-md p-6" (click)="$event.stopPropagation()">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl">{{title}}</h1>
+            <span class="material-symbols-outlined text-red-400 cursor-pointer" (click)="onClose()">close</span>
+        </div>
+        <hr class="text-gray-300 my-2"/>
+        <ng-content></ng-content>
+        <div class="mt-2 flex gap-x-1 justify-end">
+            <button class="bg-red-400!" (click)="onClose()">Cancelar</button>
+            @if(submitCallback) {
+                <button [disabled]="submitDisabled" (click)="submitCallback()">{{submitText ?? 'Confirmar'}}</button>
+            }
+        </div>
+    </div>
+</div>
+}
