@@ -1,28 +1,23 @@
-<app-header></app-header>
+<main class="w-screen h-main-screen items-center flex justify-center">
 
-<div class="w-screen">
-    <div class="form flex mx-auto flex-col gap-6 py-12">
-        <h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
-        <form class="max-w-sm mx-auto">
-            <label for="input-group-1" class="block mb-1 text-sm font-medium text-heading">Seu E-mail</label>
-            <div class="relative mb-5">
-                <div class="absolute inset-y-0 flex items-center ps-3 pointer-events-none">
-                <svg class="w-4 h-4 text-body" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m3.5 5.5 7.893 6.036a1 1 0 0 0 1.214 0L20.5 5.5M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Z"/></svg>
-                </div>
-                <input type="text" id="input-group-1" class="block w-full ps-9 pe-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body" placeholder="name@bantads.com">
-            </div>
+  <div class="w-112 rounded-md bg-white border border-gray-200 shadow-md p-6 h-fit">
+    <h1 class="text-left text-3xl font-extrabold text-primary">Bem vindo de volta!</h1>
+    <p class="text-left mb-4 text-xs text-gray-400">Faça login para continuar.</p>
 
-            <label for="input-group-1" class="block mb-1 text-sm font-medium text-heading">Sua Senha</label>
-            <div class="relative mb-5">
-                <div class="absolute inset-y-0  flex items-center ps-3 pointer-events-none">
-                <svg class="w-4 h-4 text-body" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m3.5 5.5 7.893 6.036a1 1 0 0 0 1.214 0L20.5 5.5M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Z"/></svg>
-                </div>
-                <input type="password" id="input-group-1" class="block w-full ps-9 pe-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body" placeholder="••••••••">
-            </div>
+    <form [formGroup]="formLogin" (ngSubmit)="submit()">
+      <div class="grid gap-x-2 gap-y-2 grid-cols-12">
+        <div class="col-span-12">
+          <label for="email">E-mail <span class="req-ast">*</span></label>
+          <input formControlName="email" name="email" placeholder="Digite seu e-mail">
+        </div>
+        <div class="col-span-12">
+          <label for="senha">Senha <span class="req-ast">*</span></label>
+          <input formControlName="senha" name="senha" type="password" placeholder="Digite sua senha">
+        </div>
+      </div>
+      <button class="mt-4 h-10 w-full" type="submit" [disabled]="formLogin.invalid">Entrar</button>
+    </form>
 
-            <div class="flex ">
-                <button type="button" class="mx-auto text-white bg-blue-600 box-border border border-transparent hover:bg-blue-600-strong focus:ring-4 focus:ring-bluebg-blue-600-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Entrar</button>
-            </div>
-        </form>
-    </div>
-</div>
+  </div>
+
+</main>

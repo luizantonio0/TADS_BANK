@@ -1,4 +1,4 @@
-<header class="header">
+<header class="header px-24 bg-[rgba(255, 255, 255, 0.8)]">
     <div class="m-screen header-content mx-2">
       <div class="logo cursor-pointer" [routerLink]="['/']">
         <span class="material-symbols-outlined icon-logo">account_balance</span>
@@ -11,8 +11,8 @@
       </nav>
 
       <div class="auth-buttons flex gap-2">
-        <button class="btn max-md:max-h-10 my-auto text-white bg-blue-600 box-border border border-transparent hover:bg-blue-600-strong focus:ring-4 focus:ring-blubg-blue-600-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none" [routerLink]="['/login']">Login</button>
-        <button class="btn max-md:max-h-10 my-auto text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Abra sua Conta</button>
+        <button [routerLink]="['/login']" class="h-fit">Login</button>
+        <button [routerLink]="['/autocadastro']" class="h-fit">Abra sua Conta</button>
       </div>
     </div>
   </header>
