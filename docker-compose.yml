@@ -1,5 +1,17 @@
-include:
-  - path: ./back-end/MS_Auth/docker-compose.yml
+version: '3.8'
+
+#comentando por enquanto
+#include:
+#  - path: ./back-end/MS_auth/docker-compose.yml
+
+services:
+  frontend-app:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    container_name: tadsbank-frontend
+    ports:
+      - "4200:80"
 
 networks:
   tadsbank:
