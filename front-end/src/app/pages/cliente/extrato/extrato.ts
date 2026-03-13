@@ -1,5 +1,5 @@
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { TransactionGroup } from '../../../../shared/models/transaction.model';
+import { TransactionGroup } from '../../../shared/models/transaction.model';
 import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
 import { TransactionFeedItem } from '../transaction-feed-item/transaction-feed-item';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';

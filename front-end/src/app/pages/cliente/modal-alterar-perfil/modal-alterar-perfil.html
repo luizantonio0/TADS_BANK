@@ -1,6 +1,6 @@
 <modal icon="person_edit" title="Informações pessoais" [control]="control" (close)="onClose()"
     [submitDisabled]="form.invalid" [submitCallback]="() => this.submit()" submitText="Salvar alterações">
-    <div class="w-[250px]">
+    <div class="">
         <form [formGroup]="form" (ngSubmit)="submit()">
             <div class="grid gap-x-2 gap-y-2 grid-cols-12">
                 <div class="col-span-12">

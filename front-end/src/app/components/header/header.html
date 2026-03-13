@@ -1,3 +1,4 @@
+<div class="sticky top-0 z-30">
 <header class="header px-24 bg-[rgba(255,255,255,0.4)]">
     <div class="m-screen header-content mx-2">
       <div class="logo cursor-pointer" [routerLink]="['/']">
@@ -11,3 +12,10 @@
       </div>
     </div>
   </header>
+  @if(isGerente) {
+    <div class="w-screen bg-primary mb-4 text-white flex justify-center py-2 gap-x-2">
+        <span class="material-symbols-outlined">monitoring</span>
+        <p class="my-auto">ÁREA DO GERENTE - VICTOR HUGO BETONI</p>
+    </div>
+  }
+</div>  

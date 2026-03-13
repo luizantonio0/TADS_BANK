@@ -14,6 +14,7 @@ export class App {
   protected readonly title = signal('front-end');
 
   isHome = false;
+  isGerente = false;
   isClienteInicial = false;
   isAutocadastro = false;
   isLogin = false;
@@ -26,6 +27,7 @@ export class App {
         this.isLogin = event.url === '/login' || event.urlAfterRedirects === '/login';
         this.isAutocadastro = event.url === '/autocadastro' || event.urlAfterRedirects === '/autocadastro';
         this.isClienteInicial = event.url === '/cliente' || event.urlAfterRedirects === '/cliente';
+        this.isGerente = event.url === '/gerente' || event.urlAfterRedirects === '/gerente';
       });
   }
 

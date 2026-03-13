@@ -1,0 +1,6 @@
+<modal [control]="control" icon="filter_alt" title="Filtrar cliente" submitText="Filtrar" (close)="onClose()" [submitCallback]="submit">
+   <div class="my-2 w-96">
+        <label for="nomeCpf">Nome ou CPF</label>
+        <input name="nomeCpf" placeholder="Digite nome ou CPF" [ngModel]="valor">
+    </div>
+</modal>

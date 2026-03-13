@@ -1,0 +1,56 @@
+<div class="flex justify-center w-full divide-x divide-gray-300">
+    <div *ngFor="let rpt of [].constructor(repeatTimes); let i = index" class="w-full">
+        <table class="w-full border-separate border-spacing-0">
+            @if(!hideHeader) {
+            <thead>
+                <tr>
+                    @for (col of columns; track col.title; let first = $first; let last = $last) {
+                    <th [style.width.%]="col.size" class="text-left font-normal text-xs py-2 px-2 bg-[#f2ebff] border-t border-b border-primary"
+                        [ngClass]="first ? 'rounded-l-md border-l' : last ? 'rounded-r-md border-r' : ''">
+                        {{ col.title }}
+                    </th>
+                    }
+                </tr>
+            </thead>
+            }
+            @if(getDataForTable(i + 1).slice(skip).length > 0) {
+            <tbody>
+                @for(item of getDataForTable(i + 1).slice(skip); track item.cpf; let odd = $odd) {
+                <tr class="text-sm text-text [&>td]:h-12 [&>td]:items-center [&>td]:px-2"
+                    [ngClass]="odd ? '[&>td]:bg-gray-100 [&>td:first-child]:rounded-l-md [&>td:last-child]:rounded-r-md' : 'bg-white'">
+                    <ng-container *ngTemplateOutlet="desktopRowTmpl; context: { $implicit: item }"></ng-container>
+                </tr>
+                }
+            </tbody>
+            }
+        </table>
+        @if (getDataForTable(i + 1).slice(skip).length < 1) { <div class="text-xs text-center my-4">
+            Nenhum dado encontrado
+    </div>
+    }
+</div>
+</div>
+
+@if(currentPageData() && !hidePagination) {
+<div class="flex justify-between items-center mt-4 h-6 p-4">
+    <div class="text-xs items-center">
+        Mostrando
+        <span class="text-primary">{{ indexRange()[0] }}</span> -
+        <span class="text-primary">{{ indexRange()[1] }}</span> de
+        <span class="text-primary">{{ totalRecords() }}</span> registro(s)
+        <i class="fa-solid fa-rotate ml-2 cursor-pointer" (click)="fetch(false)"></i>
+    </div>
+
+    <div class="flex gap-1 items-center">
+        <span class="material-symbols-outlined"
+            [ngClass]="currentPageIndex() === 1 ? 'text-gray-300' : 'text-primary cursor-pointer'"
+            (click)="previous()">chevron_backward</span>
+
+        <p class="text-xs">Pagina {{ currentPageIndex() }} de {{ totalPages() }}</p>
+
+        <span class="material-symbols-outlined"
+            [ngClass]="currentPageIndex() < totalPages() ? 'text-primary cursor-pointer' : 'text-gray-300'"
+            (click)="next()">chevron_forward</span>
+    </div>
+</div>
+}

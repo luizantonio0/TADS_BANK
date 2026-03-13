@@ -1,8 +1,8 @@
 <div 
   [class.bg-cliente]="isClienteInicial"
-  [class.bg-login]="isLogin || isAutocadastro"
+  [class.bg-login]="isLogin || isAutocadastro "
   class="bg-cover">
-  <app-header></app-header>
+  <app-header [isGerente]="isGerente"></app-header>
   <div [class.px-24]="!isHome">
     <router-outlet />
   </div>

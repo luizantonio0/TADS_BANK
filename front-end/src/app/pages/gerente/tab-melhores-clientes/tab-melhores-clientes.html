@@ -1,0 +1,16 @@
+<p class="text-2xl font-bold text-primary mb-4">Seus melhores clientes:</p>
+<div class="flex flex-col gap-y-2">
+    @for (item of clientes.slice(0,3); track $index) {
+        <div class="flex gap-x-8 w-full p-4 bg-primary rounded-md" [ngClass]="$index == 0 ? 'bg-primary text-white' : 'bg-white text-primary border border-primary'">
+            <span class="text-8xl font-bold">{{ $index + 1}}º</span>
+            <div class="items-center justify-center flex flex-col">
+                <p class="text-3xl font-bold">{{ item.nome }} <span class="text-lg font-light">({{ item.cpf | cpf }})</span></p>
+                <div>
+                    <span>
+                        <span class="material-symbols-outlined">money</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>

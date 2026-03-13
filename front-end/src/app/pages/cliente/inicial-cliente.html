@@ -3,8 +3,8 @@
 <modal-transferir [control]="modalTransferirControl" (close)="modalTransferirControl = false"/>
 <modal-alterar-perfil [control]="modalAlterarPerfilControl" (close)="modalAlterarPerfilControl = false"/>
 
-<div class="h-main-screen flex gap-x-16">
-  <div class="h-full items-center flex flex-col justify-center w-2/3 py-6">
+<div class="h-main-screen flex gap-x-4">
+  <div class="h-full flex-1 items-center flex flex-col justify-center py-6">
     <div class="h-full w-full mb-4">
       <div style="backdrop-font: blur(4px);"
            class="w-full bg-[rgba(255,255,255,0.6)] border border-[#ccc3eb] h-full shadow-md items-center rounded-md flex flex-col justify-center">
@@ -51,7 +51,7 @@
       </div>
     </div>
   </div>
-  <div class="w-1/3 py-6">
+  <div class="py-6 w-150">
     <extrato />
   </div>
 </div>

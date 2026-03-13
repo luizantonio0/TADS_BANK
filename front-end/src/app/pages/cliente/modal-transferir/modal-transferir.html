@@ -1,0 +1,16 @@
+<modal icon="compare_arrows" title="Transferir saldo" [control]="control" (close)="onClose()"
+    [submitDisabled]="form.invalid" [submitCallback]="() => this.submit()">
+    <div class="w-96">
+        <form [formGroup]="form">
+
+            <label for="account">Informe o número da conta de destino</label>
+            <input type="text" mask="0*" maxlength="4" formControlName="account" name="account"
+                [dropSpecialCharacters]="true" placeholder="Informe uma conta">
+
+            <label for="amount" class="mt-2">Informe o valor</label>
+            <input type="text" mask="separator.2" prefix="R$ " thousandSeparator="." decimalMarker=","
+                formControlName="amount" name="amount" [dropSpecialCharacters]="true" placeholder="Informe um valor">
+
+        </form>
+    </div>
+</modal>

@@ -1,0 +1,27 @@
+<p class="text-2xl font-bold text-primary mb-4">Seus clientes:</p>
+<div>
+    <div class="mb-2">
+        <button class="flex gap-x-2" (click)="filtrando = true">
+            <span class="material-symbols-outlined">filter_alt</span>
+            <p>Filtrar</p>
+        </button>
+    </div>
+    <data-grid [columns]="colunas" [supplier]="supplier">
+        <ng-template #desktopRow let-item>
+            <td>{{ item.cpf | cpf }}</td>
+            <td>{{ item.nome }}</td>
+            <td>{{ item.cidade }}</td>
+            <td>{{ item.estado }}</td>
+            <td>{{ item.saldo | currency: 'BRL' }}</td>
+            <td>{{ item.limite | currency: 'BRL' }}</td>
+            <td class="flex gap-x-2 [&>button]:text-xs! [&>button]:h-auto! ">
+                <button class="my-auto items-center flex justify-center gap-x-0.5">
+                    <span class="material-symbols-outlined text-sm!">search</span>
+                    Consultar
+                </button>
+            </td>
+        </ng-template>
+    </data-grid>
+</div>
+
+<modal-filtrar-cliente [control]="filtrando" (close)="filtrando = false" />
