@@ -1,8 +1,8 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { Modal } from "../../../components/modal/modal";
+import { Modal } from '../../../../components/modal/modal';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgxMaskDirective } from 'ngx-mask';
-import { ToastService } from '../../../shared/service/toast/toast';
+import { ToastService } from '../../../../shared/service/toast/toast';
 
 @Component({
   selector: 'modal-depositar-sacar',

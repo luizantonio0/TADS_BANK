@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { Homepage } from './pages/homepage/homepage';
-import { Login } from './pages/login/login';
-import { Autocadastro } from './pages/autocadastro/autocadastro';
-import { InicialCliente } from './pages/inicial-cliente/inicial-cliente';
-import { PerfilCliente } from './pages/perfil-cliente/perfil-cliente';
+import { Homepage } from './pages/sem-perfil/homepage/homepage';
+import { Login } from './pages/sem-perfil/login/login';
+import { Autocadastro } from './pages/sem-perfil/autocadastro/autocadastro';
+import { InicialCliente } from './pages/cliente/inicial-cliente/inicial-cliente';
+import { PerfilCliente } from './pages/cliente/perfil-cliente/perfil-cliente';
 
 export const routes: Routes = [
   { path: '', component: Homepage, pathMatch: 'full' },
