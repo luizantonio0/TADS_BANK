@@ -51,7 +51,7 @@
           <input formControlName="cidade" name="numero" placeholder="Escolha sua cidade" readonly>
         </div>
       </div>
-      <button class="mt-4 h-10 w-full" type="submit">Solicitar cadastro</button>
+      <button class="mt-4 h-10 w-full" [disabled]="formCadastro.invalid" type="submit">Solicitar cadastro</button>
     </form>
   </div>
 </main>

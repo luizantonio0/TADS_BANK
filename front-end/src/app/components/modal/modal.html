@@ -6,12 +6,12 @@
                 <span class="material-symbols-outlined text-primary">{{icon}}</span>
                 <h1 class="text-xl text-primary">{{title}}</h1>
             </div>
-            <span class="material-symbols-outlined text-red-400 cursor-pointer" (click)="onClose()">close</span>
+            <span class="material-symbols-outlined text-red-500 cursor-pointer" (click)="onClose()">close</span>
         </div>
         <hr class="text-gray-300 my-2"/>
         <ng-content></ng-content>
         <div class="mt-2 flex gap-x-1 justify-end">
-            <button class="bg-red-400!" (click)="onClose()">Cancelar</button>
+            <button class="bg-red-500!" (click)="onClose()">Cancelar</button>
             @if(submitCallback) {
                 <button [disabled]="submitDisabled" (click)="submitCallback()">{{submitText ?? 'Confirmar'}}</button>
             }

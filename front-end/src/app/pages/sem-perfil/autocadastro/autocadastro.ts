@@ -24,7 +24,7 @@ export class Autocadastro {
     private fb: FormBuilder,
   ) {
     this.formCadastro = this.fb.group({
-      cpf: ['', [Validators.required, Validators.email]],
+      cpf: ['', [Validators.required]],
       nome: ['', [Validators.required], Validators.minLength(10)],
       telefone: ['', [Validators.required], Validators.minLength(10)],
       email: ['', [Validators.required, Validators.email]],
