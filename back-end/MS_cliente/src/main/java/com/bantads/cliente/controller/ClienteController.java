@@ -1,14 +1,16 @@
 package com.bantads.cliente.controller;
 
+import com.bantads.cliente.dto.AlterarDadosClienteDTO;
+import com.bantads.cliente.dto.AprovarClienteDTO;
+import com.bantads.cliente.dto.ClienteRequestDTO;
+import com.bantads.cliente.exceptions.AccountAlredyExists;
 import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.service.ClienteService;
-import com.bantads.cliente.dto.ClienteRequestDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/clientes")
@@ -25,24 +27,33 @@ public class ClienteController {
         return new ResponseEntity<>(clienteService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Cliente> findById(@PathVariable UUID id){
-        return new ResponseEntity<>(clienteService.findById(id), HttpStatus.OK);
+    @GetMapping("/{cpf}")
+    public ResponseEntity<Cliente> findByCpf(@PathVariable String cpf){
+        return new ResponseEntity<>(clienteService.findByCpf(cpf), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Cliente> save(@RequestBody ClienteRequestDTO cliente){
-        return new ResponseEntity<>(clienteService.save(cliente), HttpStatus.CREATED);
+    public ResponseEntity<Cliente> save(@RequestBody ClienteRequestDTO dto){
+
+        try{
+
+            var cliente =  clienteService.save(dto);
+            return new ResponseEntity<>(cliente, HttpStatus.CREATED);
+
+        } catch (AccountAlredyExists e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+    }
+    //TODO: Metodo deveria vir da conta e não do cliente
+    @PostMapping("/{cpf}")
+    public ResponseEntity<AprovarClienteDTO> aprovar(@PathVariable String cpf){
+        return new ResponseEntity<>(clienteService.aprovar(cpf, null, null), HttpStatus.CREATED);
     }
     
-    @PutMapping
-    public ResponseEntity<Cliente> update(@RequestBody Cliente cliente){
-        return new ResponseEntity<>(clienteService.update(cliente), HttpStatus.OK);
+    @PutMapping(value = "/{cpf}")
+    public ResponseEntity<Cliente> update(@PathVariable String cpf, @RequestBody AlterarDadosClienteDTO cliente){
+        return new ResponseEntity<>(clienteService.update(cliente, cpf), HttpStatus.OK);
     }
-    
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id){
-        clienteService.delete(id);
-    }
+
 }        
         

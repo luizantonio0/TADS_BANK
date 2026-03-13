@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 public record AlterarDadosClienteDTO (
         String email,
+        String senha,
         String nome,
         String telefone,
         BigDecimal salario,
