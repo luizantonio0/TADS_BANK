@@ -1,12 +1,13 @@
 <modal-depositar-sacar [control]="modalSacarControl" tipo="withdraw" (close)="modalSacarControl = false" />
 <modal-depositar-sacar [control]="modalDepositarControl" tipo="deposit" (close)="modalDepositarControl = false"/>
 <modal-transferir [control]="modalTransferirControl" (close)="modalTransferirControl = false"/>
+<modal-alterar-perfil [control]="modalAlterarPerfilControl" (close)="modalAlterarPerfilControl = false"/>
 
 <div class="h-main-screen flex gap-x-16">
   <div class="h-full items-center flex flex-col justify-center w-2/3 py-6">
     <div class="h-full w-full mb-4">
       <div style="backdrop-font: blur(4px);"
-           class="w-full bg-[rgba(255,255,255,0.4)] h-full shadow-md items-center rounded-md flex flex-col justify-center">
+           class="w-full bg-[rgba(255,255,255,0.6)] border border-[#ccc3eb] h-full shadow-md items-center rounded-md flex flex-col justify-center">
         <h1 class="text-lg font-light ml-1 mb-2">Olá, {{ currentAccount.name.split(' ')[0]}}</h1>
         <h1 class="text-6xl" [class.text-red-600]="currentAccount.balance < 0">
           {{ currentAccount.balance | currency: 'BRL' }}
@@ -24,7 +25,7 @@
             <span class="material-symbols-outlined">compare_arrows</span>
             Transferir
           </button>
-          <button class="h-12 text-md! items-center gap-x-1 flex justify-center w-36" >
+          <button class="h-12 text-md! items-center gap-x-1 flex justify-center w-36" (click)="modalAlterarPerfilControl = true">
             <span class="material-symbols-outlined">edit</span>
             Alterar perfil
           </button>
@@ -32,11 +33,21 @@
       </div>
     </div>
     <div class="grid grid-cols-2 gap-x-4 w-full">
-      <div class="bg-white w-full rounded-md py-8 flex gap-x-2 shadow-md">
-        <span class="material-symbols-outlined text-primary scale-150">finance</span>
+      <div class="bg-white w-full rounded-md py-4 shadow-md px-8 items-center border-l-4 border-l-primary border-[#ccc3eb] border">
+        <div class="flex items-center gap-x-2">
+          <span class="material-symbols-outlined text-primary">finance</span>
+          <p class="text-lg text-primary">Seu limite</p>
+        </div>
+        <p class="text-2xl ml-0.5">{{ currentAccount.limite | currency: 'BRL' }}</p>
+        <p class="text-xs ml-1 text-gray-400">Quanto maior seu salário, maior seu limite.</p>
       </div>
-      <div class="bg-white w-full rounded-md py-8 flex gap-x-2 shadow-md">
-        <span class="material-symbols-outlined text-primary">finance</span>
+      <div class="bg-white w-full rounded-md py-4 shadow-md px-8 items-center border-l-4 border-l-primary border-[#ccc3eb] border">
+        <div class="flex items-center gap-x-2">
+          <span class="material-symbols-outlined text-primary">support_agent</span>
+          <p class="text-lg text-primary">Seu gerente</p>
+        </div>
+        <p class="text-2xl ml-0.5">{{ currentAccount.gerente }}</p>
+        <p class="text-xs ml-1 text-gray-400">{{ currentAccount.email }}</p>
       </div>
     </div>
   </div>

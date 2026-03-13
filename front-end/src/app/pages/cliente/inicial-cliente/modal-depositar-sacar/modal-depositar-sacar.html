@@ -1,4 +1,4 @@
-<modal [title]="tipo == 'deposit' ? 'Depositar' : 'Sacar'" [control]="control" (close)="onClose()" [submitDisabled]="form.invalid" [submitCallback]="() => this.submit()">
+<modal [icon]="tipo == 'deposit' ? 'arrow_downward' : 'arrow_upward'" [title]="tipo == 'deposit' ? 'Depositar' : 'Sacar'" [control]="control" (close)="onClose()" [submitDisabled]="form.invalid" [submitCallback]="() => this.submit()">
     <div class="w-64">
         <form [formGroup]="form">
             <label for="amount">Informe o valor</label>

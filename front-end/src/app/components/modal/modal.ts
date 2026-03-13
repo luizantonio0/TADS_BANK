@@ -9,6 +9,7 @@ export class Modal {
   
   @Input({required: true}) control!: boolean;
   @Input({required: true}) title!: string;
+  @Input({required: true}) icon!: string;
   @Input() submitText?: string;
   @Input() submitCallback?: () => void;
   @Input() submitDisabled?: boolean;

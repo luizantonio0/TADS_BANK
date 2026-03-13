@@ -1,1 +1,75 @@
-<p>modal-alterar-perfil works!</p>
+<modal icon="person_edit" title="Informações pessoais" [control]="control" (close)="onClose()" [submitDisabled]="form.invalid" [submitCallback]="() => this.submit()" submitText="Salvar alterações">
+    <form class="space-y-4 w-full flex-grow flex flex-col">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-light text-slate-700 mb-1">Nome Completo</label>
+                <input
+                    class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3"
+                    type="text" value="João da Silva" />
+            </div>
+            <div>
+                <label class="block text-sm font-light text-slate-700 mb-1">CPF (Inalterável)</label>
+                <input
+                    class="w-full rounded-md bg-slate-100/50 border-slate-200 text-slate-500 cursor-not-allowed py-2 px-3"
+                    disabled type="text" value="123.456.789-00" />
+            </div>
+            <div>
+                <label class="block text-sm font-light text-slate-700 mb-1">E-mail</label>
+                <input
+                    class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3"
+                    type="email" value="joao.silva@email.com" />
+            </div>
+            <div>
+                <label class="block text-sm font-light text-slate-700 mb-1">Telefone</label>
+                <input
+                    class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3"
+                    type="text" value="(11) 98765-4321" />
+            </div>
+            <div>
+                <label class="block text-sm font-light text-slate-700 mb-1">CEP</label>
+                <input
+                    class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3"
+                    type="text" value="01234-567" />
+            </div>
+        </div>
+
+        <div class="pt-4 mt-4 border-t border-slate-200/60">
+            <h3 class="text-sm font-light text-slate-500 mb-4">Endereço</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-light text-slate-700 mb-1">Rua/Logradouro</label>
+                    <input
+                        class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3"
+                        type="text" value="Avenida Paulista" />
+                </div>
+                <div>
+                    <label class="block text-sm font-light text-slate-700 mb-1">Número</label>
+                    <input
+                        class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3"
+                        type="text" value="1000" />
+                </div>
+                <div>
+                    <label class="block text-sm font-light text-slate-700 mb-1">Complemento</label>
+                    <input
+                        class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3"
+                        type="text" value="Apto 42" />
+                </div>
+                <div>
+                    <label class="block text-sm font-light text-slate-700 mb-1">Cidade</label>
+                    <input
+                        class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3"
+                        type="text" value="São Paulo" />
+                </div>
+                <div>
+                    <label class="block text-sm font-light text-slate-700 mb-1">Estado</label>
+                    <select
+                        class="w-full rounded-md border-slate-200 bg-white/70 focus:ring-primary focus:border-primary py-2 px-3">
+                        <option selected value="SP">São Paulo</option>
+                        <option value="RJ">Rio de Janeiro</option>
+                        <option value="PR">Paraná</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+</modal>
