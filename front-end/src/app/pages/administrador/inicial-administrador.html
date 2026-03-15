@@ -1,0 +1,33 @@
+<div class="h-main-screen">
+    <div class="flex gap-x-4">
+
+        <div class="flex flex-col gap-y-2">
+
+            <button class="h-16 w-48"
+                (click)="selectedTab = 1"
+                [ngClass]="selectedTab == 1 ? 'bg-primary!' : 'bg-white!'">
+                Dashboard
+            </button>
+
+            <button class="h-16 w-48"
+                (click)="selectedTab = 2"
+                [ngClass]="selectedTab == 2 ? 'bg-primary!' : 'bg-white!'">
+                Relatório Clientes
+            </button>
+
+        </div>
+
+        <div class="flex-1">
+
+            @if(selectedTab == 1) {
+                <div>Dashboard administrador</div>
+            }
+
+            @if(selectedTab == 2) {
+                <div>Relatório clientes</div>
+            }
+
+        </div>
+
+    </div>
+</div>
