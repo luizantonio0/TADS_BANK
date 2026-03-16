@@ -8,7 +8,7 @@ import { ModalAlterarPerfil } from "./modal-alterar-perfil/modal-alterar-perfil"
 
 @Component({
   selector: 'app-inicial-cliente',
-  imports: [Extrato, ModalDepositarSacar, ModalTransferir, CurrencyPipe, RouterLink, ModalAlterarPerfil],
+  imports: [Extrato, ModalDepositarSacar, ModalTransferir, CurrencyPipe, ModalAlterarPerfil],
   templateUrl: './inicial-cliente.html'
 })
 export class InicialCliente {
