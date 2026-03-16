@@ -1,8 +1,13 @@
-<div 
+<div
   [class.bg-cliente]="isClienteInicial"
   [class.bg-login]="isLogin || isAutocadastro "
   class="bg-cover">
-  <app-header [isGerente]="isGerente"></app-header>
+ 
+  @if (isClienteInicial) {
+    <app-header-cliente></app-header-cliente>
+  } @else {
+    <app-header [isGerente]="isGerente"></app-header>
+  }
   <div [class.px-24]="!isHome">
     <router-outlet />
   </div>

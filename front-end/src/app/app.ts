@@ -1,12 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Header } from './components/header/header';
+import { HeaderCliente } from './components/header-cliente/header-cliente';
 import { ToastContainerComponent } from './components/toast/toast';
 import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToastContainerComponent, Header],
+  imports: [RouterOutlet, ToastContainerComponent, Header, HeaderCliente],
   templateUrl: './app.html'
 })
 export class App {
