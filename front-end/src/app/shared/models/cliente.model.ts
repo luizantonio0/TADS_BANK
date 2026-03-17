@@ -6,4 +6,11 @@ export interface Cliente {
   endereco: string;
   cidade: string;
   estado: string;
+
+  conta?: number;
+  telefone?: string;
+  saldo?: number;
+  limite?: number;
+  gerente_nome?: string;
+  gerente_email?: string;
 }

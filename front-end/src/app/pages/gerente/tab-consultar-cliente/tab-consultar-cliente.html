@@ -1,0 +1,118 @@
+<p class="text-2xl font-bold text-primary mb-4">Consultar cliente:</p>
+<div>
+    <div class="flex gap-x-2 w-64">
+        <input [(ngModel)]="cpf" mask="000.000.000-00" [dropSpecialCharacters]="true" name="cpf" placeholder="Digite o CPF">
+        <button class="w-8! h-8!">
+            <span class="material-symbols-outlined" (click)="submit()">search</span>
+        </button>
+    </div>
+    @if(cliente != null) {
+        <div class="grid grid-cols-12 w-3/5 gap-2 mt-4">
+
+            <div class="col-span-6">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">account_circle</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Nome</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.nome}}</p>
+            </div>
+
+            <div class="col-span-3">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">description</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">CPF</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.cpf | cpf}}</p>
+            </div>
+
+            <div class="col-span-3">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">description</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Conta</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.conta}}</p>
+            </div>
+
+            <div class="col-span-6">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">mail</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">E-mail</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.email}}</p>
+            </div>
+
+            <div class="col-span-6">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">phone</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Telefone</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.telefone??'' | telefone}}</p>
+            </div>
+
+            <div class="col-span-4">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">finance</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Salário</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.salario | currency: 'BRL'}}</p>
+            </div>
+
+            <div class="col-span-4">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">payments</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Saldo</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.saldo | currency: 'BRL'}}</p>
+            </div>
+
+            <div class="col-span-4">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">finance</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Limite</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.limite | currency: 'BRL'}}</p>
+            </div>
+
+            <div class="col-span-6">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">location_on</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Endereço</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.endereco}}</p>
+            </div>
+
+            <div class="col-span-4">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">location_on</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Endereço</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.cidade}}</p>
+            </div>
+
+            <div class="col-span-2">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">location_on</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Estado</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.estado}}</p>
+            </div>
+
+            <div class="col-span-6">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">badge</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Gerente</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.gerente_nome}}</p>
+            </div>
+
+            <div class="col-span-6">
+                <span class="flex gap-x-0.5 items-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]!">contact_mail</span>
+                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Gerente - Email</span>
+                </span>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.gerente_email}}</p>
+            </div>
+            
+        </div>
+    }
+</div>

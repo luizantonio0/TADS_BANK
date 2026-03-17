@@ -12,7 +12,7 @@ import { CpfPipe } from '../../../shared/pipe/cpf.pipe';
 })
 export class TabSolicitacoes {
 
-  clientes = Array.from({ length: 25 }, (_, i) => ({
+  clientes: Cliente[] = Array.from({ length: 25 }, (_, i) => ({
     cpf: Math.random().toString().slice(2, 13).padEnd(11, '0'),
     nome: `Cliente ${i + 1}`,
     email: `cliente${i + 1}@email.com.br`,
@@ -35,4 +35,5 @@ export class TabSolicitacoes {
       data: this.clientes.slice(req.page * req.page_size - req.page_size, req.page * req.page_size)
     })
   }
+  
 }

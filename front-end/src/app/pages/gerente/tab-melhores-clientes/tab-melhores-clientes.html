@@ -1,16 +1,33 @@
 <p class="text-2xl font-bold text-primary mb-4">Seus melhores clientes:</p>
 <div class="flex flex-col gap-y-2">
     @for (item of clientes.slice(0,3); track $index) {
-        <div class="flex gap-x-8 w-full p-4 bg-primary rounded-md" [ngClass]="$index == 0 ? 'bg-primary text-white' : 'bg-white text-primary border border-primary'">
-            <span class="text-8xl font-bold">{{ $index + 1}}º</span>
-            <div class="items-center justify-center flex flex-col">
-                <p class="text-3xl font-bold">{{ item.nome }} <span class="text-lg font-light">({{ item.cpf | cpf }})</span></p>
-                <div>
-                    <span>
-                        <span class="material-symbols-outlined">money</span>
-                    </span>
+    <div class="flex gap-x-8 w-full p-4 bg-primary rounded-md"
+        [ngClass]="$index == 0 ? 'bg-primary text-white' : 'bg-white text-primary border border-primary'">
+        <span class="text-8xl font-bold">{{ $index + 1}}º</span>
+        <div class="items-center justify-center">
+            <p class="text-3xl font-bold">{{ item.nome }}</p>
+            <div class="flex items-center gap-x-1 text-sm">
+                <div class="flex items-center gap-x-0.5">
+                    <span class="material-symbols-outlined text-sm!">description</span>
+                    <p class="font-semibold">CPF: </p>
                 </div>
+                <span class="font-light">{{ item.cpf | cpf }}</span>
+            </div>
+            <div class="flex items-center gap-x-1 text-sm">
+                <div class="flex items-center gap-x-0.5">
+                    <span class="material-symbols-outlined text-sm!">location_on</span>
+                    <p class="font-semibold">Cidade: </p>
+                </div>
+                <span class="font-light">{{ item.cidade }}, {{item.estado}}</span>
+            </div>
+            <div class="flex items-center gap-x-1 text-sm">
+                <div class="flex items-center gap-0.5">
+                    <span class="material-symbols-outlined text-sm!">payments</span>
+                    <p class="font-semibold">Saldo: </p>
+                </div>
+                <span class="font-light">{{ item.saldo | currency: 'BRL'}}</span>
             </div>
         </div>
+    </div>
     }
 </div>
