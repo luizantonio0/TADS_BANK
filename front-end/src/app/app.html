@@ -3,7 +3,9 @@
   [class.bg-login]="isLogin || isAutocadastro "
   class="bg-cover">
  
-  @if (isClienteInicial) {
+  @if (isAdmin) {
+    <app-header-administrador></app-header-administrador>
+  } @else if (isClienteInicial) {
     <app-header-cliente></app-header-cliente>
   } @else {
     <app-header [isGerente]="isGerente"></app-header>

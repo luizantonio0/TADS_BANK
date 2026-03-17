@@ -2,12 +2,13 @@ import { Component, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Header } from './components/header/header';
 import { HeaderCliente } from './components/header-cliente/header-cliente';
+import { HeaderAdministrador } from './components/header-administrador/header-administrador';
 import { ToastContainerComponent } from './components/toast/toast';
 import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToastContainerComponent, Header, HeaderCliente],
+  imports: [RouterOutlet, ToastContainerComponent, Header, HeaderCliente, HeaderAdministrador],
   templateUrl: './app.html'
 })
 export class App {
@@ -19,6 +20,7 @@ export class App {
   isClienteInicial = false;
   isAutocadastro = false;
   isLogin = false;
+  isAdmin = false;
 
   constructor(private router: Router) {
     this.router.events
@@ -29,6 +31,7 @@ export class App {
         this.isAutocadastro = event.url === '/autocadastro' || event.urlAfterRedirects === '/autocadastro';
         this.isClienteInicial = event.url === '/cliente' || event.urlAfterRedirects === '/cliente';
         this.isGerente = event.url === '/gerente' || event.urlAfterRedirects === '/gerente';
+        this.isAdmin = event.url.startsWith('/admin') || event.urlAfterRedirects.startsWith('/admin');
       });
   }
 
