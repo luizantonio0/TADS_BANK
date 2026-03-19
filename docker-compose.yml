@@ -1,8 +1,11 @@
 version: '3.8'
 
-#comentando por enquanto
-#include:
-#  - path: ./back-end/MS_auth/docker-compose.yml
+networks:
+  tadsbank:
+  auth:
+  cliente:
+  conta:
+  gerente:
 
 services:
   frontend-app:
@@ -13,9 +16,30 @@ services:
     ports:
       - "4200:80"
 
-networks:
-  tadsbank:
-  auth:
-  cliente:
-  conta:
-  gerente:
+  auth-ms-db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - auth
+
+  auth-ms:
+    build: .back-end/MS_Auth/Dockerfile
+    depends_on:
+      - auth-ms-db
+    environment:
+      JWT_SECRET: AYqQdMQcnW6JOCMyBS24A8GFbeRk4VTth6o8FlSDNIs
+    volumes:
+      - ./src:/app/src
+    command: mvn spring-boot:run
+    networks:
+      - auth
+      - tadsbank
+
+  gateway:
+    build: ./back-end/API_Gateway/Dockerfile
+    networks:
+      - tadsbank
+
