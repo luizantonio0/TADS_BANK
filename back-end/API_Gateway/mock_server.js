@@ -51,6 +51,11 @@ app.put('/clientes', (req, res) => {
 
 // =============================== CONTAS =================================
 
+app.get('/contas/:numero', (req, res) => {
+    return res.status(200).json(
+        dados.GET.contas.default
+    )
+})
 app.get('/contas/:numero/saldo', (req, res) => {
     return res.status(200).json(
         dados.GET.contas.default

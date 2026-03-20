@@ -1,14 +1,26 @@
-require('dotenv').config();
+//require('dotenv').config();
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 const PORT = 3000;
 
+
+// Original
+// const services = {
+//     ms_auth: "http://auth-ms:8055",
+// };
+
+
+//Mockado
 const services = {
-    ms_auth: "http://auth-ms:8055",
-    ms_cliente: "http://localhost:8080"
+    ms_auth: "http://localhost:3001",
+    clientes: "http://localhost:3001",
+    contas: "http://localhost:3001",
+    gerentes: "http://localhost:3001"
 };
+
+/*
 
 const publicRoutes = ['/ms_auth/auth/login', '/ms_auth/auth/validate'];
 
@@ -45,18 +57,44 @@ app.use(async (req, res, next) => {
         res.status(500).json({ error: "Serviço de autenticação indisponível." });
     }
 });
+*/
 
-app.use('/ms_auth', createProxyMiddleware({
+app.use(createProxyMiddleware({
+    pathFilter: '/clientes',
+    target: services.clientes,
+    changeOrigin: true
+}));
+
+app.use(createProxyMiddleware({
+    pathFilter: '/logout',
     target: services.ms_auth,
-    changeOrigin: true,
-    pathRewrite: { '^/ms_auth': '' }
+    changeOrigin: true
 }));
 
-app.use('/ms_cliente', createProxyMiddleware({
-    target: services.ms_cliente,
-    changeOrigin: true,
-    pathRewrite: { '^/ms_cliente': '' }
+app.use(createProxyMiddleware({
+    pathFilter: '/gerentes',
+    target: services.gerentes,
+    changeOrigin: true
 }));
+
+app.use(createProxyMiddleware({
+    pathFilter: '/contas',
+    target: services.contas,
+    changeOrigin: true
+}));
+
+app.use(createProxyMiddleware({
+    pathFilter: '/login',
+    target: services.ms_auth,
+    changeOrigin: true
+}));
+
+// app.use(createProxyMiddleware({
+//     pathFilter: '/ms_auth',
+//     target: services.ms_auth,
+//     changeOrigin: true,
+//     pathRewrite: { '^/ms_auth': '' }
+// }));
 
 
 app.listen(PORT, () => {
