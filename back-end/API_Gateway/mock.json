@@ -1,0 +1,144 @@
+{
+  "GET": {
+    "clientes": {
+        "cpf": "12912861012",
+        "nome": "Catharyna",
+        "telefone": "(41) 9 9999-8989",
+        "email": "cli1@bantads.com.br",
+        "endereco": "Rua X, nr 10",
+        "cidade": "Curitib",
+        "estado": "PR",
+        "salario": 800,
+        "conta": "1291",
+        "saldo": "1291",
+        "limite": 5000,
+        "gerente": "98574307084",
+        "gerente_nome": "Geniéve",
+        "gerente_email": "ger1@bantads.com.br"
+    },
+    "contas": {
+      "default": {
+        "cliente": "76179646090",
+        "conta": "0556",
+        "saldo": 1506.88
+      },
+      "extrato": {
+        "conta": "8722",
+        "saldo": 1933.32,
+        "movimentacoes": [
+          {
+            "data": "2025-08-01T10:22:45-03:00",
+            "tipo": "saque",
+            "origem": "8872",
+            "destino": "9961",
+            "valor": 972.22
+          }
+        ]
+      }
+    },
+    "gerentes": [
+      {
+        "gerente": {
+          "cpf": "40501740066",
+          "nome": "Geniéve",
+          "email": "ger1@bantads.com.br",
+          "tipo": "ADMINISTRADOR"
+        },
+        "clientes": [
+          {
+            "cliente": "40501740066",
+            "numero": "7811",
+            "saldo": 1099.21,
+            "limite": 5000,
+            "gerente": "23862179060",
+            "criacao": "2025-08-01T16:27:48-03:00"
+          }
+        ],
+        "saldo_positivo": 89123.22,
+        "saldo_negativo": -982.35
+      }
+    ],
+    "reboot": {}
+  },
+  "POST": {
+    "clientes": {
+      "default": {
+        "cpf": "string",
+        "email": "string",
+        "nome": "string",
+        "telefone": "string",
+        "salario": 0,
+        "endereco": "string",
+        "CEP": "string",
+        "cidade": "string",
+        "estado": "string"
+      },
+      "aprovar": {
+        "cliente": "76179646090",
+        "numero": "0114",
+        "saldo": 2000,
+        "limite": 1000,
+        "gerente": "98574307084",
+        "criacao": "2025-08-01T10:22:45-03:00"
+      },
+      "rejeitar": {
+        "motivo": "Usuário não é interessante para o banco"
+      }
+
+    },
+    "contas": {
+      "depositar":{
+        "valor": 51.44
+      },
+      "sacar": {
+        "valor": 51.44
+      },
+      "transferir": {
+        "destino": "0123",
+        "valor": 51.44
+      }
+    },
+    "gerentes": {
+      "cpf": "40501740066",
+      "nome": "Geniéve",
+      "email": "ger1@bantads.com.br",
+      "tipo": "ADMINISTRADOR",
+      "senha": "tads"
+    },
+    "login": {
+      "login": "string",
+      "senha": "string"
+    },
+    "logout": {
+      "cpf": "string",
+      "nome": "string",
+      "email": "string",
+      "tipo": "string"
+    }
+  },
+  "PUT": {
+    "clientes": {
+      "nome": "Crysthôncio",
+      "email": "crys@bantads.com.br",
+      "salario": 1506.88,
+      "endereco": "Rua das Palmeiras, 500",
+      "CEP": "80000000",
+      "cidade": "Curitiba",
+      "estado": "PR"
+    },
+    "gerentes": {
+      "cpf": "40501740066",
+      "nome": "Geniéve",
+      "email": "ger1@bantads.com.br",
+      "tipo": "ADMINISTRADOR"
+    }
+  },
+  "DELETE": {
+    "gerentes":  {
+      "cpf": "40501740066",
+      "nome": "Geniéve",
+      "email": "ger1@bantads.com.br",
+      "tipo": "ADMINISTRADOR"
+      }
+  }
+}
