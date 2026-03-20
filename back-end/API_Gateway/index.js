@@ -32,7 +32,7 @@ app.use(async (req, res, next) => {
         return next();
     } catch (err) {
         console.error(err);
-        res.status(505).json({
+        res.status(500).json({
             error: "Algo deu errado. Tente novamente mais tarde."
         });
     }
