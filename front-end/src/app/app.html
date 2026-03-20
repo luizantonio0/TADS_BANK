@@ -2,7 +2,7 @@
   [class.bg-cliente]="isClienteInicial"
   [class.bg-login]="isLogin || isAutocadastro "
   class="bg-cover">
- 
+
   @if (isAdmin) {
     <app-header-administrador></app-header-administrador>
   } @else if (isClienteInicial) {
@@ -10,7 +10,7 @@
   } @else {
     <app-header [isGerente]="isGerente"></app-header>
   }
-  <div [class.px-24]="!isHome">
+  <div [class.md:px-24]="!isHome" class="px-12">
     <router-outlet />
   </div>
 </div>
