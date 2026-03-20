@@ -3,28 +3,24 @@ package com.bantads.auth.controller;
 import com.bantads.auth.dto.LoginDTO;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.service.JwtService;
-import org.apache.coyote.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
     private JwtService jwtService;
-
-    @Autowired
     private AuthService authService;
-
-    @Autowired
     private UserDetailsService userDetailsService;
+
+    public AuthController(JwtService jwtService, AuthService authService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.authService = authService;
+        this.userDetailsService = userDetailsService;
+    }
 
     @GetMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {

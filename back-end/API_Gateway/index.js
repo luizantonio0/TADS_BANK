@@ -6,7 +6,7 @@ const app = express();
 const PORT = 3000;
 
 const services = {
-    ms_auth: "http://tadsbank:8055",
+    ms_auth: "http://auth-ms:8055",
     ms_cliente: "http://localhost:8080"
 };
 
@@ -52,5 +52,5 @@ app.use('/ms_auth', createProxyMiddleware({
 
 
 app.listen(PORT, () => {
-    console.log(`API Gateway rodando em http://tadsbank:${PORT}`);
+    console.log(`API Gateway rodando em http://gateway:${PORT}`);
 });

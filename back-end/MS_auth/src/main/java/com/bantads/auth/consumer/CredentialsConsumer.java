@@ -11,11 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CredentialsConsumer {
 
-    @Autowired
     private AuthService authService;
+
+    public CredentialsConsumer(AuthService authService) {
+        this.authService = authService;
+    }
 
     @RabbitListener(queues = "ms_auth.credentials.create")
     public void consumeCreate(CredentialsCreateDTO dto) {
+        System.out.println(dto.cpf());
         try {
             authService.createCredentials(dto.email(), dto.cpf(), dto.password());
         } catch (CredentialsAlreadyExistsException | IllegalArgumentException ex) {

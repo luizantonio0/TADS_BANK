@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
-    @Autowired
     private CredentialsRepository credentialsRepository;
-
-    @Autowired
     private PasswordEncoder encoder;
+
+    public AuthService(CredentialsRepository credentialsRepository, PasswordEncoder encoder) {
+        this.credentialsRepository = credentialsRepository;
+        this.encoder = encoder;
+    }
 
     public boolean login(String login, String senha) {
         var credentials = credentialsRepository.findByEmail(login);

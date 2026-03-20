@@ -1,5 +1,8 @@
 version: '3.8'
 
+volumes:
+  rabbitmq_data:
+
 networks:
   tadsbank:
   auth:
@@ -15,6 +18,29 @@ services:
     container_name: tadsbank-frontend
     ports:
       - "4200:80"
+    
+  gateway:
+    build:
+      context: ./back-end/API_Gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - tadsbank
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - tadsbank
 
   auth-ms-db:
     image: mongo
@@ -22,24 +48,32 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - auth
+    ports:
+      - "27017:27017"
 
   auth-ms:
-    build: .back-end/MS_Auth/Dockerfile
+    build:
+      context: ./back-end/MS_Auth
+      dockerfile: Dockerfile
     depends_on:
-      - auth-ms-db
+      rabbitmq:
+        condition: service_started
+      auth-ms-db:
+        condition: service_healthy
     environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@auth-ms-db:27017/ms_auth
       JWT_SECRET: AYqQdMQcnW6JOCMyBS24A8GFbeRk4VTth6o8FlSDNIs
     volumes:
-      - ./src:/app/src
-    command: mvn spring-boot:run
+      - ./back-end/MS_Auth:/app 
+    command: ./gradlew bootRun --no-daemon
     networks:
       - auth
-      - tadsbank
-
-  gateway:
-    build: ./back-end/API_Gateway/Dockerfile
-    networks:
       - tadsbank
 
