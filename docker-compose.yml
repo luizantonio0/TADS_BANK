@@ -23,10 +23,16 @@ services:
     build:
       context: ./back-end/API_Gateway
       dockerfile: Dockerfile
+    volumes:
+      - ./back-end/API_Gateway:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
     ports:
       - "3000:3000"
     networks:
       - tadsbank
+    command: npx nodemon index.js
 
   rabbitmq:
     image: rabbitmq:3-management

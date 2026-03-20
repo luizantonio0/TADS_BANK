@@ -44,9 +44,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+        System.out.println("Chegou aqui");
         if(authService.login(loginDTO.login(), loginDTO.senha())) {
+            System.out.println("1");
             return ResponseEntity.ok("Login efetuado com sucesso");
         }
+        System.out.println("2");
         return ResponseEntity.status(401).body("Usuário/Senha inválidos");
     }
 

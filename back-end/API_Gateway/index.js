@@ -10,39 +10,41 @@ const services = {
     ms_cliente: "http://localhost:8080"
 };
 
+const publicRoutes = ['/ms_auth/auth/login', '/ms_auth/auth/validate'];
+
 app.use(async (req, res, next) => {
+
+    console.log(req.path)
+
+    if (publicRoutes.some(route => req.path.startsWith(route))) {
+        return next();
+    }
+
     if (req.path.startsWith('/ms_auth')) {
         return next();
     }
+
     try {
         const token = req.headers['authorization'];
+        if (!token) return res.status(401).json({ error: "Token ausente." });
+
         const authResp = await fetch(`${services.ms_auth}/auth/validate`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
+                'Authorization': token,
             }
         });
+
         if (!authResp.ok) {
-            res.status(401).json({
-                error: "Faça login novamente."
-            });
-            return;
+            return res.status(401).json({ error: "Faça login novamente." });
         }
-        return next();
+        
+        next();
     } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            error: "Algo deu errado. Tente novamente mais tarde."
-        });
+        console.error("Erro no Gateway:", err.message);
+        res.status(500).json({ error: "Serviço de autenticação indisponível." });
     }
 });
-
-app.use('/ms_cliente', createProxyMiddleware({
-    target: services.ms_cliente,
-    changeOrigin: true,
-    pathRewrite: { '^/ms_cliente': '' }
-}));
 
 app.use('/ms_auth', createProxyMiddleware({
     target: services.ms_auth,
@@ -50,7 +52,13 @@ app.use('/ms_auth', createProxyMiddleware({
     pathRewrite: { '^/ms_auth': '' }
 }));
 
+app.use('/ms_cliente', createProxyMiddleware({
+    target: services.ms_cliente,
+    changeOrigin: true,
+    pathRewrite: { '^/ms_cliente': '' }
+}));
+
 
 app.listen(PORT, () => {
-    console.log(`API Gateway rodando em http://gateway:${PORT}`);
+    console.log(`API Gateway rodando em http://localhost:${PORT}`);
 });
