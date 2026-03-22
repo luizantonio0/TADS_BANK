@@ -5,10 +5,11 @@ import { HeaderCliente } from './components/header-cliente/header-cliente';
 import { HeaderAdministrador } from './components/header-administrador/header-administrador';
 import { ToastContainerComponent } from './components/toast/toast';
 import { filter } from 'rxjs';
+import { Footer } from './components/footer/footer';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToastContainerComponent, Header, HeaderCliente, HeaderAdministrador],
+  imports: [RouterOutlet, ToastContainerComponent, Header, HeaderCliente, HeaderAdministrador, Footer],
   templateUrl: './app.html'
 })
 export class App {
