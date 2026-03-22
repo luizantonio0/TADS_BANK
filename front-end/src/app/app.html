@@ -3,13 +3,7 @@
   [class.bg-login]="isLogin || isAutocadastro "
   class="bg-cover">
 
-  @if (isAdmin) {
-    <app-header-administrador></app-header-administrador>
-  } @else if (isClienteInicial) {
-    <app-header-cliente></app-header-cliente>
-  } @else {
-    <app-header [isGerente]="isGerente"></app-header>
-  }
+  <app-header [isAdmin]="isAdmin" [isGerente]="isGerente" [isCliente]="isClienteInicial" [isPublic]="!isAdmin && !isGerente && !isClienteInicial"></app-header>
   <div [class.md:px-24]="!isHome" class="px-12">
     <router-outlet />
   </div>

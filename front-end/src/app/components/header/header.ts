@@ -1,12 +1,24 @@
 import { Component, Input } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './header.html',
-  styleUrl: './header.css',
+  styleUrls: ['./header.css'],
 })
 export class Header {
-  @Input() isGerente = false;
+  @Input() isAdmin: boolean = false;
+  @Input() isGerente: boolean = false;
+  @Input() isCliente: boolean = false;
+  @Input() isPublic: boolean = false; 
+
+  constructor(private router: Router) {}
+
+  logout(): void {
+    localStorage.removeItem('usuarioLogado');
+    this.router.navigate(['/login']);
+  }
 }
