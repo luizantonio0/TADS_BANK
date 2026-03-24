@@ -23,14 +23,13 @@ public class AuthService {
         return credentials.filter(value -> encoder.matches(senha, value.getPassword())).isPresent();
     }
 
-    public void createCredentials(String email, String cpf, String senha) {
-        if(email == null || cpf == null || senha == null || email.trim().isEmpty() || cpf.trim().isEmpty() || senha.trim().isEmpty()) {
+    public void createCredentials(String email, String cpf, String cryptoPw) {
+        if(email == null || cpf == null || cryptoPw == null || email.trim().isEmpty() || cpf.trim().isEmpty() || senha.trim().isEmpty()) {
             throw new IllegalArgumentException("Email, CPF e Senha devem ser preenchidos.");
         }
         if(credentialsRepository.existsById(cpf)) {
             throw new CredentialsAlreadyExistsException();
         }
-        var cryptoPw = encoder.encode(senha);
         credentialsRepository.insert(new Credentials(cpf, email, cryptoPw));
     }
 

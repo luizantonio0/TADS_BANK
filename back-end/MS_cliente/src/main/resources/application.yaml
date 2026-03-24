@@ -2,7 +2,7 @@ spring:
   application:
     name: cliente
   datasource:
-    url: jdbc:postgresql://localhost:5000/cliente_db
+    url: jdbc:postgresql://postgres:5000/cliente_db
     username: postgres
     password: '123456'
     driver-class-name: org.postgresql.Driver #
@@ -18,3 +18,7 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+mail:
+  username: ${GMAIL_USERNAME}
+  password: ${GMAIL_PASSWORD}

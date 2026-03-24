@@ -64,6 +64,26 @@ services:
     ports:
       - "27017:27017"
 
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cliente
+      - conta
+      - gerente
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
   auth-ms:
     build:
       context: ./back-end/MS_Auth
@@ -74,7 +94,6 @@ services:
       auth-ms-db:
         condition: service_healthy
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://admin:password@auth-ms-db:27017/ms_auth
       JWT_SECRET: AYqQdMQcnW6JOCMyBS24A8GFbeRk4VTth6o8FlSDNIs
     volumes:
       - ./back-end/MS_Auth:/app 
@@ -82,4 +101,23 @@ services:
     networks:
       - auth
       - tadsbank
+
+  auth-cliente:
+    build:
+      context: ./back-end/MS_Cliente
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./back-end/MS_Cliente:/usr/app/src 
+    command: ./gradlew bootRun --no-daemon
+    networks:
+      - cliente
+      - tadsbank
+    
+
+
 
