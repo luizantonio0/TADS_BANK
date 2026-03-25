@@ -11,6 +11,7 @@ networks:
   gerente:
 
 services:
+
   frontend-app:
     build:
       context: ./front-end
@@ -47,6 +48,18 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - tadsbank
+
+  redis:
+    image: redis:8.6.2-alpine
+    container_name: tads-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tads-network
+    command: ["redis-server", "--appendonly", "yes"]
 
   auth-ms-db:
     image: mongo

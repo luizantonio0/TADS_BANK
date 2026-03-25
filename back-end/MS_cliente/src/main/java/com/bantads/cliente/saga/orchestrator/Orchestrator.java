@@ -1,15 +1,20 @@
 package com.bantads.cliente.saga.orchestrator;
 
 import com.bantads.cliente.saga.dto.OrchestrationResultDTO;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-// orchestrator só cuida das transações
+@Component
 public class Orchestrator {
 
     private static final Map<Long, Orchestration> orchestrations = new HashMap<>();
-    private static final Map<Long, OrchestratorCommand<?>> pendingCommands = new HashMap<>();
+
+    public static boolean orchestrate(Orchestration orchestration) {
+        orchestrations.put(orchestration.getId(), orchestration);
+
+    }
 
     public static void onResult(OrchestrationResultDTO dto) {
 

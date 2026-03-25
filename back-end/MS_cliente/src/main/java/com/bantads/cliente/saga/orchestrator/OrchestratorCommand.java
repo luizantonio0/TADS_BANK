@@ -6,33 +6,24 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class OrchestratorCommand<T> {
 
-    private long id;
-    private long orchestrationId;
-    private boolean ok;
-    private T dto;
-    private Service target;
+    private final long id;
+    private long idOrchestration;
+    private final T dto;
+    private final Service target;
 
-    public OrchestratorCommand(Service target, long orchestrationId, T dto) {
+    public OrchestratorCommand(Service target, long idOrchestration, T dto) {
         this.id = ThreadLocalRandom.current().nextLong();
         this.dto = dto;
         this.target = target;
-        this.orchestrationId = orchestrationId;
+        this.idOrchestration = idOrchestration;
     }
 
     public long getId() {
         return id;
     }
 
-    public boolean isOk() {
-        return ok;
-    }
-
-    public void setOk(boolean b) {
-        this.ok = b;
-    }
-
     public long getOrchestrationId() {
-        return orchestrationId;
+        return idOrchestration;
     }
 
     public Service getTarget() {
