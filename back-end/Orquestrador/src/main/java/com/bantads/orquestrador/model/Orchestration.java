@@ -5,19 +5,29 @@ import java.util.UUID;
 
 public class Orchestration {
 
-    private UUID idOrchestration;
+    private UUID id;
+    private boolean failed;
     private List<Command<?>> commands;
 
-    public Orchestration(UUID idOrchestration, List<Command<?>> commands) {
-        this.idOrchestration = idOrchestration;
+    public Orchestration(UUID id, List<Command<?>> commands) {
+        this.id = id;
         this.commands = commands;
+        this.failed = false;
     }
 
-    public UUID getIdOrchestration() {
-        return idOrchestration;
+    public boolean failed() {
+        return failed;
     }
 
-    public List<Command<?>> getCommands() {
+    public void setFailed(boolean failed) {
+        this.failed = failed;
+    }
+
+    public UUID id() {
+        return id;
+    }
+
+    public List<Command<?>> commands() {
         return commands;
     }
 }
