@@ -15,13 +15,18 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue credentialsCreateQueue() {
-        return new Queue("ms_auth.credentials.create", true);
+    public Queue commandQueue() {
+        return new Queue("ms_auth.command", true);
     }
 
     @Bean
-    public Queue credentialsUpdateQueue() {
-        return new Queue("ms_auth.credentials.update", true);
+    public Queue resultQueue() {
+        return new Queue("orchestration.result", true);
+    }
+
+    @Bean
+    public Queue confirmQueue() {
+        return new Queue("orchestration.confirm", true);
     }
 
 }
