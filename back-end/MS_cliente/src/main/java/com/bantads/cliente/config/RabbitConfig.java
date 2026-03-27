@@ -1,4 +1,4 @@
-package com.bantads.auth.configuration;
+package com.bantads.cliente.config;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
@@ -15,13 +15,8 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue commandQueue() {
-        return new Queue("ms-auth.command", true);
-    }
-
-    @Bean
-    public Queue resultQueue() {
-        return new Queue("orchestration.result", true);
+    public Queue orchestrationCommandQueue() {
+        return new Queue("orchestration.orchestrate", true);
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package com.bantads.orquestrador.dto;
+package com.bantads.cliente.dto.orchestrator;
 
 import com.bantads.orquestrador.model.Command;
 

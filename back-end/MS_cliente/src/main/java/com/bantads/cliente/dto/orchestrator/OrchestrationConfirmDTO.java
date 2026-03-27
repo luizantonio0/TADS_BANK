@@ -1,4 +1,4 @@
-package com.bantads.orquestrador.dto;
+package com.bantads.cliente.dto.orchestrator;
 
 import java.util.List;
 import java.util.UUID;

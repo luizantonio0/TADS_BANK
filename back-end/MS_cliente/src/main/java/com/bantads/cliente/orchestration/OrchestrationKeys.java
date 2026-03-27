@@ -1,4 +1,4 @@
-package com.bantads.auth.orchestration;
+package com.bantads.cliente.orchestration;
 
 public class OrchestrationKeys {
 
@@ -13,5 +13,6 @@ public class OrchestrationKeys {
     public static final String MS_CLIENTE = "ms-cliente";
 
     public static final String CREATE_CREDENTIALS_COMMAND = "CreateCredentials";
+    public static final String CREATE_CONTA_COMMAND = "CreateConta";
 
 }

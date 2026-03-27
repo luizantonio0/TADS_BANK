@@ -1,5 +1,6 @@
 package com.bantads.orquestrador.component;
 
+import com.bantads.orquestrador.dto.OrchestrationConfirmDTO;
 import com.bantads.orquestrador.dto.OrchestrationRequestDTO;
 import com.bantads.orquestrador.dto.OrchestrationResultDTO;
 import com.bantads.orquestrador.service.OrchestratorService;
@@ -22,8 +23,8 @@ public class RabbitConsumer {
     }
 
     @RabbitListener(queues = "orchestration.orchestrate")
-    public void consumeOrchestrateRequest(OrchestrationRequestDTO dto) {
-        orchestrator.orchestrate(dto);
+    public OrchestrationConfirmDTO consumeOrchestrateRequest(OrchestrationRequestDTO dto) {
+        return orchestrator.orchestrate(dto);
     }
 
     @RabbitListener(queues = "orchestration.result")

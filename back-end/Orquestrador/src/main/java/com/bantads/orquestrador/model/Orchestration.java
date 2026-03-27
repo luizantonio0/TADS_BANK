@@ -7,12 +7,14 @@ public class Orchestration {
 
     private UUID id;
     private boolean failed;
+    private List<String> errors;
     private List<Command<?>> commands;
 
-    public Orchestration(UUID id, List<Command<?>> commands) {
+    public Orchestration(UUID id, boolean failed, List<String> errors, List<Command<?>> commands) {
         this.id = id;
         this.commands = commands;
-        this.failed = false;
+        this.failed = failed;
+        this.errors = errors;
     }
 
     public boolean failed() {
@@ -29,5 +31,9 @@ public class Orchestration {
 
     public List<Command<?>> commands() {
         return commands;
+    }
+
+    public List<String> getErrors() {
+        return errors;
     }
 }
