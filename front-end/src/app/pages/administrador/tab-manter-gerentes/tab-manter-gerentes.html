@@ -1,12 +1,13 @@
 <app-modal-editar-gerente [control]="exibirModalEditar" (close)="exibirModalEditar = false" />
 <app-modal-excluir-gerente [control]="exibirModalExcluir" (close)="exibirModalExcluir = false"/>
+<app-modal-adicionar-gerente [control]="exibirModalAdicionar" (close)="exibirModalAdicionar = false"/>
 
 <div class="p-4 bg-white border border-primary rounded-lg shadow-md">
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
       <span class="material-symbols-outlined">manage_accounts</span> Gerenciamento de Gerentes
     </h2>
-    <button class="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-opacity-90">
+    <button (click)="exibirModalAdicionar = true" class="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-opacity-90">
       <span class="material-symbols-outlined">person_add</span> Novo Gerente
     </button>
   </div>
