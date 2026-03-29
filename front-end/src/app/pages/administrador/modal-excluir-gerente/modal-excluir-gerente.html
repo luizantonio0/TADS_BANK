@@ -1,0 +1,21 @@
+<modal 
+  [control]="control" 
+  title="Excluir Gerente" 
+  icon="delete_forever"
+  submitText="Confirmar Exclusão"
+  [submitCallback]="submit"
+  (close)="onClose()">
+
+  <div class="flex flex-col gap-8 w-[280px] md:w-[420px] py-6 text-center">
+    <div class="flex flex-col items-center gap-2">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-2">
+        <span class="material-symbols-outlined text-red-600 text-[40px]">warning</span>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800">Você tem certeza?</h3>
+      <p class="text-gray-600 text-sm leading-relaxed">
+        Deseja realmente excluir o gerente <span class="font-bold text-gray-800 text-base block my-1">Geniéve?</span>
+        As contas atreladas a este gerente serão automaticamente transferidas para o gerente com menos contas no momento.
+      </p>
+    </div>
+  </div>
+</modal>
