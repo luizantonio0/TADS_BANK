@@ -1,7 +1,6 @@
-version: '3.8'
-
 volumes:
   rabbitmq_data:
+  redis_data:
 
 networks:
   tadsbank:
@@ -9,6 +8,7 @@ networks:
   cliente:
   conta:
   gerente:
+  tads-network:
 
 services:
 
@@ -18,7 +18,7 @@ services:
       dockerfile: Dockerfile
     container_name: tadsbank-frontend
     ports:
-      - "4200:80"
+      - "4200:4200"
     
   gateway:
     build:
