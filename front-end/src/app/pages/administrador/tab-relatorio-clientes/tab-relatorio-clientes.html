@@ -1,27 +1,32 @@
-<div class="p-4 bg-white border border-primary rounded-lg shadow-md">
+<div class="bg-white rounded-lg shadow p-4">
   <h2 class="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
-    <span class="material-symbols-outlined">description</span> Relatório Geral de Clientes
+    <span class="material-symbols-outlined">description</span>
+    Relatório Geral de Clientes
   </h2>
+
   <div class="overflow-x-auto">
-    <table class="w-full text-sm border-collapse">
-      <thead>
-        <tr class="bg-gray-100 text-primary">
-          <th class="p-2 border">Cliente (CPF)</th>
-          <th class="p-2 border">E-mail</th>
-          <th class="p-2 border">Conta</th>
-          <th class="p-2 border text-right">Saldo</th>
-          <th class="p-2 border text-right">Limite</th>
-          <th class="p-2 border">Gerente</th>
+    <table class="w-full text-sm text-left">
+      <thead class="text-xs uppercase bg-gray-100 text-gray-600">
+        <tr>
+          <th class="px-4 py-3">Cliente (CPF)</th>
+          <th class="px-4 py-3">E-mail</th>
+          <th class="px-4 py-3">Conta</th>
+          <th class="px-4 py-3 text-right">Saldo</th>
+          <th class="px-4 py-3 text-right">Limite</th>
+          <th class="px-4 py-3">Gerente</th>
         </tr>
       </thead>
+
       <tbody>
-        <tr class="hover:bg-gray-50">
-          <td class="p-2 border font-medium">Catharyna (129.128.610-12)</td>
-          <td class="p-2 border">cli1@bantads.com.br</td>
-          <td class="p-2 border text-center">1291</td>
-          <td class="p-2 border text-right text-blue-600">R$ 800,00</td>
-          <td class="p-2 border text-right">R$ 5.000,00</td>
-          <td class="p-2 border text-xs text-gray-600">Geniéve (CPF: 985...)</td>
+        <tr class="border-t hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3 font-medium">Catharyna (129.128.610-12)</td>
+          <td class="px-4 py-3">cli1@bantads.com.br</td>
+          <td class="px-4 py-3 text-center">1291</td>
+          <td class="px-4 py-3 text-right text-blue-600">R$ 800,00</td>
+          <td class="px-4 py-3 text-right">R$ 5.000,00</td>
+          <td class="px-4 py-3 text-xs text-gray-600">
+            Geniéve (CPF: 985...)
+          </td>
         </tr>
       </tbody>
     </table>

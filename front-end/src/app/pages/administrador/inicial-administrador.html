@@ -1,26 +1,31 @@
 <div class="h-main-screen">
     <div class="flex gap-x-4">
         <div class="flex flex-col gap-y-2">
-            <button class="h-16 w-48 flex items-center justify-center gap-x-2 text-lg font-medium transition-colors"
+
+            <button
+                class="h-16 w-48 flex items-center justify-center gap-x-2 text-lg font-medium transition-colors"
                 (click)="selectedTab = 1"
                 [ngClass]="selectedTab == 1 ? 'bg-primary! text-white!' : 'bg-white! text-primary! border border-primary'">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span>Dashboard</span>
             </button>
 
-            <button class="h-16 w-48 flex items-center justify-center gap-x-2 text-lg font-medium transition-colors"
+            <button
+                class="h-16 w-48 flex items-center justify-center gap-x-2 text-lg font-medium transition-colors"
                 (click)="selectedTab = 2"
                 [ngClass]="selectedTab == 2 ? 'bg-primary! text-white!' : 'bg-white! text-primary! border border-primary'">
                 <span class="material-symbols-outlined">description</span>
                 <span>Relatório Clientes</span>
             </button>
 
-            <button class="h-16 w-48 flex items-center justify-center gap-x-2 text-lg font-medium transition-colors"
+            <button
+                class="h-16 w-48 flex items-center justify-center gap-x-2 text-lg font-medium transition-colors"
                 (click)="selectedTab = 3"
                 [ngClass]="selectedTab == 3 ? 'bg-primary! text-white!' : 'bg-white! text-primary! border border-primary'">
                 <span class="material-symbols-outlined">manage_accounts</span>
                 <span>Manter Gerentes</span>
             </button>
+
         </div>
 
         <div class="flex-1">
