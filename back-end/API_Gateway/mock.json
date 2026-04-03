@@ -106,8 +106,14 @@
       "senha": "tads"
     },
     "login": {
-      "login": "string",
-      "senha": "string"
+      "access_token": "string",
+      "token_type": "bearer",
+      "tipo": "CLIENTE",
+      "usuario": {
+        "nome": "Catharyna",
+        "cpf": "12912861012",
+        "email": "cli1@bantads.com.br"
+      }
     },
     "logout": {
       "cpf": "string",
