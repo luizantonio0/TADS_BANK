@@ -11,10 +11,12 @@
             O Banco do TADS (pois é...)
           </h1>
           <div class="flex flex-col sm:flex-row gap-4 mt-8">
-            <button class="px-8 py-4 bg-[#002d61] text-white rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 transition-all duration-200 hover:bg-[#002d61]/90 cursor-pointer border-none">
+            <button [routerLink]="['/autocadastro']"  ]
+                    class="px-8 py-4 bg-[#002d61] text-white rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 transition-all duration-200 hover:brightness-80 active:brightness-50 cursor-pointer border-none">
               <span class="material-symbols-outlined text-2xl">person_add</span> Abra sua Conta
             </button>
-            <button class="px-8 py-4 bg-white border border-[#e2e8f0] text-[#0f172a] rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 transition-all duration-200 hover:bg-slate-50 cursor-pointer">
+            <button [routerLink]="['/login']"
+                    class="px-8 py-4 bg-white border border-[#e2e8f0] text-[#0f172a] rounded-lg font-bold text-base inline-flex items-center justify-center gap-2 transition-all duration-200 hover:brightness-80 active:brightness-50 cursor-pointer">
               <span class="material-symbols-outlined text-2xl">login</span> Acesse o Sistema
             </button>
           </div>
@@ -34,7 +36,8 @@
           <p class="text-[#64748b]">Escolha seu perfil para entrar na plataforma</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center">
+        <div [routerLink]="['/cliente']"
+          class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center">
           <div class="p-8 border border-[#e2e8f0] rounded-2xl transition-all duration-300 cursor-pointer hover:border-[#002d61] hover:-translate-y-1">
             <div class="w-12 h-12 bg-[#002d61]/10 text-[#002d61] flex items-center justify-center rounded-lg mb-6">
               <span class="material-symbols-outlined">person</span>
@@ -46,7 +49,8 @@
             </div>
           </div>
 
-          <div class="p-8 border border-[#e2e8f0] rounded-2xl transition-all duration-300 cursor-pointer hover:border-[#002d61] hover:-translate-y-1">
+          <div [routerLink]="['/gerente']"
+            class="p-8 border border-[#e2e8f0] rounded-2xl transition-all duration-300 cursor-pointer hover:border-[#002d61] hover:-translate-y-1">
             <div class="w-12 h-12 bg-[#002d61]/10 text-[#002d61] flex items-center justify-center rounded-lg mb-6">
               <span class="material-symbols-outlined">badge</span>
             </div>
@@ -57,7 +61,8 @@
             </div>
           </div>
 
-          <div class="p-8 border border-[#e2e8f0] rounded-2xl transition-all duration-300 cursor-pointer hover:border-[#002d61] hover:-translate-y-1">
+          <div [routerLink]="['/administrador']"]
+            class="p-8 border border-[#e2e8f0] rounded-2xl transition-all duration-300 cursor-pointer hover:border-[#002d61] hover:-translate-y-1">
             <div class="w-12 h-12 bg-[#002d61]/10 text-[#002d61] flex items-center justify-center rounded-lg mb-6">
               <span class="material-symbols-outlined">admin_panel_settings</span>
             </div>
