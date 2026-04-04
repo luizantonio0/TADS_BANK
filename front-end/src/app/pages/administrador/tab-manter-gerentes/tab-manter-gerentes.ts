@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ModalEditarGerente } from '../modal-editar-gerente/modal-editar-gerente';
 import { ModalExcluirGerente } from '../modal-excluir-gerente/modal-excluir-gerente';
 import { ModalAdicionarGerente } from '../modal-adicionar-gerente/modal-adicionar-gerente';
@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class TabManterGerentes implements OnInit {
 
   gerenteService = inject(GerenteService);
+  cdr = inject(ChangeDetectorRef);
   gerentes: GerenteResponse[] = [];
 
   exibirModalEditar: boolean = false;
@@ -29,6 +30,7 @@ export class TabManterGerentes implements OnInit {
     this.gerenteService.getGerentes().subscribe({
       next: (dados) => {
         this.gerentes = dados;
+        this.cdr.detectChanges();
       },
       error: (erro) => {
         console.error('Erro ao carregar gerentes:', erro);
