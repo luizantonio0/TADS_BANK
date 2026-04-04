@@ -27,7 +27,7 @@ export class ClienteService {
     return this.http.get<Cliente[]>(`${this.API_URL}/clientes`);
   }
 
-  alterarCliente(cliente: Cliente): Observable<any> {
+  alterarCliente(cliente: Cliente | any): Observable<any> {
     return this.http.put(`${this.API_URL}/clientes`, cliente);
   }
   aprovarCliente(cpf: string): Observable<ClienteAprovadoResponseModel>{
