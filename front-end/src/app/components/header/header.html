@@ -1,3 +1,5 @@
+<app-modal-confirmar-logout [control]="exibirModalLogout" (close)="exibirModalLogout  = false" (confirm)="logout()" />
+
 <header class="px-4 md:px-10 lg:px-40 py-4 sticky top-0 z-50 backdrop-blur-md bg-white/70 border-b border-white/20">
   <div class="flex items-center justify-between max-w-[1200px] mx-auto">
     <div class="flex items-center gap-3">
@@ -48,7 +50,7 @@
             @else if (isCliente) { Cliente }
           </span>
         </div>
-        <button (click)="logout()" class="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-semibold transition-colors">
+        <button (click)="abrirModalLogout()" class="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-semibold transition-colors">
           <span class="material-symbols-outlined text-sm">logout</span>
           Sair
         </button>
