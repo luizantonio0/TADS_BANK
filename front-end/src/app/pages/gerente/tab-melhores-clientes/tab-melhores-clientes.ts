@@ -1,10 +1,10 @@
-import { NgClass } from '@angular/common';
+import { CurrencyPipe, NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { CpfPipe } from '../../../shared/pipe/cpf.pipe';
 
 @Component({
   selector: 'tab-melhores-clientes',
-  imports: [NgClass, CpfPipe],
+  imports: [NgClass, CpfPipe, CurrencyPipe],
   templateUrl: './tab-melhores-clientes.html'
 })
 export class TabMelhoresClientes {

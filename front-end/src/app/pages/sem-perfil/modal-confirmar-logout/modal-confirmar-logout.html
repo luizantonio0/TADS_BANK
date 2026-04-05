@@ -1,0 +1,17 @@
+<modal 
+  [control]="control" 
+  title="Logout" 
+  icon="delete_forever"
+  submitText="Sim"
+  [submitCallback]="submit"
+  (close)="onClose()">
+
+  <div class="flex flex-col gap-8 w-[280px] md:w-[420px] py-6 text-center">
+    <div class="flex flex-col items-center gap-2">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-2">
+        <span class="material-symbols-outlined text-red-600 text-[40px]">warning</span>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800">Tem certeza que deseja fazer logout?</h3>
+    </div>
+  </div>
+</modal>

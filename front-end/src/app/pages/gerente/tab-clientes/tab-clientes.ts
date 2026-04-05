@@ -12,7 +12,7 @@ import { ModalFiltrarCliente } from '../modal-filtrar-cliente/modal-filtrar-clie
   templateUrl: './tab-clientes.html'
 })
 export class TabClientes {
-  clientes = Array.from({ length: 25 }, (_, i) => ({
+  clientes: Cliente[] = Array.from({ length: 25 }, (_, i) => ({
       cpf: Math.random().toString().slice(2, 13).padEnd(11, '0'),
       nome: `Cliente ${i + 1}`,
       email: `cliente${i + 1}@email.com.br`,

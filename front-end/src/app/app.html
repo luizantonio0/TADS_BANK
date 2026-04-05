@@ -1,10 +1,12 @@
-<div 
+<div
   [class.bg-cliente]="isClienteInicial"
   [class.bg-login]="isLogin || isAutocadastro "
   class="bg-cover">
-  <app-header [isGerente]="isGerente"></app-header>
-  <div [class.px-24]="!isHome">
+
+  <app-header [isAdmin]="isAdmin" [isGerente]="isGerente" [isCliente]="isClienteInicial" [isPublic]="!isAdmin && !isGerente && !isClienteInicial"></app-header>
+  <div [class.md:px-24]="!isHome" class="px-12">
     <router-outlet />
   </div>
 </div>
 <toast-container/>
+<app-footer></app-footer>

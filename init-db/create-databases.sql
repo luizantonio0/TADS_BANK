@@ -1,0 +1,3 @@
+CREATE DATABASE ms_cliente;
+CREATE DATABASE ms_gerente;
+CREATE DATABASE ms_contas;

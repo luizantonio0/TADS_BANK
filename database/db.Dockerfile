@@ -1,4 +1,4 @@
-FROM postgres:15.17-trixie
+FROM postgres:15-alpine
 
 WORKDIR /
 

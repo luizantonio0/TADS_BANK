@@ -1,0 +1,11 @@
+.dockerignore
+../../database/db.Dockerfile
+Dockerfile
+../../database/data-migration
+../../database/init-scripts
+*.sh
+*.bat
+.gitattributes
+.gitignore
+build
+.gradle

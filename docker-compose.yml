@@ -1,17 +1,6 @@
-version: '3.8'
-
-#comentando por enquanto
-#include:
-#  - path: ./back-end/MS_auth/docker-compose.yml
-
-services:
-  frontend-app:
-    build:
-      context: ./front-end
-      dockerfile: Dockerfile
-    container_name: tadsbank-frontend
-    ports:
-      - "4200:80"
+volumes:
+  rabbitmq_data:
+  redis_data:
 
 networks:
   tadsbank:
@@ -19,3 +8,129 @@ networks:
   cliente:
   conta:
   gerente:
+  tads-network:
+
+services:
+
+  frontend-app:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    container_name: tadsbank-frontend
+    ports:
+      - "4200:4200"
+    
+  gateway:
+    build:
+      context: ./back-end/API_Gateway
+      dockerfile: Dockerfile
+    volumes:
+      - ./back-end/API_Gateway:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    networks:
+      - tadsbank
+    command: npx nodemon index.js
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - tadsbank
+
+  redis:
+    image: redis:8.6.2-alpine
+    container_name: tads-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tads-network
+    command: ["redis-server", "--appendonly", "yes"]
+
+  auth-ms-db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - auth
+    ports:
+      - "27017:27017"
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cliente
+      - conta
+      - gerente
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  auth-ms:
+    build:
+      context: ./back-end/MS_Auth
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      auth-ms-db:
+        condition: service_healthy
+    environment:
+      JWT_SECRET: AYqQdMQcnW6JOCMyBS24A8GFbeRk4VTth6o8FlSDNIs
+    volumes:
+      - ./back-end/MS_Auth:/app 
+    command: ./gradlew bootRun --no-daemon
+    networks:
+      - auth
+      - tadsbank
+
+  auth-cliente:
+    build:
+      context: ./back-end/MS_Cliente
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./back-end/MS_Cliente:/usr/app/src 
+    command: ./gradlew bootRun --no-daemon
+    networks:
+      - cliente
+      - tadsbank
+    
+
+
+
