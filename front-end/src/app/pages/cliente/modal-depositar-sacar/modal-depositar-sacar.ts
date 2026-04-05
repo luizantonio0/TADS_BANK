@@ -31,11 +31,11 @@ export class ModalDepositarSacar {
   submit = () => {
     if (this.form.valid) {
       const valor = Number(this.form.value.amount);
-
+      
       if (this.tipo === 'deposit') {
         this.contaService.depositar(this.numeroConta, valor).subscribe({
           next: (res) => {
-            this.toastr.success(`Depósito de R$ ${res.valor} realizado com sucesso!`);
+            this.toastr.success(`Depósito de R$ ${valor} realizado com sucesso!`);
             this.form.reset();
             this.onClose();
             this.cdr.detectChanges();
@@ -46,7 +46,18 @@ export class ModalDepositarSacar {
           }
         });
       } else {
-        this.toastr.success('Saque realizado com sucesso')
+        this.contaService.sacar(this.numeroConta, valor).subscribe({
+          next: (res) => {
+            this.toastr.success(`Saque de R$ ${valor} realizado com sucesso!`);
+            this.form.reset();
+            this.onClose();
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            this.toastr.error("Erro ao realizar saque");
+            console.error(err)
+          }
+        })
         this.onClose()
       }
     }

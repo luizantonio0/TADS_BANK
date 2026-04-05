@@ -3,6 +3,7 @@ import { Modal } from '../../../components/modal/modal';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastService } from '../../../shared/service/toast/toast';
 import { NgxMaskDirective } from 'ngx-mask';
+import { ContaService } from '../../../shared/service/requests/conta';
 
 @Component({
   selector: 'modal-transferir',
@@ -12,9 +13,10 @@ import { NgxMaskDirective } from 'ngx-mask';
 export class ModalTransferir {
   private fb = inject(FormBuilder);
   private toastr = inject(ToastService);
+  private contaService = inject(ContaService)
 
   @Input({ required: true }) control!: boolean;
-
+  @Input({ required: true }) numeroConta!: string;
   @Output() close = new EventEmitter();
 
   form = this.fb.group({
@@ -24,8 +26,20 @@ export class ModalTransferir {
 
   submit = () => {
     if (this.form.valid) {
-        this.toastr.success('Transferencia realizada com sucesso!');
-        this.onClose();
+      const contaDestino = this.form.value.account!;
+      const valor = Number(this.form.value.amount);
+
+      this.contaService.transferir(this.numeroConta, contaDestino, valor).subscribe({
+        next: (res) => {
+          this.toastr.success(`Transferência de R$ ${valor} para a conta ${contaDestino} realizada com sucesso!`);
+          this.form.reset();
+          this.onClose();
+        },
+        error: (err) => {
+          this.toastr.error("Erro ao realizar transferencia");
+          console.log(err);
+        }
+      })
     }
   }
 
