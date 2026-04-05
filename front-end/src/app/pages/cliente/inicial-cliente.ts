@@ -26,6 +26,7 @@ export class InicialCliente implements OnInit {
     limite: 0,
     gerente: '',
     email: '',
+    numeroConta: ''
   };
 
   ngOnInit() {
@@ -39,7 +40,8 @@ export class InicialCliente implements OnInit {
       balance: this.cliente.saldo? this.cliente.saldo: 0,
       limite: this.cliente.limite? this.cliente.limite: 0,
       gerente: this.cliente.gerente_nome? this.cliente.gerente_nome: '',
-      email: this.cliente.gerente_email? this.cliente.gerente_email: ''
+      email: this.cliente.gerente_email? this.cliente.gerente_email: '',
+      numeroConta: this.cliente.conta? String(this.cliente.conta) : ''
     }
   }
 }
@@ -50,4 +52,5 @@ interface CurrentAccount {
   limite: number,
   gerente: string,
   email: string,
+  numeroConta: string
 }
