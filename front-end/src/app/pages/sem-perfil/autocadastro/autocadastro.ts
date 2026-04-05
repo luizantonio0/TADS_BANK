@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { Header } from '../../../components/header/header';
 import { Cliente } from '../../../shared/models/BarrelFile';
 import {
   FormBuilder,
@@ -42,7 +41,7 @@ export class Autocadastro {
   async submit() {
     if (this.formCadastro.valid) {
       this.autocadastrar(this.formCadastro.value);
-      //await this.router.navigate(['/cliente']);
+      await this.router.navigate(['/login']);
     }
   }
 
