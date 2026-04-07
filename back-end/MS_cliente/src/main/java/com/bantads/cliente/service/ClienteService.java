@@ -68,7 +68,15 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    public void aprovar(String cpf, String cpfGerente) throws Exception {
+    public void aprovarCliente(String cpf) throws Exception {
+        var cliente = clienteRepository.findByCpf(cpf);
+        if(cliente.isEmpty()) throw new IllegalStateException("Cliente não encontrado");
+        var c = cliente.get();
+        c.setAprovado(true);
+        clienteRepository.save(c);
+    }
+
+    public void aprovarDeprecated(String cpf, String cpfGerente) throws Exception {
         var clienteAtual = clienteRepository.findByCpf(cpf);
 
         if(clienteAtual.isEmpty()) throw new IllegalStateException("Cliente não encontrado");

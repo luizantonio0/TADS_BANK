@@ -15,6 +15,4 @@ public record ClienteRequestDTO
     String CEP,
     String cidade,
     UF estado
-)
-{
-}
+) { }

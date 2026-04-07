@@ -44,11 +44,7 @@ public class ClienteController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
-    //TODO: Metodo deveria vir da conta e não do cliente
-    @PostMapping("/{cpf}")
-    public ResponseEntity<AprovarClienteDTO> aprovar(@PathVariable String cpf){
-        return new ResponseEntity<>(clienteService.aprovar(cpf, null, null), HttpStatus.CREATED);
-    }
+
     
     @PutMapping(value = "/{cpf}")
     public ResponseEntity<Cliente> update(@PathVariable String cpf, @RequestBody AlterarDadosClienteDTO cliente){
