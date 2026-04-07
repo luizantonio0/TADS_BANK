@@ -29,29 +29,29 @@
       <div class="grid gap-x-2 gap-y-2 grid-cols-12 mt-8">
         <div class="col-span-6">
           <label for="cep">CEP</label>
-          <input formControlName="cep" mask="000000-000" [dropSpecialCharacters]="true" name="cep" placeholder="Digite seu CEP">
+          <input formControlName="cep" mask="00000-000" [dropSpecialCharacters]="true" name="cep" placeholder="Digite seu CEP">
         </div>
         <div class="col-span-6 flex flex-col justify-end w-fit items-center">
           <span class="material-symbols-outlined text-primary h-8 border-gray-200 border p-1 rounded-md cursor-pointer bg-gray-100">search</span>
         </div>
         <div class="col-span-8">
           <label for="endereco">Endereço</label>
-          <input formControlName="endereco" name="endereco" placeholder="Digite seu endereço" readonly>
+          <input formControlName="endereco" name="endereco" placeholder="Digite seu endereço" >
         </div>
         <div class="col-span-4">
           <label for="numero">Número</label>
-          <input name="numero" placeholder="Digite o número" disabled>
+          <input name="numero" placeholder="Digite o número" >
         </div>
         <div class="col-span-4">
           <label for="estado">Estado</label>
-          <input formControlName="estado" name="estado" placeholder="Escolha seu estado" readonly>
+          <input formControlName="estado" name="estado" placeholder="Escolha seu estado" >
         </div>
         <div class="col-span-8">
           <label for="cidade">Cidade</label>
-          <input formControlName="cidade" name="numero" placeholder="Escolha sua cidade" readonly>
+          <input formControlName="cidade" name="numero" placeholder="Escolha sua cidade" >
         </div>
       </div>
-      <button class="mt-4 h-10 w-full" [disabled]="formCadastro.invalid" type="submit">Solicitar cadastro</button>
+      <button class="mt-4 h-10 w-full hover:brightness-80 active:brightness-50" [disabled]="formCadastro.invalid" ] type="submit">Solicitar cadastro</button>
     </form>
   </div>
 </main>

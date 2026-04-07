@@ -1,8 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const porta = 3001;
+
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 let dados;
 
@@ -115,7 +122,7 @@ app.delete('/gerentes/:cpf', (req, res) => {
     )
 })
 
-// LOGIN
+// ========================= LOGIN =======================================
 
 app.post('/login', (req, res) => {
     return res.status(200).json(
@@ -128,5 +135,6 @@ app.post('/logout', (req, res) => {
         dados.POST.logout
     )
 })
+
 
 app.listen(porta, () => console.log(`Servidor rodando em http://localhost:${porta}`));

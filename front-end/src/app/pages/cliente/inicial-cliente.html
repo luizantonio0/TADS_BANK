@@ -1,6 +1,6 @@
-<modal-depositar-sacar [control]="modalSacarControl" tipo="withdraw" (close)="modalSacarControl = false" />
-<modal-depositar-sacar [control]="modalDepositarControl" tipo="deposit" (close)="modalDepositarControl = false"/>
-<modal-transferir [control]="modalTransferirControl" (close)="modalTransferirControl = false"/>
+<modal-depositar-sacar [control]="modalSacarControl" [numeroConta]="currentAccount.numeroConta" tipo="withdraw" (close)="modalSacarControl = false" />
+<modal-depositar-sacar [control]="modalDepositarControl" [numeroConta]="currentAccount.numeroConta" tipo="deposit" (close)="modalDepositarControl = false"/>
+<modal-transferir [control]="modalTransferirControl" [numeroConta]="currentAccount.numeroConta" (close)="modalTransferirControl = false"/>
 <modal-alterar-perfil [control]="modalAlterarPerfilControl" (close)="modalAlterarPerfilControl = false"/>
 
 <div class="h-main-screen flex gap-x-4">
