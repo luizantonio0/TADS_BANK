@@ -27,9 +27,4 @@ public class RabbitConsumer {
         return orchestrator.orchestrate(dto);
     }
 
-    @RabbitListener(queues = "orchestration.result")
-    public void consumeOrchestrateResult(OrchestrationResultDTO dto) {
-        orchestrator.onResult(dto);
-    }
-
 }

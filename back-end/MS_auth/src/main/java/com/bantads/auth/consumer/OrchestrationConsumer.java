@@ -30,13 +30,12 @@ public class OrchestrationConsumer {
         if (strategy == null) {
             this.rabbitTemplate.convertAndSend(
                     OrchestrationKeys.CONFIRM_QUEUE,
-                    OrchestrationResultDTO.builder()
-                            .idOrchestration(dto.idOrchestration())
-                            .idCommand(dto.idCommand())
-                            .message("None strategy found for command " + dto.commandType())
-                            .ok(false)
-                            .build()
-                    );
+                    new OrchestrationResultDTO(
+                            dto.idCommand(),
+                            dto.idOrchestration(),
+                            "None strategy found for command " + dto.commandType(),
+                            false
+                    ));
             return;
         }
 
@@ -52,13 +51,11 @@ public class OrchestrationConsumer {
 
         this.rabbitTemplate.convertAndSend(
                 OrchestrationKeys.CONFIRM_QUEUE,
-                OrchestrationResultDTO.builder()
-                        .idOrchestration(dto.idOrchestration())
-                        .idCommand(dto.idCommand())
-                        .message(message)
-                        .ok(ok)
-                        .build()
-        );
+                new OrchestrationResultDTO(
+                        dto.idCommand(),
+                        dto.idOrchestration(),
+                        message,
+                        ok));
     }
 
 }

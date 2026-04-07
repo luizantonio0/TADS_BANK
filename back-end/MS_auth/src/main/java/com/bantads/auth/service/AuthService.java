@@ -24,7 +24,7 @@ public class AuthService {
     }
 
     public void createCredentials(String email, String cpf, String cryptoPw) {
-        if(email == null || cpf == null || cryptoPw == null || email.trim().isEmpty() || cpf.trim().isEmpty() || senha.trim().isEmpty()) {
+        if(email == null || cpf == null || cryptoPw == null || email.trim().isEmpty() || cpf.trim().isEmpty() || cryptoPw.trim().isEmpty()) {
             throw new IllegalArgumentException("Email, CPF e Senha devem ser preenchidos.");
         }
         if(credentialsRepository.existsById(cpf)) {
