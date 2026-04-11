@@ -1,6 +1,5 @@
-package com.bantads.cliente.config;
+package com.bantads.conta.config;
 
-import com.bantads.cliente.orchestration.OrchestrationKeys;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -14,15 +13,14 @@ public class RabbitConfig {
     public MessageConverter messageConverter() {
         return new JacksonJsonMessageConverter();
     }
-
     @Bean
-    public Queue msclienteCommandQueue() {
-        return new Queue(OrchestrationKeys.MS_CLIENTE + ".orchestrate", true);
+    public Queue msContaCommandQueue() {
+        return new Queue("ms-conta.orchestrate", true);
     }
 
     @Bean
     public Queue confirmQueue() {
-        return new Queue(OrchestrationKeys.CONFIRM_QUEUE, true);
+        return new Queue("orchestration.confirm", true);
     }
 
 }

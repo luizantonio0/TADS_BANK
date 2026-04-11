@@ -23,21 +23,15 @@ public class OrchestrationConsumer {
     private RabbitTemplate rabbitTemplate;
 
     @RabbitListener(queues = "ms-auth.command")
-    public <T> void consumeCreate(OrchestrationCommandDTO<T> dto) {
-
+    public <T> OrchestrationResultDTO consumeCreate(OrchestrationCommandDTO<T> dto) {
         var strategy = (SagaCommandStrategy<T>) cmdFactory.newCommand(dto.commandType());
-
         if (strategy == null) {
-            this.rabbitTemplate.convertAndSend(
-                    OrchestrationKeys.CONFIRM_QUEUE,
-                    OrchestrationResultDTO.builder()
-                            .idOrchestration(dto.idOrchestration())
-                            .idCommand(dto.idCommand())
-                            .message("None strategy found for command " + dto.commandType())
-                            .ok(false)
-                            .build()
+            return new OrchestrationResultDTO(
+                            dto.idCommand(),
+                            dto.idOrchestration(),
+                            "None strategy found for command " + dto.commandType(),
+                            false
                     );
-            return;
         }
 
         String message = "";
@@ -50,15 +44,7 @@ public class OrchestrationConsumer {
             message = ex.getMessage();
         }
 
-        this.rabbitTemplate.convertAndSend(
-                OrchestrationKeys.CONFIRM_QUEUE,
-                OrchestrationResultDTO.builder()
-                        .idOrchestration(dto.idOrchestration())
-                        .idCommand(dto.idCommand())
-                        .message(message)
-                        .ok(ok)
-                        .build()
-        );
+        return new OrchestrationResultDTO(dto.idCommand(), dto.idOrchestration(), message, ok);
     }
 
 }

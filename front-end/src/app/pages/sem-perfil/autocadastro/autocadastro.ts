@@ -10,7 +10,8 @@ import {
 import { Router } from '@angular/router';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ClienteService } from '../../../shared/service/requests/cliente';
-
+import { ToastService } from '../../../shared/service/toast/toast';
+import { cpfValidator } from '../../../shared/validators/cpf.validator';
 @Component({
   selector: 'app-autocadastro',
   imports: [ReactiveFormsModule, FormsModule, NgxMaskDirective],
@@ -18,6 +19,7 @@ import { ClienteService } from '../../../shared/service/requests/cliente';
 })
 export class Autocadastro {
   clienteService = inject(ClienteService);
+  private toastr = inject(ToastService);
   formCadastro: FormGroup;
 
   //todo: não consegui testar o submit com o FormGroup e as validações ativas, esta funcionando sem os Validators
@@ -26,7 +28,7 @@ export class Autocadastro {
     private fb: FormBuilder,
   ) {
     this.formCadastro = this.fb.group({
-      cpf: ['', [Validators.required]],
+      cpf: ['', [Validators.required, cpfValidator()]],
       nome: ['', [Validators.required, Validators.minLength(10)]],
       telefone: ['', [Validators.required, Validators.minLength(10)]],
       email: ['', [Validators.required, Validators.email]],
@@ -41,7 +43,7 @@ export class Autocadastro {
   async submit() {
     if (this.formCadastro.valid) {
       this.autocadastrar(this.formCadastro.value);
-      await this.router.navigate(['/login']);
+      this.toastr.success('Cadastro realizado com sucesso!');
     }
   }
 

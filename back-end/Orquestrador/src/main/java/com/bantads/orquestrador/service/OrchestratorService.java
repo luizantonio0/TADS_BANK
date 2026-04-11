@@ -69,9 +69,7 @@ public class OrchestratorService {
     }
 
     private OrchestrationConfirmDTO confirm(UUID orchestrationId, List<String> errors, boolean ok) {
-        var confirm = new OrchestrationConfirmDTO(orchestrationId, errors,  ok);
-        rabbitTemplate.convertAndSend("orchestration.confirm", confirm);
-        return confirm;
+        return new OrchestrationConfirmDTO(orchestrationId, errors,  ok);
     }
 
     @Async

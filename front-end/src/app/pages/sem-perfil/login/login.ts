@@ -56,6 +56,7 @@ export class Login {
     this.authService.login(login_model).subscribe({
       next: (response) => {
         console.log(response);
+        sessionStorage.setItem('access_token', response.access_token);
       },
       error: (error) => {
         console.log(error);

@@ -42,6 +42,8 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private UF estado;
 
+    private boolean aprovado;
+
     public Cliente(ClienteRequestDTO clienteRequestDTO) {
         this.cpf = clienteRequestDTO.cpf();
         this.email = clienteRequestDTO.email();
@@ -51,6 +53,11 @@ public class Cliente {
         this.cep = clienteRequestDTO.CEP();
         this.cidade = clienteRequestDTO.cidade();
         this.estado = clienteRequestDTO.estado();
+        this.aprovado = false;
+    }
+
+    public void setAprovado(boolean aprovado) {
+        this.aprovado = aprovado;
     }
 
     public UUID getId() {
