@@ -1,26 +1,20 @@
 package com.bantads.cliente.service;
 
 import com.bantads.cliente.dto.AlterarDadosClienteDTO;
-import com.bantads.cliente.dto.AprovarClienteDTO;
 import com.bantads.cliente.dto.ClienteRequestDTO;
 import com.bantads.cliente.dto.auth.CredentialsCreateDTO;
 import com.bantads.cliente.dto.conta.ContaCreateDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationCommandDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationConfirmDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationRequestDTO;
 import com.bantads.cliente.exceptions.AccountAlredyExists;
 import com.bantads.cliente.mapper.ClienteMapper;
 import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.orchestration.OrchestrationKeys;
+import com.bantads.cliente.orchestration.Snapshot;
 import com.bantads.cliente.repository.ClienteRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.*;
 
@@ -68,12 +62,13 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    public void aprovarCliente(String cpf) throws Exception {
+    public Snapshot<Cliente> aprovarCliente(String cpf) throws Exception {
         var cliente = clienteRepository.findByCpf(cpf);
         if(cliente.isEmpty()) throw new IllegalStateException("Cliente não encontrado");
         var c = cliente.get();
         c.setAprovado(true);
         clienteRepository.save(c);
+        return c;
     }
 
     public void aprovarDeprecated(String cpf, String cpfGerente) throws Exception {

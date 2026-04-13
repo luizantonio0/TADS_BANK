@@ -5,6 +5,8 @@ import com.bantads.cliente.enums.UF;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -12,6 +14,7 @@ import java.util.UUID;
 @Table(name = "tb_cliente")
 @NoArgsConstructor
 @AllArgsConstructor
+@Audited
 public class Cliente {
 
     @Id
