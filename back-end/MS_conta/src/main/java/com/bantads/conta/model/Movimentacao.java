@@ -11,33 +11,31 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tb_conta")
+@Table(name = "tb_movimentacao")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Conta {
+public class Movimentacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = true, nullable = false, length = 11)
-    private String cpf;
+    @Column(nullable = false)
+    private LocalDateTime dataHora;
 
-    @Column(unique = true, nullable = false, length = 10)
-    private String conta;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoMovimentacao tipo;
 
     @Column(nullable = false)
-    private BigDecimal saldo;
+    private BigDecimal valor;
 
-    @Column(nullable = false)
-    private BigDecimal limite;
+    @Column(nullable = false, length = 10)
+    private String contaOrigem;
 
-    @Column(nullable = false)
-    private LocalDateTime criacao;
-
-    @Column(nullable = false, length = 11)
-    private String gerenteCpf;
+    @Column(length = 10)
+    private String contaDestino;
 
 }
