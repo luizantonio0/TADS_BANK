@@ -28,10 +28,7 @@ public class GerenteService {
 
         return gerenteRepository.save(gerente);
     }
-    
-    public Gerente update(Gerente gerente){
-        return gerenteRepository.save(gerente);
-    }
+
 
     public void deleteByCpf(String cpf) {
         this.gerenteRepository.deleteByCpf(cpf);
