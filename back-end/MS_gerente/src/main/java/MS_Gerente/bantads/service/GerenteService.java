@@ -1,14 +1,14 @@
-package main.java.MS_Gerente.bantads.service;
+package MS_Gerente.bantads.service;
 
-import main.java.MS_Gerente.bantads.dto.request.AtualizaGerenteDTO;
-import main.java.MS_Gerente.bantads.dto.response.GerenteAtualizadoDTO;
-import main.java.MS_Gerente.bantads.mapper.GerenteMapper;
-import main.java.MS_Gerente.bantads.model.Gerente;
-import main.java.MS_Gerente.bantads.repository.GerenteRepository;
+import MS_Gerente.bantads.dto.request.AtualizaGerenteDTO;
+import MS_Gerente.bantads.dto.request.CriaGerenteDTO;
+import MS_Gerente.bantads.model.Gerente;
+import MS_Gerente.bantads.repository.GerenteRepository;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import MS_Gerente.bantads.dto.response.GerenteAtualizadoDTO;
+import MS_Gerente.bantads.mapper.GerenteMapper;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 public class GerenteService {
@@ -20,15 +20,12 @@ public class GerenteService {
         this.gerenteMapper = gerenteMapper;
     }
 
-    public List<Gerente> findAll() {
-        return gerenteRepository.findAll(); 
-    }
-    
-    public Gerente findById(UUID id){
-        return gerenteRepository.findById(id).orElse(null);
-    }
+    @Transactional
+    public Gerente save(CriaGerenteDTO criaGerenteDTO){
 
-    public Gerente save(Gerente gerente){
+        @Valid
+        Gerente gerente = new Gerente(criaGerenteDTO);
+
         return gerenteRepository.save(gerente);
     }
     
@@ -36,16 +33,14 @@ public class GerenteService {
         return gerenteRepository.save(gerente);
     }
 
-    public void deleteById(UUID id){
-        gerenteRepository.deleteById(id);
-    }
-
     public void deleteByCpf(String cpf) {
-
+        this.gerenteRepository.deleteByCpf(cpf);
     }
 
     public GerenteAtualizadoDTO updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) {
-        var gerente = gerenteRepository.findByCpf(cpf);
+
+        @Valid
+        Gerente gerente = gerenteRepository.findByCpf(cpf);
 
         gerenteMapper.ataualizaGerentePeloDto(atualizaGerenteDTO, gerente);
 

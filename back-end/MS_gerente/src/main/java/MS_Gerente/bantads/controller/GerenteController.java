@@ -1,9 +1,10 @@
-package main.java.MS_Gerente.bantads.controller;
+package MS_Gerente.bantads.controller;
 
-import main.java.MS_Gerente.bantads.dto.request.AtualizaGerenteDTO;
-import main.java.MS_Gerente.bantads.dto.response.GerenteAtualizadoDTO;
-import main.java.MS_Gerente.bantads.model.Gerente;
-import main.java.MS_Gerente.bantads.service.GerenteService;
+import MS_Gerente.bantads.dto.request.CriaGerenteDTO;
+import MS_Gerente.bantads.model.Gerente;
+import MS_Gerente.bantads.dto.request.AtualizaGerenteDTO;
+import MS_Gerente.bantads.dto.response.GerenteAtualizadoDTO;
+import MS_Gerente.bantads.service.GerenteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,8 @@ public class GerenteController {
     }
 
     @PostMapping("product")
-    public ResponseEntity<Gerente> save(@RequestBody Gerente gerente){
-        return new ResponseEntity<>(gerenteService.save(gerente), HttpStatus.CREATED);
+    public ResponseEntity<Gerente> save(@RequestBody CriaGerenteDTO criaGerenteDTO){
+        return new ResponseEntity<>(gerenteService.save(criaGerenteDTO), HttpStatus.CREATED);
     }
     
     @PutMapping("product/{cpf}")
