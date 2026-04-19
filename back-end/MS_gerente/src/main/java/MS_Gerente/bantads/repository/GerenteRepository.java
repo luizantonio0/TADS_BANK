@@ -8,5 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface GerenteRepository extends JpaRepository<Gerente, UUID> {
+    Gerente findByCpf(String cpf);
 } 
         
