@@ -1,4 +1,4 @@
-package main.java.MS_Gerente.bantads.enums;
+package MS_Gerente.bantads.enums;
 
 public enum GerenteTipo {
     ADMINISTRADOR("ADMINISTRADOR"),

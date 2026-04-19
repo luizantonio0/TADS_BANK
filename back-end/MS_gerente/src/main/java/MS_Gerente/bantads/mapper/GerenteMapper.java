@@ -1,7 +1,7 @@
-package main.java.MS_Gerente.bantads.mapper;
+package MS_Gerente.bantads.mapper;
 
-import main.java.MS_Gerente.bantads.dto.request.AtualizaGerenteDTO;
-import main.java.MS_Gerente.bantads.model.Gerente;
+import MS_Gerente.bantads.dto.request.AtualizaGerenteDTO;
+import MS_Gerente.bantads.model.Gerente;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 

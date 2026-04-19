@@ -1,24 +1,38 @@
-package main.java.MS_Gerente.bantads.model;
+package MS_Gerente.bantads.model;
 
+import MS_Gerente.bantads.dto.request.CriaGerenteDTO;
 import jakarta.persistence.*;
-import main.java.MS_Gerente.bantads.dto.request.AtualizaGerenteDTO;
-import main.java.MS_Gerente.bantads.enums.GerenteTipo;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import MS_Gerente.bantads.dto.request.AtualizaGerenteDTO;
+import MS_Gerente.bantads.enums.GerenteTipo;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "tb_gerente")
+@Getter
+@Setter
 public class Gerente {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(nullable = false, length = 20)
+    @NotBlank(message = "Nome não pode ser vazio")
+    @Min(value = 3, message = "Nome deve ter pelo menos 3 caracteres")
     private String nome;
     @Column(nullable = false, length = 11)
     private String cpf;
     @Column(nullable = false, length = 128)
+    @NotBlank(message = "Email não pode ser vazio")
+    @Min(value = 3, message = "Email deve ter pelo menos 3 caracteres")
+    @Email
     private String email;
     @Column(nullable = false)
+    @NotBlank(message = "Senha não pode ser vazio")
     private String senha;
     @Column(nullable = false)
     private String tipo;
@@ -30,60 +44,16 @@ public class Gerente {
         this.email = atualizaGerenteDTO.email();
         this.senha = atualizaGerenteDTO.senha();
     }
-    public Gerente(String nome, String cpf, String email, String senha, String tipo) {
-        this.nome = nome;
-        this.cpf = cpf;
-        this.email = email;
-        this.senha = senha;
-        this.tipo = tipo;
+    public Gerente(CriaGerenteDTO criaGerenteDTO) {
+        this.nome = criaGerenteDTO.nome();
+        this.cpf = criaGerenteDTO.cpf();
+        this.email = criaGerenteDTO.email();
+        this.senha = criaGerenteDTO.senha();
+        this.tipo = criaGerenteDTO.tipo().name();
     }
-
-    public String getTipo() {
-        return tipo;
-    }
-
     public void setTipo(GerenteTipo tipo) {
         this.tipo = tipo.name();
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
 }
         

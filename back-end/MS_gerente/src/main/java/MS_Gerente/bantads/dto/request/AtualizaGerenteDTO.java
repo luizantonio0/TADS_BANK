@@ -1,4 +1,4 @@
-package main.java.MS_Gerente.bantads.dto.request;
+package MS_Gerente.bantads.dto.request;
 
 public record AtualizaGerenteDTO(
         String nome,

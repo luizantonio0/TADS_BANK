@@ -1,7 +1,7 @@
-package main.java.MS_Gerente.bantads.dto.response;
+package MS_Gerente.bantads.dto.response;
 
-import main.java.MS_Gerente.bantads.enums.GerenteTipo;
-import main.java.MS_Gerente.bantads.model.Gerente;
+import MS_Gerente.bantads.enums.GerenteTipo;
+import MS_Gerente.bantads.model.Gerente;
 
 public record GerenteAtualizadoDTO(
         String nome,
