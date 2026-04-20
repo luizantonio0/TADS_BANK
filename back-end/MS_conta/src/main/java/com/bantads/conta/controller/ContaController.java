@@ -16,9 +16,11 @@ public class ContaController {
     @Autowired
     private ContaService contaService;
 
+    /*
     @PostMapping("/{cpf}")
     public ResponseEntity<String> aprovar(@PathVariable String cpf){
         return new ResponseEntity<>(contaService.aprovar(cpf, null, null), HttpStatus.CREATED);
     }
+    */
 
 }

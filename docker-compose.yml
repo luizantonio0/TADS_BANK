@@ -140,10 +140,10 @@ services:
         condition: service_started
       postgres:
         condition: service_healthy
-    volumes:
-      - ./back-end/MS_conta:/app
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/conta_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ms_contas
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_RABBITMQ_HOST=rabbitmq
     networks:
       - conta

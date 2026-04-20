@@ -15,7 +15,7 @@ public class RabbitConfig {
     }
     @Bean
     public Queue msContaCommandQueue() {
-        return new Queue("ms-conta.orchestrate", true);
+        return new Queue("ms-conta.command", true);
     }
 
     @Bean

@@ -39,7 +39,7 @@ public class RabbitConsumer {
             message = ex.getMessage();
         }
 
-        return new OrchestrationResultDTO(dto.idCommand(), dto.idOrchestration(), message, ok);
+        return new OrchestrationResultDTO(dto.idCommand(), dto.idOrchestration(), message, ok, null);
     }
 
 }
