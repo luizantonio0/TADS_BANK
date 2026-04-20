@@ -33,19 +33,11 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<Cliente> save(@RequestBody ClienteRequestDTO dto){
-
-        try{
-
-            var cliente =  clienteService.save(dto);
-            return new ResponseEntity<>(cliente, HttpStatus.CREATED);
-
-        } catch (AccountAlredyExists e) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
+    public ResponseEntity<Cliente> save(@RequestBody ClienteRequestDTO dto) throws IllegalArgumentException {
+        var cliente = clienteService.cadastrarCliente(dto);
+        return new ResponseEntity<>(cliente, HttpStatus.CREATED);
     }
 
-    
     @PutMapping(value = "/{cpf}")
     public ResponseEntity<Cliente> update(@PathVariable String cpf, @RequestBody AlterarDadosClienteDTO cliente){
         return new ResponseEntity<>(clienteService.update(cliente, cpf), HttpStatus.OK);

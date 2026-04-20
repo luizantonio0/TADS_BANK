@@ -4,13 +4,19 @@ import com.bantads.cliente.dto.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.ClienteRequestDTO;
 import com.bantads.cliente.dto.auth.CredentialsCreateDTO;
 import com.bantads.cliente.dto.conta.ContaCreateDTO;
+import com.bantads.cliente.dto.orchestrator.OrchestrationCommandDTO;
+import com.bantads.cliente.dto.orchestrator.OrchestrationConfirmDTO;
+import com.bantads.cliente.dto.orchestrator.OrchestrationRequestDTO;
 import com.bantads.cliente.exceptions.AccountAlredyExists;
 import com.bantads.cliente.mapper.ClienteMapper;
 import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.orchestration.OrchestrationKeys;
-import com.bantads.cliente.orchestration.Snapshot;
 import com.bantads.cliente.repository.ClienteRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.history.Revision;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,12 +47,13 @@ public class ClienteService {
         return clienteRepository.findByCpf(cpf).orElse(null);
     }
 
-    public Cliente save(ClienteRequestDTO dto) throws AccountAlredyExists {
-        boolean existe = clienteRepository.existsByCpf(dto.cpf());
-
-        if(existe) throw new AccountAlredyExists("Não é possivel cadastrar um cliente com o mesmo CPF");
+    public Cliente cadastrarCliente(ClienteRequestDTO dto) throws AccountAlredyExists {
+        if(clienteRepository.existsByCpf(dto.cpf())) {
+            throw new AccountAlredyExists("Este CPF já está em uso!");
+        }
 
         Cliente cliente = new Cliente(dto);
+
         return clienteRepository.save(cliente);
     }
     
@@ -62,13 +69,25 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    public Snapshot<Cliente> aprovarCliente(String cpf) throws Exception {
+    public void aprovarCliente(String cpf) throws Exception {
         var cliente = clienteRepository.findByCpf(cpf);
         if(cliente.isEmpty()) throw new IllegalStateException("Cliente não encontrado");
         var c = cliente.get();
         c.setAprovado(true);
         clienteRepository.save(c);
-        return c;
+    }
+
+    public void rollbackCliente(UUID uuid) throws Exception {
+        Page<Revision<Integer, Cliente>> revisions = clienteRepository.findRevisions(uuid, PageRequest.of(0, 2, Sort.by("revisionNumber").descending()));
+        List<Revision<Integer, Cliente>> content = revisions.getContent();
+
+        if (content.size() >= 2) {
+            var revision = content.get(1).getEntity();
+            clienteRepository.save(revision);
+        } else {
+            clienteRepository.deleteById(uuid);
+        }
+
     }
 
     public void aprovarDeprecated(String cpf, String cpfGerente) throws Exception {
@@ -85,11 +104,11 @@ public class ClienteService {
         var credentialsDTO = new CredentialsCreateDTO(cliente.getEmail(), cpf, encoder.encode(senha));
         var contaDTO = new ContaCreateDTO(numConta, cpf, cpfGerente);
 
-        var request = new OrchestrationRequestDTO (
+        var request = new OrchestrationRequestDTO(
                 idOperation,
                 List.of(
-                        new OrchestrationCommandDTO<>(UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, credentialsDTO),
-                        new OrchestrationCommandDTO<>(UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, contaDTO)
+                        new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, credentialsDTO),
+                        new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, contaDTO)
                 )
         );
 
@@ -100,7 +119,7 @@ public class ClienteService {
             return;
         }
 
-        throw new Exception("Erro ao tentar aprovar cliente: " + response.errors().getFirst());
+        throw new Exception("Erro ao tentar aprovar cliente: " + response.message());
     }
 }
         

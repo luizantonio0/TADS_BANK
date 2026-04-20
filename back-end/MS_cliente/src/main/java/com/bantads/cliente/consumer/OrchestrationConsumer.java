@@ -4,6 +4,7 @@ import com.bantads.cliente.dto.orchestrator.OrchestrationCommandDTO;
 import com.bantads.cliente.dto.orchestrator.OrchestrationConfirmDTO;
 import com.bantads.cliente.dto.orchestrator.OrchestrationResultDTO;
 import com.bantads.cliente.orchestration.OrchestrationKeys;
+import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.strategy.SagaCommandStrategy;
 import com.bantads.cliente.strategy.SagaCommandStrategyFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -11,6 +12,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class OrchestrationConsumer {
@@ -23,6 +26,9 @@ public class OrchestrationConsumer {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    private ClienteService clienteService;
 
     @RabbitListener(queues = "ms-auth.command")
     public <T> OrchestrationResultDTO consumeCreate(OrchestrationCommandDTO<T> dto) {
@@ -55,11 +61,15 @@ public class OrchestrationConsumer {
         var redisKey = dto.idOrchestration().toString() + ":touched:cliente";
         var touchedCliente = redisTemplate.opsForValue().getAndDelete(redisKey);
 
-        if(dto.ok()) {
+        if(dto.ok() || touchedCliente == null) {
             return;
         }
 
-        // TODO: fazer rollback usando o hibernate envers
+        try {
+            clienteService.rollbackCliente(UUID.fromString(touchedCliente));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
     }
 

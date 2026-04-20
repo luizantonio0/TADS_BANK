@@ -12,12 +12,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "tb_cliente")
-@NoArgsConstructor
-@AllArgsConstructor
 @Audited
 public class Cliente {
 
     @Id
+    @Column
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
@@ -45,10 +44,11 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private UF estado;
 
+    @Column
     private boolean aprovado;
 
     public Cliente(ClienteRequestDTO clienteRequestDTO) {
-        this.cpf = clienteRequestDTO.cpf();
+        this.cpf = clienteRequestDTO.cpf().replaceAll("[^0-9]", "");
         this.email = clienteRequestDTO.email();
         this.nome = clienteRequestDTO.nome();
         this.telefone = clienteRequestDTO.telefone();
@@ -99,5 +99,8 @@ public class Cliente {
         return estado;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
 }
         
