@@ -1,6 +1,5 @@
 package com.bantads.conta.strategy.strategies;
 
-import com.bantads.conta.dto.ContaCreateDTO;
 import com.bantads.conta.dto.orchestrator.OrchestrationCommandDTO;
 import com.bantads.conta.service.ContaService;
 import com.bantads.conta.strategy.SagaCommandStrategy;

@@ -1,9 +1,10 @@
 package com.bantads.cliente.service;
 
 import com.bantads.cliente.dto.AlterarDadosClienteDTO;
+import com.bantads.cliente.dto.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.ClienteRequestDTO;
 import com.bantads.cliente.dto.auth.CredentialsCreateDTO;
-import com.bantads.cliente.dto.conta.ContaCreateDTO;
+import com.bantads.cliente.dto.conta.ContaCreateInputDTO;
 import com.bantads.cliente.dto.orchestrator.OrchestrationCommandDTO;
 import com.bantads.cliente.dto.orchestrator.OrchestrationConfirmDTO;
 import com.bantads.cliente.dto.orchestrator.OrchestrationRequestDTO;
@@ -69,12 +70,28 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    public void aprovarCliente(String cpf) throws Exception {
+    public AprovarClienteResponseDTO aprovarCliente(String cpf) throws Exception {
+
         var cliente = clienteRepository.findByCpf(cpf);
         if(cliente.isEmpty()) throw new IllegalStateException("Cliente não encontrado");
         var c = cliente.get();
         c.setAprovado(true);
         clienteRepository.save(c);
+
+        var idOperation = UUID.randomUUID();
+
+        var credentialsDTO = new CredentialsCreateDTO(c.getEmail(), cpf);
+        var contaDTO = new ContaCreateInputDTO(cpf, c.getSalario());
+
+        var request = new OrchestrationRequestDTO(
+                idOperation,
+                List.of(
+                        new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, credentialsDTO),
+                        new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, contaDTO)
+                )
+        );
+        return null;
+
     }
 
     public void rollbackCliente(UUID uuid) throws Exception {
@@ -102,7 +119,7 @@ public class ClienteService {
         var idOperation = UUID.randomUUID();
 
         var credentialsDTO = new CredentialsCreateDTO(cliente.getEmail(), cpf, encoder.encode(senha));
-        var contaDTO = new ContaCreateDTO(numConta, cpf, cpfGerente);
+        var contaDTO = new ContaCreateInputDTO(numConta, cpf, cpfGerente);
 
         var request = new OrchestrationRequestDTO(
                 idOperation,

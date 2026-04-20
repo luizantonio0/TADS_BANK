@@ -6,5 +6,6 @@ public record OrchestrationResultDTO (
         UUID idCommand,
         UUID idOrchestration,
         String message,
-        boolean ok
+        boolean ok,
+        Object body
 ) { }

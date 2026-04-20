@@ -5,6 +5,6 @@ import com.bantads.conta.dto.orchestrator.OrchestrationCommandDTO;
 
 public interface SagaCommandStrategy<T> {
 
-    void handle(OrchestrationCommandDTO<T> cmd) throws Exception;
+    T handle(OrchestrationCommandDTO<T> cmd) throws Exception;
 
 }

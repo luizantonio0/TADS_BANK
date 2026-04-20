@@ -24,7 +24,8 @@ public class RabbitConsumer {
                     dto.idCommand(),
                     dto.idOrchestration(),
                     "None strategy found for command " + dto.commandType(),
-                    false
+                    false,
+                    null
             );
         }
 

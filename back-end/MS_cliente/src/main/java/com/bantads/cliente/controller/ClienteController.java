@@ -2,6 +2,7 @@ package com.bantads.cliente.controller;
 
 import com.bantads.cliente.dto.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.AprovarClienteDTO;
+import com.bantads.cliente.dto.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.ClienteRequestDTO;
 import com.bantads.cliente.exceptions.AccountAlredyExists;
 import com.bantads.cliente.model.Cliente;
@@ -37,6 +38,13 @@ public class ClienteController {
         var cliente = clienteService.cadastrarCliente(dto);
         return new ResponseEntity<>(cliente, HttpStatus.CREATED);
     }
+
+    @PostMapping("/{cpf}/aprovar")
+    public ResponseEntity<AprovarClienteResponseDTO> aprovar(@PathVariable String cpf) throws Exception {
+        var dto = clienteService.aprovarCliente(cpf);
+        return ResponseEntity.ok(dto);
+    }
+
 
     @PutMapping(value = "/{cpf}")
     public ResponseEntity<Cliente> update(@PathVariable String cpf, @RequestBody AlterarDadosClienteDTO cliente){
