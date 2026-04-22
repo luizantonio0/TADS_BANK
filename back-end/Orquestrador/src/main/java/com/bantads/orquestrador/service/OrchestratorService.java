@@ -1,9 +1,6 @@
 package com.bantads.orquestrador.service;
 
-import com.bantads.orquestrador.dto.OrchestrationCommandDTO;
-import com.bantads.orquestrador.dto.OrchestrationConfirmDTO;
-import com.bantads.orquestrador.dto.OrchestrationRequestDTO;
-import com.bantads.orquestrador.dto.OrchestrationResultDTO;
+import com.bantads.orquestrador.dto.*;
 import com.bantads.orquestrador.model.Command;
 import com.bantads.orquestrador.model.Orchestration;
 import org.redisson.api.RLock;
@@ -31,18 +28,20 @@ public class OrchestratorService {
         this.redisson = redisson;
     }
 
-    public OrchestrationConfirmDTO orchestrate(OrchestrationRequestDTO dto) {
+    public OrchestrationRequestResultDTO orchestrate(OrchestrationRequestDTO dto) {
 
         var orchestration = new Orchestration(
                 dto.uuid(),
                 false,
-                new ArrayList<>(),
-                dto.commands().stream().map(OrchestrationCommandDTO::toCommand).collect(Collectors.toList())
+                new HashMap<>(),
+                dto.commands().stream().map(OrchestrationCommandDTO::toCommand).collect(Collectors.toList()),
+                new HashMap<>()
         );
 
         redisTemplate.opsForValue().set(orchestration.id().toString(), orchestration);
 
         CountDownLatch latch = new CountDownLatch(orchestration.commands().size());
+        var errors = new HashMap<String, String>();
 
         for(var cmd : orchestration.commands()) {
             String queueName = cmd.targetService() + ".command";
@@ -53,46 +52,50 @@ public class OrchestratorService {
             // 15 segundo no maximo para todos os serviços retornarem ok ou erro.
             var ok = latch.await(15, TimeUnit.SECONDS);
             if(!ok) {
-                return confirm(dto.uuid(), List.of("Tempo de espera excedido"), false);
+                orchestration.getErrors().put("orquestrador", "Tempo de espera excedido");
+                orchestration.setFailed(true);
             }
             orchestration = redisTemplate.opsForValue().get(dto.uuid());
             if(orchestration == null) {
                 // por algum motivo nao existe mais a orchestration no redis ???
-                return confirm(dto.uuid(), List.of("Orquestração não existe mais no registro"), false);
+                orchestration.getErrors().put("orquestrador", "Orquestrador não existe mais no registro");
+                orchestration.setFailed(true);
             }
-            return confirm(dto.uuid(), orchestration.getErrors(), orchestration.failed());
+            confirm(dto.uuid(), orchestration.getErrors(), orchestration.failed());
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
 
-        return confirm(dto.uuid(), List.of("Orquestração não existe mais no registro"), false);
+        return new OrchestrationRequestResultDTO(dto.uuid(), orchestration.failed(), orchestration.getPayloads(), orchestration.getErrors());
     }
 
-    private OrchestrationConfirmDTO confirm(UUID orchestrationId, List<String> errors, boolean ok) {
-        return new OrchestrationConfirmDTO(orchestrationId, errors,  ok);
+    private void confirm(UUID orchestrationId, Map<String, String> errors, boolean ok) {
+        rabbitTemplate.convertAndSend("orchestration.confirm", new OrchestrationConfirmDTO(orchestrationId, String.join(", ", errors.values()),  ok));
     }
 
     @Async
     public <T> void waitResultAsync(UUID idOrchestration, String queue, Command<?> dto, CountDownLatch latch) {
 
-        RLock lock = redisson.getLock(idOrchestration.toString());
+        RLock lock = redisson.getLock("lock:" + idOrchestration.toString());
 
         try {
-            if (lock.tryLock(3, 5, TimeUnit.SECONDS)) {
+            if (lock.tryLock()) {
                 try {
                     var orchestration = redisTemplate.opsForValue().get(idOrchestration.toString());
                     if(orchestration == null) {
                         throw new IllegalStateException("Orquestração não existe no Redis");
                     }
-                    var result = (OrchestrationResultDTO) rabbitTemplate.convertSendAndReceive(queue, dto);
+                    var result = (OrchestrationCommandResultDTO) rabbitTemplate.convertSendAndReceive(queue, dto);
                     latch.countDown();
                     if(result == null) {
                         orchestration.setFailed(true);
-                        orchestration.getErrors().add("O serviço retornou nulo");
+                        orchestration.getErrors().put(dto.targetService(), "O serviço retornou nulo");
                     } else {
+                        var payload = result.payload() == null ? "" : result.payload();
+                        orchestration.getPayloads().put(dto.targetService(), payload);
                         if(!orchestration.failed() && result.ok() != orchestration.failed()) {
                             orchestration.setFailed(result.ok());
-                            orchestration.getErrors().add(result.message());
+                            orchestration.getErrors().put(dto.targetService(), result.message());
                             redisTemplate.opsForValue().set(result.idOrchestration().toString(), orchestration);
                         }
                     }
@@ -101,8 +104,8 @@ public class OrchestratorService {
                     lock.unlock();
                 }
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

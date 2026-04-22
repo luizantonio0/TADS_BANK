@@ -1,4 +1,4 @@
-package com.bantads.cliente.config;
+package com.bantads.conta.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.context.annotation.Bean;

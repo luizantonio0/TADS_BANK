@@ -1,29 +1,29 @@
 package com.bantads.orquestrador.component;
 
-import com.bantads.orquestrador.dto.OrchestrationConfirmDTO;
 import com.bantads.orquestrador.dto.OrchestrationRequestDTO;
-import com.bantads.orquestrador.dto.OrchestrationResultDTO;
+import com.bantads.orquestrador.dto.OrchestrationRequestResultDTO;
 import com.bantads.orquestrador.service.OrchestratorService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RabbitConsumer {
 
-    @Autowired
+    @Autowired @Lazy
     private OrchestratorService orchestrator;
 
     @Bean
     public MessageConverter messageConverter() {
-        return new JacksonJsonMessageConverter();
+        return new Jackson2JsonMessageConverter();
     }
 
     @RabbitListener(queues = "orchestration.orchestrate")
-    public OrchestrationConfirmDTO consumeOrchestrateRequest(OrchestrationRequestDTO dto) {
+    public OrchestrationRequestResultDTO consumeOrchestrateRequest(OrchestrationRequestDTO dto) {
         return orchestrator.orchestrate(dto);
     }
 

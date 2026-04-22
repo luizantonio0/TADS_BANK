@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,8 +15,7 @@ import java.util.UUID;
 @Table(name = "tb_conta")
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Audited
 public class Conta {
 
     @Id
@@ -43,5 +43,31 @@ public class Conta {
         this.saldo = saldo;
         this.conta = conta;
         this.cpf = cpf.replaceAll("[^0-9]", "");;
+    }
+
+    public Conta() {}
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public String getConta() {
+        return conta;
+    }
+
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
+    public BigDecimal getLimite() {
+        return limite;
+    }
+
+    public LocalDateTime getCriacao() {
+        return criacao;
     }
 }

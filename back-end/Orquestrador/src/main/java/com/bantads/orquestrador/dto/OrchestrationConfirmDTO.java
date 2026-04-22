@@ -1,6 +1,8 @@
 package com.bantads.orquestrador.dto;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.util.UUID;
 
-public record OrchestrationConfirmDTO (UUID idOrchestration, List<String> errors, boolean ok) { }
+@JsonTypeName("OrchestrationConfirmDTO")
+public record OrchestrationConfirmDTO (UUID idOrchestration, String message, boolean ok) { }

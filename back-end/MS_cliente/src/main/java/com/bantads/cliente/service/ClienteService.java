@@ -5,14 +5,17 @@ import com.bantads.cliente.dto.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.ClienteRequestDTO;
 import com.bantads.cliente.dto.auth.CredentialsCreateDTO;
 import com.bantads.cliente.dto.conta.ContaCreateInputDTO;
+import com.bantads.cliente.dto.conta.ContaCreateOutputDTO;
 import com.bantads.cliente.dto.orchestrator.OrchestrationCommandDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationConfirmDTO;
 import com.bantads.cliente.dto.orchestrator.OrchestrationRequestDTO;
+import com.bantads.cliente.dto.orchestrator.OrchestrationCommandResultDTO;
+import com.bantads.cliente.dto.orchestrator.OrchestrationRequestResultDTO;
 import com.bantads.cliente.exceptions.AccountAlredyExists;
 import com.bantads.cliente.mapper.ClienteMapper;
 import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.orchestration.OrchestrationKeys;
 import com.bantads.cliente.repository.ClienteRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,10 +23,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.history.Revision;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class ClienteService {
@@ -70,6 +74,7 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    @Transactional
     public AprovarClienteResponseDTO aprovarCliente(String cpf) throws Exception {
 
         var cliente = clienteRepository.findByCpf(cpf);
@@ -80,7 +85,7 @@ public class ClienteService {
 
         var idOperation = UUID.randomUUID();
 
-        var credentialsDTO = new CredentialsCreateDTO(c.getEmail(), cpf);
+        var credentialsDTO = new CredentialsCreateDTO(c.getEmail(), cpf, ThreadLocalRandom.current().nextInt(1000, 10000) + "");
         var contaDTO = new ContaCreateInputDTO(cpf, c.getSalario());
 
         var request = new OrchestrationRequestDTO(
@@ -90,53 +95,41 @@ public class ClienteService {
                         new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, contaDTO)
                 )
         );
-        return null;
 
+        var result = (OrchestrationRequestResultDTO) rabbitTemplate.convertSendAndReceive(OrchestrationKeys.ORCHESTRATE_QUEUE, request);
+
+        if(result == null || result.failed()) {
+            throw new Exception(result == null ?
+                    "Resultado de orquestração nulo" : "Orquestração falhou: " + String.join(",", result.errors().values()));
+        }
+
+        if (!result.payloads().containsKey(OrchestrationKeys.MS_CONTA)) {
+            throw new Exception("Serviço de conta não retornou payload");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        ContaCreateOutputDTO contaOutput = mapper.convertValue(result.payloads().get(OrchestrationKeys.MS_CONTA), ContaCreateOutputDTO.class);
+
+        return new AprovarClienteResponseDTO(
+                c.getCpf(),
+                contaOutput.numero(),
+                contaOutput.saldo(),
+                contaOutput.limite(),
+                "Gerente 1",
+                "Criacao top"
+        );
     }
 
     public void rollbackCliente(UUID uuid) throws Exception {
         Page<Revision<Integer, Cliente>> revisions = clienteRepository.findRevisions(uuid, PageRequest.of(0, 2, Sort.by("revisionNumber").descending()));
         List<Revision<Integer, Cliente>> content = revisions.getContent();
-
         if (content.size() >= 2) {
             var revision = content.get(1).getEntity();
             clienteRepository.save(revision);
         } else {
             clienteRepository.deleteById(uuid);
         }
-
     }
 
-    public void aprovarDeprecated(String cpf, String cpfGerente) throws Exception {
-        var clienteAtual = clienteRepository.findByCpf(cpf);
-
-        if(clienteAtual.isEmpty()) throw new IllegalStateException("Cliente não encontrado");
-
-        var cliente = clienteAtual.get();
-
-        var numConta = ThreadLocalRandom.current().nextInt(1000, 9999)+"";
-        var senha = ThreadLocalRandom.current().nextInt(1000, 9999)+"";
-        var idOperation = UUID.randomUUID();
-
-        var credentialsDTO = new CredentialsCreateDTO(cliente.getEmail(), cpf, encoder.encode(senha));
-        var contaDTO = new ContaCreateInputDTO(numConta, cpf, cpfGerente);
-
-        var request = new OrchestrationRequestDTO(
-                idOperation,
-                List.of(
-                        new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, credentialsDTO),
-                        new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, contaDTO)
-                )
-        );
-
-        var response = (OrchestrationConfirmDTO) rabbitTemplate.convertSendAndReceive(OrchestrationKeys.ORCHESTRATE_QUEUE, request);
-
-        if(response != null && response.ok()) {
-            clienteRepository.save(cliente);
-            return;
-        }
-
-        throw new Exception("Erro ao tentar aprovar cliente: " + response.message());
-    }
 }
         

@@ -47,6 +47,9 @@ public class Cliente {
     @Column
     private boolean aprovado;
 
+    public Cliente() {
+    }
+
     public Cliente(ClienteRequestDTO clienteRequestDTO) {
         this.cpf = clienteRequestDTO.cpf().replaceAll("[^0-9]", "");
         this.email = clienteRequestDTO.email();

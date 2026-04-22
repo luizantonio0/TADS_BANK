@@ -1,5 +1,6 @@
 package com.bantads.auth.document;
 
+import org.javers.spring.annotation.JaversAuditable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

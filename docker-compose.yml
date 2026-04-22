@@ -50,7 +50,7 @@ services:
       - tadsbank
 
   redis:
-    image: redis:8.6.2-alpine
+    image: redis:7.2-alpine
     container_name: tads-redis
     restart: always
     ports:
