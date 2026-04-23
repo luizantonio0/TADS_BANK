@@ -1,4 +1,4 @@
-package com.bantads.orquestrador.dto;
+package com.bantads.shared.dto;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 

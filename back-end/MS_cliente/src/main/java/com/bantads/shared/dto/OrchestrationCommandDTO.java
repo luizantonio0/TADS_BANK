@@ -1,14 +1,15 @@
-package com.bantads.conta.dto.orchestrator;
+package com.bantads.shared.dto;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.UUID;
 
 @JsonTypeName("OrchestrationCommandDTO")
-public record OrchestrationCommandDTO<T> (
+public record OrchestrationCommandDTO (
         UUID idOrchestration,
         UUID idCommand,
         String serviceName,
         String commandType,
-        T dto
-) {}
+        String payload
+) {
+}

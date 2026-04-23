@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: conta
+  rabbitmq:
+    template:
+      reply-timeout: 1000000
   jpa:
     hibernate:
       ddl-auto: update

@@ -1,9 +1,9 @@
 package com.bantads.cliente.strategy;
 
-import com.bantads.cliente.dto.orchestrator.OrchestrationCommandDTO;
+import com.bantads.shared.dto.OrchestrationCommandDTO;
 
-public interface SagaCommandStrategy<T> {
+public interface SagaCommandStrategy {
 
-    Object handle(OrchestrationCommandDTO<T> cmd) throws Exception;
+    Object handle(OrchestrationCommandDTO cmd) throws Exception;
 
 }

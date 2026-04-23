@@ -1,7 +1,7 @@
 package com.bantads.orquestrador.component;
 
-import com.bantads.orquestrador.dto.OrchestrationRequestDTO;
-import com.bantads.orquestrador.dto.OrchestrationRequestResultDTO;
+import com.bantads.shared.dto.OrchestrationRequestDTO;
+import com.bantads.shared.dto.OrchestrationRequestResultDTO;
 import com.bantads.orquestrador.service.OrchestratorService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;

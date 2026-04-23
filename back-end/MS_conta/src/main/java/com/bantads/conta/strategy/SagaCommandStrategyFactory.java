@@ -11,8 +11,8 @@ public class SagaCommandStrategyFactory {
     @Autowired
     private SagaCreateContaStrategy createContaStrategy;
 
-    public <T> SagaCommandStrategy<T> newCommand(String commandType) {
-        return (SagaCommandStrategy<T>) switch(commandType) {
+    public SagaCommandStrategy newCommand(String commandType) {
+        return switch(commandType) {
             case OrchestrationKeys.CREATE_CONTA_COMMAND -> createContaStrategy;
             default -> throw new IllegalStateException("Unexpected value: " + commandType);
         };

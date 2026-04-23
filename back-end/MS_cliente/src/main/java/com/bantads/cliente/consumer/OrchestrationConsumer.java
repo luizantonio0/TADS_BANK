@@ -1,8 +1,6 @@
 package com.bantads.cliente.consumer;
 
-import com.bantads.cliente.dto.orchestrator.OrchestrationCommandDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationConfirmDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationCommandResultDTO;
+import com.bantads.shared.dto.*;
 import com.bantads.cliente.orchestration.OrchestrationKeys;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.strategy.SagaCommandStrategy;
@@ -31,15 +29,15 @@ public class OrchestrationConsumer {
     @Autowired
     private ClienteService clienteService;
 
-    @RabbitListener(queues = "ms-auth.command")
-    public <T> OrchestrationCommandResultDTO consumeCreate(OrchestrationCommandDTO<T> dto) {
-        var strategy = (SagaCommandStrategy<T>) cmdFactory.newCommand(dto.commandType());
+    @RabbitListener(queues = "ms-cliente.command")
+    public <T> OrchestrationCommandResultDTO consumeCreate(OrchestrationCommandDTO dto) {
+        var strategy = cmdFactory.newCommand(dto.commandType());
         ObjectMapper mapper = new ObjectMapper();
         if (strategy == null) {
             return new OrchestrationCommandResultDTO(
                             dto.idCommand(),
                             dto.idOrchestration(),
-                            "None strategy found for command " + dto.commandType(),
+                            "Nenhuma estratégia para o comando " + dto.commandType(),
                             false,
                     null
                     );

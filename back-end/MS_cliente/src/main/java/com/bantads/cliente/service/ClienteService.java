@@ -1,15 +1,12 @@
 package com.bantads.cliente.service;
 
+import com.bantads.shared.dto.*;
 import com.bantads.cliente.dto.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.ClienteRequestDTO;
 import com.bantads.cliente.dto.auth.CredentialsCreateDTO;
 import com.bantads.cliente.dto.conta.ContaCreateInputDTO;
 import com.bantads.cliente.dto.conta.ContaCreateOutputDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationCommandDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationRequestDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationCommandResultDTO;
-import com.bantads.cliente.dto.orchestrator.OrchestrationRequestResultDTO;
 import com.bantads.cliente.exceptions.AccountAlredyExists;
 import com.bantads.cliente.mapper.ClienteMapper;
 import com.bantads.cliente.model.Cliente;
@@ -88,11 +85,13 @@ public class ClienteService {
         var credentialsDTO = new CredentialsCreateDTO(c.getEmail(), cpf, ThreadLocalRandom.current().nextInt(1000, 10000) + "");
         var contaDTO = new ContaCreateInputDTO(cpf, c.getSalario());
 
+        ObjectMapper mapper = new ObjectMapper();
+
         var request = new OrchestrationRequestDTO(
                 idOperation,
                 List.of(
-                        new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, credentialsDTO),
-                        new OrchestrationCommandDTO<>(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, contaDTO)
+                        new OrchestrationCommandDTO(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, mapper.writeValueAsString(credentialsDTO)),
+                        new OrchestrationCommandDTO(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, mapper.writeValueAsString(contaDTO))
                 )
         );
 
@@ -107,8 +106,7 @@ public class ClienteService {
             throw new Exception("Serviço de conta não retornou payload");
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        ContaCreateOutputDTO contaOutput = mapper.convertValue(result.payloads().get(OrchestrationKeys.MS_CONTA), ContaCreateOutputDTO.class);
+        ContaCreateOutputDTO contaOutput = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_CONTA), ContaCreateOutputDTO.class);
 
         return new AprovarClienteResponseDTO(
                 c.getCpf(),

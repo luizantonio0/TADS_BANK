@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SagaCommandStrategyFactory {
 
-    public <T> SagaCommandStrategy<T> newCommand(String commandType) {
+    public SagaCommandStrategy newCommand(String commandType) {
         throw new IllegalStateException("Unexpected value: " + commandType);
     }
 

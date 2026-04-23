@@ -24,6 +24,8 @@ spring:
     password: guest
     virtual-host: /
     connection-timeout: 5s
+    template:
+      reply-timeout: 1000000
 logging:
   level:
     org.springframework.web: DEBUG

@@ -1,4 +1,4 @@
-package com.bantads.conta.dto.orchestrator;
+package com.bantads.shared.dto;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -8,5 +8,5 @@ import java.util.UUID;
 @JsonTypeName("OrchestrationRequestDTO")
 public record OrchestrationRequestDTO(
         UUID uuid,
-        List<OrchestrationCommandDTO<?>> commands
+        List<OrchestrationCommandDTO> commands
 ) { }

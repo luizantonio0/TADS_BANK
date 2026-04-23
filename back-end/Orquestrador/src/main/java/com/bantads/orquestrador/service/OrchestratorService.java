@@ -1,8 +1,7 @@
 package com.bantads.orquestrador.service;
 
-import com.bantads.orquestrador.dto.*;
-import com.bantads.orquestrador.model.Command;
 import com.bantads.orquestrador.model.Orchestration;
+import com.bantads.shared.dto.*;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -34,17 +33,16 @@ public class OrchestratorService {
                 dto.uuid(),
                 false,
                 new HashMap<>(),
-                dto.commands().stream().map(OrchestrationCommandDTO::toCommand).collect(Collectors.toList()),
+                dto.commands(),
                 new HashMap<>()
         );
 
-        redisTemplate.opsForValue().set(orchestration.id().toString(), orchestration);
+        redisTemplate.opsForValue().set(orchestration.getId().toString(), orchestration);
 
-        CountDownLatch latch = new CountDownLatch(orchestration.commands().size());
-        var errors = new HashMap<String, String>();
+        CountDownLatch latch = new CountDownLatch(orchestration.getCommands().size());
 
-        for(var cmd : orchestration.commands()) {
-            String queueName = cmd.targetService() + ".command";
+        for(var cmd : orchestration.getCommands()) {
+            String queueName = cmd.serviceName() + ".command";
             waitResultAsync(dto.uuid(), queueName, cmd, latch);
         }
 
@@ -55,18 +53,18 @@ public class OrchestratorService {
                 orchestration.getErrors().put("orquestrador", "Tempo de espera excedido");
                 orchestration.setFailed(true);
             }
-            orchestration = redisTemplate.opsForValue().get(dto.uuid());
+            orchestration = redisTemplate.opsForValue().get(dto.uuid().toString());
             if(orchestration == null) {
                 // por algum motivo nao existe mais a orchestration no redis ???
                 orchestration.getErrors().put("orquestrador", "Orquestrador não existe mais no registro");
                 orchestration.setFailed(true);
             }
-            confirm(dto.uuid(), orchestration.getErrors(), orchestration.failed());
+            confirm(dto.uuid(), orchestration.getErrors(), orchestration.isFailed());
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
 
-        return new OrchestrationRequestResultDTO(dto.uuid(), orchestration.failed(), orchestration.getPayloads(), orchestration.getErrors());
+        return new OrchestrationRequestResultDTO(dto.uuid(), orchestration.isFailed(), orchestration.getPayloads(), orchestration.getErrors());
     }
 
     private void confirm(UUID orchestrationId, Map<String, String> errors, boolean ok) {
@@ -74,7 +72,7 @@ public class OrchestratorService {
     }
 
     @Async
-    public <T> void waitResultAsync(UUID idOrchestration, String queue, Command<?> dto, CountDownLatch latch) {
+    public <T> void waitResultAsync(UUID idOrchestration, String queue, OrchestrationCommandDTO dto, CountDownLatch latch) {
 
         RLock lock = redisson.getLock("lock:" + idOrchestration.toString());
 
@@ -89,14 +87,13 @@ public class OrchestratorService {
                     latch.countDown();
                     if(result == null) {
                         orchestration.setFailed(true);
-                        orchestration.getErrors().put(dto.targetService(), "O serviço retornou nulo");
+                        orchestration.getErrors().put(dto.serviceName(), "O serviço retornou nulo");
                     } else {
                         var payload = result.payload() == null ? "" : result.payload();
-                        orchestration.getPayloads().put(dto.targetService(), payload);
-                        if(!orchestration.failed() && result.ok() != orchestration.failed()) {
-                            orchestration.setFailed(result.ok());
-                            orchestration.getErrors().put(dto.targetService(), result.message());
-                            redisTemplate.opsForValue().set(result.idOrchestration().toString(), orchestration);
+                        orchestration.getPayloads().put(dto.serviceName(), payload);
+                        if(!result.ok()) {
+                            orchestration.setFailed(true);
+                            orchestration.getErrors().put(dto.serviceName(), result.message());
                         }
                     }
                     redisTemplate.opsForValue().set(idOrchestration.toString(), orchestration);

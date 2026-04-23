@@ -1,9 +1,9 @@
 package com.bantads.auth.strategy;
 
-import com.bantads.auth.dto.orchestration.OrchestrationCommandDTO;
+import com.bantads.shared.dto.*;
 
-public interface SagaCommandStrategy<T> {
+public interface SagaCommandStrategy {
 
-    Object handle(OrchestrationCommandDTO<T> cmd);
+    Object handle(OrchestrationCommandDTO cmd);
 
 }

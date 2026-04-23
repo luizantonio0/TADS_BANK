@@ -14,7 +14,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "tb_conta")
 @Data
-@Builder
 @Audited
 public class Conta {
 

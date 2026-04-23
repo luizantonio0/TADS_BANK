@@ -1,8 +1,6 @@
 package com.bantads.conta.consumer;
 
-import com.bantads.conta.dto.orchestrator.OrchestrationCommandDTO;
-import com.bantads.conta.dto.orchestrator.OrchestrationCommandResultDTO;
-import com.bantads.conta.dto.orchestrator.OrchestrationConfirmDTO;
+import com.bantads.shared.dto.*;
 import com.bantads.conta.orchestration.OrchestrationKeys;
 import com.bantads.conta.service.ContaService;
 import com.bantads.conta.strategy.SagaCommandStrategy;
@@ -28,14 +26,14 @@ public class RabbitConsumer {
     private RedisTemplate<String, String> redisTemplate;
 
     @RabbitListener(queues = OrchestrationKeys.MS_CONTA + ".command")
-    public <T> OrchestrationCommandResultDTO consumeCreate(OrchestrationCommandDTO<T> dto) {
-        var strategy = (SagaCommandStrategy<T>) cmdFactory.newCommand(dto.commandType());
+    public <T> OrchestrationCommandResultDTO consumeCreate(OrchestrationCommandDTO dto) {
+        var strategy = cmdFactory.newCommand(dto.commandType());
         var objectMapper = new ObjectMapper();
         if (strategy == null) {
             return new OrchestrationCommandResultDTO(
                     dto.idCommand(),
                     dto.idOrchestration(),
-                    "None strategy found for command " + dto.commandType(),
+                    "Nenhuma estratégia para o comando " + dto.commandType(),
                     false,
                     null
             );
