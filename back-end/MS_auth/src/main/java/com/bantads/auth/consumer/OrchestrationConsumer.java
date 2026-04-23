@@ -60,7 +60,7 @@ public class OrchestrationConsumer {
         return new OrchestrationCommandResultDTO(dto.idCommand(), dto.idOrchestration(), message, ok, payload);
     }
 
-    @RabbitListener(queues = OrchestrationKeys.CONFIRM_QUEUE)
+    @RabbitListener(queues = "ms-auth.orchestration.confirm")
     public void consumeConfirm(OrchestrationConfirmDTO dto) {
 
         var redisKey = dto.idOrchestration().toString() + ":touched:credentials";

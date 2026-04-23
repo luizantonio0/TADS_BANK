@@ -56,7 +56,7 @@ public class RabbitConsumer {
         return new OrchestrationCommandResultDTO(dto.idCommand(), dto.idOrchestration(), message, ok, payload);
     }
 
-    @RabbitListener(queues = OrchestrationKeys.CONFIRM_QUEUE)
+    @RabbitListener(queues = "ms-conta.orchestration.confirm")
     public void consumeConfirm(OrchestrationConfirmDTO dto) {
 
         var redisKey = dto.idOrchestration().toString() + ":touched:conta";
