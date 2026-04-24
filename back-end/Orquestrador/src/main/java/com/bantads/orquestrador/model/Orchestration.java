@@ -7,6 +7,7 @@ import java.util.*;
 
 public class Orchestration implements Serializable {
     private UUID id;
+    private int latch;
     private boolean failed;
     private Map<String, String> errors = new HashMap<>();
     private List<OrchestrationCommandDTO> commands = new ArrayList<>();
@@ -14,8 +15,9 @@ public class Orchestration implements Serializable {
 
     public Orchestration() {}
 
-    public Orchestration(UUID id, boolean failed, Map<String, String> errors, List<OrchestrationCommandDTO> commands, Map<String, String> payloads) {
+    public Orchestration(UUID id, int latch, boolean failed, Map<String, String> errors, List<OrchestrationCommandDTO> commands, Map<String, String> payloads) {
         this.id = id;
+        this.latch = latch;
         this.commands = commands;
         this.failed = failed;
         this.errors = errors;
@@ -39,4 +41,9 @@ public class Orchestration implements Serializable {
 
     public Map<String, String> getPayloads() { return payloads; }
     public void setPayloads(Map<String, String> payloads) { this.payloads = payloads; }
+
+    public boolean decrementLatchAndTest() {
+        this.latch = Math.max(0, this.latch-1);
+        return this.latch == 0;
+    }
 }

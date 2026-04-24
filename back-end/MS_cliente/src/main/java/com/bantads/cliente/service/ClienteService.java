@@ -1,5 +1,7 @@
 package com.bantads.cliente.service;
 
+import com.bantads.cliente.dto.ClienteResponseDTO;
+import com.bantads.cliente.dto.gerente.DefinirGerenteOutputDTO;
 import com.bantads.shared.dto.*;
 import com.bantads.cliente.dto.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.AprovarClienteResponseDTO;
@@ -22,8 +24,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -33,6 +39,9 @@ public class ClienteService {
     private final PasswordEncoder encoder;
     private final ClienteRepository clienteRepository;
     private final ClienteMapper mapper;
+
+    private final Map<UUID, CompletableFuture<AprovarClienteResponseDTO>> aprovarClienteResponses = new ConcurrentHashMap<>();
+    private final Map<UUID, CompletableFuture<ClienteResponseDTO>> criarClienteResponses = new ConcurrentHashMap<>();
 
     public ClienteService(RabbitTemplate rabbitTemplate, ClienteRepository clienteRepository, ClienteMapper mapper, PasswordEncoder encoder) {
         this.clienteRepository = clienteRepository;
@@ -72,54 +81,86 @@ public class ClienteService {
     }
 
     @Transactional
-    public AprovarClienteResponseDTO aprovarCliente(String cpf) throws Exception {
+    public void finishCriarCliente(OrchestrationRequestResultDTO result) throws Exception {
 
-        var cliente = clienteRepository.findByCpf(cpf);
-        if(cliente.isEmpty()) throw new IllegalStateException("Cliente não encontrado");
-        var c = cliente.get();
-        c.setAprovado(true);
-        clienteRepository.save(c);
+        var ok = true;
+        var errors = new ArrayList<String>();
+
+        try {
+            if (result == null) {
+                throw new Exception("Resposta nula do orquestrador");
+            }
+
+            if(result.failed()) {
+                errors.addAll(result.errors().values());
+                ok = false;
+            }
+
+            if (!result.payloads().containsKey(OrchestrationKeys.MS_GERENTE)
+                    || !result.payloads().containsKey(OrchestrationKeys.MS_CLIENTE)) {
+                throw new Exception("Payloads esperados não encontrados");
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            var gerenteOutput = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_GERENTE), DefinirGerenteOutputDTO.class);
+            var clienteDTO = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_CLIENTE), ClienteRequestDTO.class);
+
+            Cliente cliente = new Cliente(clienteDTO);
+            cliente.setGerente(gerenteOutput.idGerente());
+            clienteRepository.save(cliente);
+
+            ClienteResponseDTO dto = new ClienteResponseDTO();
+            if(criarClienteResponses.containsKey(result.idOrchestration())) {
+                criarClienteResponses.get(result.idOrchestration()).complete(dto);
+            }
+
+        } catch (Exception ex) {
+            errors.add(ex.getMessage());
+            ok = false;
+            throw new Exception(String.join(",", errors));
+        } finally {
+            if(result != null) {
+                rabbitTemplate.convertAndSend(
+                        "orchestration.confirm",
+                        "orchestration.confirm",
+                        new OrchestrationConfirmDTO(result.idOrchestration(), String.join(",", errors), ok)
+                );
+            }
+        }
+    }
+
+    @Transactional
+    public CompletableFuture<ClienteResponseDTO> startCriarCliente(ClienteRequestDTO dto) throws Exception {
 
         var idOrchestration = UUID.randomUUID();
 
-        var credentialsDTO = new CredentialsCreateDTO(c.getEmail(), cpf, ThreadLocalRandom.current().nextInt(1000, 10000) + "");
-        var contaDTO = new ContaCreateInputDTO(cpf, c.getSalario());
+        try {
 
-        ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = new ObjectMapper();
 
-        var request = new OrchestrationRequestDTO(
-                idOrchestration,
-                List.of(
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, mapper.writeValueAsString(credentialsDTO)),
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, mapper.writeValueAsString(contaDTO))
-                )
-        );
+            var request = new OrchestrationRequestDTO(
+                    idOrchestration,
+                    false,
+                    List.of(
+                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CLIENTE, OrchestrationKeys.CREATE_CLIENTE_COMMAND, mapper.writeValueAsString(dto))
+                    )
+            );
 
-        var result = (OrchestrationRequestResultDTO) rabbitTemplate.convertSendAndReceive(OrchestrationKeys.ORCHESTRATE_QUEUE, request);
+            var completable = new CompletableFuture<ClienteResponseDTO>();
+            criarClienteResponses.put(idOrchestration, completable);
+            rabbitTemplate.convertSendAndReceive(OrchestrationKeys.ORCHESTRATE_QUEUE, request);
 
-        if(result == null || result.failed()) {
-            throw new Exception(result == null ?
-                    "Resultado de orquestração nulo" : "Orquestração falhou: " + String.join(",", result.errors().values()));
+            return completable;
+
+        } catch (Exception ex) {
+            throw ex;
         }
 
-        if (!result.payloads().containsKey(OrchestrationKeys.MS_CONTA)) {
-            throw new Exception("Serviço de conta não retornou payload");
-        }
-
-        ContaCreateOutputDTO contaOutput = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_CONTA), ContaCreateOutputDTO.class);
-
-        return new AprovarClienteResponseDTO(
-                c.getCpf(),
-                contaOutput.numero(),
-                contaOutput.saldo(),
-                contaOutput.limite(),
-                "Gerente 1",
-                "Criacao top"
-        );
     }
 
     public void rollbackCliente(UUID uuid) throws Exception {
-        Page<Revision<Integer, Cliente>> revisions = clienteRepository.findRevisions(uuid, PageRequest.of(0, 2, Sort.by("revisionNumber").descending()));
+        Page<Revision<Integer, Cliente>> revisions = clienteRepository.findRevisions(uuid, PageRequest.of(0, 2));
         List<Revision<Integer, Cliente>> content = revisions.getContent();
         if (content.size() >= 2) {
             var revision = content.get(1).getEntity();

@@ -6,6 +6,7 @@ import com.bantads.conta.service.ContaService;
 import com.bantads.conta.strategy.SagaCommandStrategy;
 import com.bantads.conta.strategy.SagaCommandStrategyFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -16,27 +17,28 @@ import java.util.UUID;
 @Component
 public class RabbitConsumer {
 
-    @Autowired
-    private SagaCommandStrategyFactory cmdFactory;
+    @Autowired private SagaCommandStrategyFactory cmdFactory;
 
-    @Autowired
-    private ContaService contaService;
+    @Autowired private ContaService contaService;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    @Autowired private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired private RabbitTemplate rabbitTemplate;
 
     @RabbitListener(queues = OrchestrationKeys.MS_CONTA + ".command")
-    public <T> OrchestrationCommandResultDTO consumeCreate(OrchestrationCommandDTO dto) {
+    public void onCommand(OrchestrationCommandDTO dto) {
         var strategy = cmdFactory.newCommand(dto.commandType());
         var objectMapper = new ObjectMapper();
         if (strategy == null) {
-            return new OrchestrationCommandResultDTO(
+            rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(
                     dto.idCommand(),
                     dto.idOrchestration(),
+                    "ms-conta",
                     "Nenhuma estratégia para o comando " + dto.commandType(),
                     false,
                     null
-            );
+            ));
+            return;
         }
 
         String payload = null;
@@ -53,11 +55,18 @@ public class RabbitConsumer {
             message = ex.getMessage();
         }
 
-        return new OrchestrationCommandResultDTO(dto.idCommand(), dto.idOrchestration(), message, ok, payload);
+        rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(
+                dto.idCommand(),
+                dto.idOrchestration(),
+                "ms-conta",
+                message,
+                ok,
+                payload
+        ));
     }
 
     @RabbitListener(queues = "ms-conta.orchestration.confirm")
-    public void consumeConfirm(OrchestrationConfirmDTO dto) {
+    public void onConfirm(OrchestrationConfirmDTO dto) {
 
         var redisKey = dto.idOrchestration().toString() + ":touched:conta";
         var touched = redisTemplate.opsForValue().getAndDelete(redisKey);

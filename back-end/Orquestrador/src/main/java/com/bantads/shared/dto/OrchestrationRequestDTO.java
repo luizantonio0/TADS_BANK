@@ -8,5 +8,6 @@ import java.util.UUID;
 @JsonTypeName("OrchestrationRequestDTO")
 public record OrchestrationRequestDTO(
         UUID uuid,
+        boolean autoConfirm,
         List<OrchestrationCommandDTO> commands
 ) { }

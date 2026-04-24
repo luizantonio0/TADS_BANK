@@ -1,4 +1,4 @@
-package com.bantads.auth.strategy;
+package com.bantads.gerente.strategy;
 
 import com.bantads.shared.dto.*;
 

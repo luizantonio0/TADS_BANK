@@ -47,6 +47,9 @@ public class Cliente {
     @Column
     private boolean aprovado;
 
+    @Column
+    private UUID idGerente;
+
     public Cliente() {
     }
 
@@ -104,6 +107,10 @@ public class Cliente {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public void setGerente(UUID id) {
+        this.idGerente = id;
     }
 }
         

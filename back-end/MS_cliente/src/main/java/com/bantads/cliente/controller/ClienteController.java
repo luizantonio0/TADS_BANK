@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/clientes")
@@ -34,9 +36,11 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<Cliente> save(@RequestBody ClienteRequestDTO dto) throws IllegalArgumentException {
-        var cliente = clienteService.cadastrarCliente(dto);
-        return new ResponseEntity<>(cliente, HttpStatus.CREATED);
+    public CompletableFuture<ResponseEntity<Cliente>> save(@RequestBody ClienteRequestDTO dto) throws IllegalArgumentException {
+        return clienteService.startCriarCliente(dto)
+                .thenApply(ResponseEntity::ok)
+                .orTimeout(15, TimeUnit.SECONDS) // Timeout de segurança
+                .exceptionally(ex -> ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build());
     }
 
     @PostMapping("/{cpf}/aprovar")

@@ -20,27 +20,26 @@ public class OrchestrationConsumer {
     @Autowired
     private SagaCommandStrategyFactory cmdFactory;
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    @Autowired private RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    @Autowired private RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    private AuthService authService;
+    @Autowired private AuthService authService;
 
     @RabbitListener(queues = "ms-auth.command")
-    public OrchestrationCommandResultDTO consumeCreate(OrchestrationCommandDTO dto) {
+    public void onCommand(OrchestrationCommandDTO dto) {
         var strategy = cmdFactory.newCommand(dto.commandType());
         ObjectMapper mapper = new ObjectMapper();
         if (strategy == null) {
-            return new OrchestrationCommandResultDTO(
-                            dto.idCommand(),
-                            dto.idOrchestration(),
-                            "Nenhuma estratégia para o comando " + dto.commandType(),
-                            false,
+             rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(
+                     dto.idCommand(),
+                     dto.idOrchestration(),
+                     "ms-auth",
+                     "Nenhuma estratégia para o comando " + dto.commandType(),
+                     false,
                     null
-                    );
+             ));
+             return;
         }
 
         String payload = null;
@@ -57,7 +56,7 @@ public class OrchestrationConsumer {
             message = ex.getMessage();
         }
 
-        return new OrchestrationCommandResultDTO(dto.idCommand(), dto.idOrchestration(), message, ok, payload);
+        rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(dto.idCommand(), dto.idOrchestration(), "ms-auth", message, ok, payload));
     }
 
     @RabbitListener(queues = "ms-auth.orchestration.confirm")

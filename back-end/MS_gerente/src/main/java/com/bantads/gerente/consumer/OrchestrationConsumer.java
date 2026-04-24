@@ -1,8 +1,8 @@
-package com.bantads.cliente.consumer;
+package com.bantads.gerente.consumer;
 
+import com.bantads.gerente.service.GerenteService;
+import com.bantads.gerente.strategy.SagaCommandStrategyFactory;
 import com.bantads.shared.dto.*;
-import com.bantads.cliente.service.ClienteService;
-import com.bantads.cliente.strategy.SagaCommandStrategyFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,9 @@ public class OrchestrationConsumer {
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    private ClienteService clienteService;
+    private GerenteService gerenteService;
 
-    @RabbitListener(queues = "ms-cliente.command")
+    @RabbitListener(queues = "ms-gerente.command")
     public void onCommand(OrchestrationCommandDTO dto) {
         var strategy = cmdFactory.newCommand(dto.commandType());
         ObjectMapper mapper = new ObjectMapper();
@@ -35,12 +35,11 @@ public class OrchestrationConsumer {
             rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(
                     dto.idCommand(),
                     dto.idOrchestration(),
-                    "ms-cliente",
+                    "ms-gerente",
                     "Nenhuma estratégia para o comando " + dto.commandType(),
                     false,
                     null
             ));
-            return;
         }
 
         String payload = null;
@@ -60,27 +59,25 @@ public class OrchestrationConsumer {
         rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(
                 dto.idCommand(),
                 dto.idOrchestration(),
-                "ms-cliente",
+                "ms-gerente",
                 message,
                 ok,
-                payload
-        ));
+                payload)
+        );
     }
 
-    @RabbitListener(queues = "ms-cliente.orchestration.confirm")
+    @RabbitListener(queues = "ms-gerente.orchestration.confirm")
     public void onConfirm(OrchestrationConfirmDTO dto) {
 
+        var redisKey = dto.idOrchestration().toString() + ":touched:gerente";
+        var touched = redisTemplate.opsForValue().getAndDelete(redisKey);
 
-
-        var redisKey = dto.idOrchestration().toString() + ":touched:cliente";
-        var touchedCliente = redisTemplate.opsForValue().getAndDelete(redisKey);
-
-        if(dto.ok() || touchedCliente == null) {
+        if(dto.ok() || touched == null) {
             return;
         }
 
         try {
-            clienteService.rollbackCliente(UUID.fromString(touchedCliente));
+            gerenteService.rollbackGerente(UUID.fromString(touched));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
