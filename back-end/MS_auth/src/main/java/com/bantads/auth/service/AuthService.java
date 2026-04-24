@@ -37,7 +37,9 @@ public class AuthService {
         if(credentialsRepository.existsById(cpf)) {
             throw new CredentialsAlreadyExistsException();
         }
-        credentialsRepository.insert(new Credentials(cpf, email, cryptoPw));
+        var creds = new Credentials(cpf, email, cryptoPw);
+        credentialsRepository.insert(creds);
+        javers.commit("system", creds);
     }
 
     public void updateCredentials(String cpf, String email) {

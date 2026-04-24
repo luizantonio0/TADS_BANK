@@ -25,7 +25,7 @@ public class ContaService {
     private ContaRepository contaRepository;
 
     public void rollbackConta(UUID uuid) throws Exception {
-        Page<Revision<Integer, Conta>> revisions = contaRepository.findRevisions(uuid, PageRequest.of(0, 2, Sort.by("revisionNumber").descending()));
+        Page<Revision<Integer, Conta>> revisions = contaRepository.findRevisions(uuid, PageRequest.of(0, 2));
         List<Revision<Integer, Conta>> content = revisions.getContent();
 
         if (content.size() >= 2) {
@@ -54,7 +54,6 @@ public class ContaService {
                 dto.cpf()
                 );
         contaRepository.save(conta);
-
         return conta;
     }
 

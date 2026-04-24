@@ -69,4 +69,28 @@ public class Conta {
     public LocalDateTime getCriacao() {
         return criacao;
     }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public void setConta(String conta) {
+        this.conta = conta;
+    }
+
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
+    }
+
+    public void setLimite(BigDecimal limite) {
+        this.limite = limite;
+    }
+
+    public void setCriacao(LocalDateTime criacao) {
+        this.criacao = criacao;
+    }
 }

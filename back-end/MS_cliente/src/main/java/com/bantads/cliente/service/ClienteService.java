@@ -80,7 +80,7 @@ public class ClienteService {
         c.setAprovado(true);
         clienteRepository.save(c);
 
-        var idOperation = UUID.randomUUID();
+        var idOrchestration = UUID.randomUUID();
 
         var credentialsDTO = new CredentialsCreateDTO(c.getEmail(), cpf, ThreadLocalRandom.current().nextInt(1000, 10000) + "");
         var contaDTO = new ContaCreateInputDTO(cpf, c.getSalario());
@@ -88,10 +88,10 @@ public class ClienteService {
         ObjectMapper mapper = new ObjectMapper();
 
         var request = new OrchestrationRequestDTO(
-                idOperation,
+                idOrchestration,
                 List.of(
-                        new OrchestrationCommandDTO(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, mapper.writeValueAsString(credentialsDTO)),
-                        new OrchestrationCommandDTO(UUID.randomUUID(), UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, mapper.writeValueAsString(contaDTO))
+                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, mapper.writeValueAsString(credentialsDTO)),
+                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, mapper.writeValueAsString(contaDTO))
                 )
         );
 

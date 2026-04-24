@@ -1,6 +1,7 @@
 package com.bantads.orquestrador.config;
 
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -43,6 +44,11 @@ public class RabbitConfig {
     @Bean
     public Queue msClienteCommandQueue() {
         return new Queue("ms-cliente.command", true);
+    }
+
+    @Bean
+    public TopicExchange confirmExchange() {
+        return new TopicExchange("orchestration.confirm");
     }
 
 

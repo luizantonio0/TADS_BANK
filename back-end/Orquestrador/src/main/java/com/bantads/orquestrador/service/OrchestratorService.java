@@ -59,7 +59,7 @@ public class OrchestratorService {
                 orchestration.getErrors().put("orquestrador", "Orquestrador não existe mais no registro");
                 orchestration.setFailed(true);
             }
-            confirm(dto.uuid(), orchestration.getErrors(), orchestration.isFailed());
+            confirm(dto.uuid(), orchestration.getErrors(), !orchestration.isFailed());
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
@@ -68,7 +68,7 @@ public class OrchestratorService {
     }
 
     private void confirm(UUID orchestrationId, Map<String, String> errors, boolean ok) {
-        rabbitTemplate.convertAndSend("orchestration.confirm", new OrchestrationConfirmDTO(orchestrationId, String.join(", ", errors.values()),  ok));
+        rabbitTemplate.convertAndSend("orchestration.confirm", "orchestration.confirm", new OrchestrationConfirmDTO(orchestrationId, String.join(", ", errors.values()),  ok));
     }
 
     @Async
