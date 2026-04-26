@@ -2,6 +2,8 @@ package com.bantads.conta.controller;
 
 import com.bantads.conta.dto.ContaCreateInputDTO;
 import com.bantads.conta.dto.DepositoDTO;
+import com.bantads.conta.dto.SaqueDTO;
+import com.bantads.conta.dto.TransferenciaDTO;
 import com.bantads.conta.service.ContaService;
 import com.bantads.conta.service.MovimentacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,18 @@ public class ContaController {
     @PostMapping("/deposito")
     public ResponseEntity<Void> depositar(@RequestBody DepositoDTO dto) {
         movimentacaoService.depositar(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/saque")
+    public ResponseEntity<Void> sacar(@RequestBody SaqueDTO dto) {
+        movimentacaoService.sacar(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/transferencia")
+    public ResponseEntity<Void> transferir(@RequestBody TransferenciaDTO dto) {
+        movimentacaoService.transferir(dto);
         return ResponseEntity.ok().build();
     }
 
