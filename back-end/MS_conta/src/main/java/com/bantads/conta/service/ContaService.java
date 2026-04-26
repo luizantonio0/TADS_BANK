@@ -37,6 +37,11 @@ public class ContaService {
 
     }
 
+    public Conta getConta(String numConta) {
+        return contaRepository.findByConta(numConta)
+                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
+    }
+
     public Conta createConta(ContaCreateInputDTO dto) throws Exception {
 
         if(contaRepository.existsByCpf(dto.cpf())) {

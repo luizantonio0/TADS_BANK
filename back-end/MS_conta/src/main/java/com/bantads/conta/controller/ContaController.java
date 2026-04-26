@@ -30,4 +30,9 @@ public class ContaController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{numConta}")
+    public ResponseEntity<Object> getSaldo(@PathVariable String numConta) {
+        return ResponseEntity.ok(contaService.getConta(numConta));
+    }
+
 }
