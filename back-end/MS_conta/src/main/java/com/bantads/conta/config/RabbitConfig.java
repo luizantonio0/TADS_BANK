@@ -35,4 +35,19 @@ public class RabbitConfig {
     public Binding binding(Queue confirmQueue, TopicExchange confirmExchange) {
         return BindingBuilder.bind(confirmQueue).to(confirmExchange).with("orchestration.confirm");
     }
+
+    @Bean
+    public TopicExchange finishedExchange() {
+        return new TopicExchange("orchestration.finished");
+    }
+
+    @Bean
+    public Queue finishedQueue() {
+        return new Queue("ms-conta.orchestration.finished", true);
+    }
+
+    @Bean
+    public Binding finishedBinding(Queue finishedQueue, TopicExchange finishedExchange) {
+        return BindingBuilder.bind(finishedQueue).to(finishedExchange).with("orchestration.finished");
+    }
 }

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.enums.GerenteTipo;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
@@ -22,18 +23,17 @@ public class Gerente {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, length = 20)
-    @NotBlank(message = "Nome não pode ser vazio")
-    @Min(value = 3, message = "Nome deve ter pelo menos 3 caracteres")
-    private String nome;
-
     @Column(nullable = false, length = 11)
     private String cpf;
 
-    @Column(nullable = false, length = 128)
-    @NotBlank(message = "Email não pode ser vazio")
-    @Min(value = 3, message = "Email deve ter pelo menos 3 caracteres")
-    @Email
+    @NotBlank
+    @Size(min = 3, max = 20)
+    @Column(name = "nome", nullable = false, length = 20)
+    private String nome;
+
+    @NotBlank
+    @Size(min = 3, max = 128)
+    @Column(name = "email", nullable = false, length = 128)
     private String email;
 
     @Column(nullable = false)
@@ -61,6 +61,7 @@ public class Gerente {
         this.email = criaGerenteDTO.email();
         this.senha = criaGerenteDTO.senha();
         this.tipo = criaGerenteDTO.tipo().name();
+        this.totalClientes = 0;
     }
 
     public void incrementTotalClientes() {

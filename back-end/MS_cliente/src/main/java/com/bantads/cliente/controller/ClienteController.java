@@ -1,12 +1,11 @@
 package com.bantads.cliente.controller;
 
-import com.bantads.cliente.dto.AlterarDadosClienteDTO;
-import com.bantads.cliente.dto.AprovarClienteDTO;
-import com.bantads.cliente.dto.AprovarClienteResponseDTO;
-import com.bantads.cliente.dto.ClienteRequestDTO;
+import com.bantads.cliente.dto.*;
 import com.bantads.cliente.exceptions.AccountAlredyExists;
 import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.service.ClienteService;
+import com.bantads.cliente.service.OrchestrationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +18,9 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/clientes")
 public class ClienteController {
 
-    final ClienteService clienteService;
+    @Autowired private ClienteService clienteService;
+    @Autowired private OrchestrationService orchestrationService;
 
-    public ClienteController(ClienteService clienteService) {
-        this.clienteService = clienteService;
-    }
-    
     @GetMapping
     public ResponseEntity<List<Cliente>> findAll(){
         return new ResponseEntity<>(clienteService.findAll(), HttpStatus.OK);
@@ -36,17 +32,16 @@ public class ClienteController {
     }
 
     @PostMapping
-    public CompletableFuture<ResponseEntity<Cliente>> save(@RequestBody ClienteRequestDTO dto) throws IllegalArgumentException {
-        return clienteService.startCriarCliente(dto)
+    public CompletableFuture<ResponseEntity<ClienteCreateResponseDTO>> save(@RequestBody ClienteRequestDTO dto) throws Exception {
+        return orchestrationService.startCriarCliente(dto)
                 .thenApply(ResponseEntity::ok)
-                .orTimeout(15, TimeUnit.SECONDS) // Timeout de segurança
+                .orTimeout(15, TimeUnit.SECONDS)
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build());
     }
 
     @PostMapping("/{cpf}/aprovar")
     public ResponseEntity<AprovarClienteResponseDTO> aprovar(@PathVariable String cpf) throws Exception {
-        var dto = clienteService.aprovarCliente(cpf);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(null);
     }
 
 

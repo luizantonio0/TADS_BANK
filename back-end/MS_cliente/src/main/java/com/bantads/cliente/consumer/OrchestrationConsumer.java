@@ -1,8 +1,10 @@
 package com.bantads.cliente.consumer;
 
+import com.bantads.cliente.service.OrchestrationService;
 import com.bantads.shared.dto.*;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.strategy.SagaCommandStrategyFactory;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,16 @@ public class OrchestrationConsumer {
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired
+    private OrchestrationService orchestrationService;
+
+    @RabbitListener(queues = "ms-cliente.orchestration.finished")
+    public void onResult(OrchestrationRequestResultDTO dto) {
+        if(orchestrationService.isCriarClienteSaga(dto.idOrchestration())) {
+            orchestrationService.finishCriarCliente(dto);
+        }
+    }
 
     @RabbitListener(queues = "ms-cliente.command")
     public void onCommand(OrchestrationCommandDTO dto) {
@@ -69,8 +81,6 @@ public class OrchestrationConsumer {
 
     @RabbitListener(queues = "ms-cliente.orchestration.confirm")
     public void onConfirm(OrchestrationConfirmDTO dto) {
-
-
 
         var redisKey = dto.idOrchestration().toString() + ":touched:cliente";
         var touchedCliente = redisTemplate.opsForValue().getAndDelete(redisKey);

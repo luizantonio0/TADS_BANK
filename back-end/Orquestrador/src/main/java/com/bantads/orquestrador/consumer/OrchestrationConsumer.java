@@ -6,6 +6,7 @@ import com.bantads.orquestrador.service.OrchestratorService;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
 import com.bantads.shared.dto.OrchestrationCommandResultDTO;
 import com.bantads.shared.dto.OrchestrationConfirmDTO;
+import com.bantads.shared.dto.OrchestrationRequestResultDTO;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -44,27 +45,41 @@ public class OrchestrationConsumer {
 
         try {
             if (lock.tryLock(5, TimeUnit.SECONDS)) {
+                if(orchestration.isFinished()) {
+                    return;
+                }
                 orchestration.getPayloads().put(dto.sourceService(), dto.payload());
                 if(!dto.ok()) {
                     orchestration.setFailed(true);
                     orchestration.getErrors().put(dto.sourceService(), dto.message());
                 }
-                redisTemplate.opsForValue().set(orchestrationKey, orchestration);
                 if (ended) {
+                    orchestration.setFinished(true);
                     rabbitTemplate.convertAndSend(
-                            "orchestration.confirm",
-                            "orchestration.confirm",
-                            new OrchestrationConfirmDTO(
+                            "orchestration.finished",
+                            "orchestration.finished",
+                            new OrchestrationRequestResultDTO(
                                     dto.idOrchestration(),
-                                    String.join(",", orchestration.getErrors().values()),
-                                    !orchestration.isFailed()
-                            )
+                                    orchestration.isFailed(),
+                                    orchestration.getPayloads(),
+                                    orchestration.getErrors())
                     );
+                    if(orchestration.isAutoConfirm()) {
+                        rabbitTemplate.convertAndSend(
+                                "orchestration.confirm",
+                                "orchestration.confirm",
+                                new OrchestrationConfirmDTO(
+                                        dto.idOrchestration(),
+                                        String.join(",", orchestration.getErrors().values()),
+                                        orchestration.isFailed()
+                        ));
+                    }
                 }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
+            redisTemplate.opsForValue().set(orchestrationKey, orchestration);
             lock.unlock();
         }
     }

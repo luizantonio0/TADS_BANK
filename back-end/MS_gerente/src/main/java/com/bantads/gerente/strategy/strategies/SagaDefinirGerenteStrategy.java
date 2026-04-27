@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 @Component
-public class SagaDefinirGerenteCommand implements SagaCommandStrategy {
+public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {
 
     @Autowired
     private GerenteService gerenteService;

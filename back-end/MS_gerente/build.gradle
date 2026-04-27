@@ -20,6 +20,8 @@ repositories {
 }
 
 dependencies {
+	// Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct
+
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.springframework.data:spring-data-envers:4.1.0-RC1'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
@@ -29,6 +31,10 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }

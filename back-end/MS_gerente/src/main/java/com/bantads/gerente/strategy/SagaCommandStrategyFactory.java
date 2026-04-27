@@ -1,7 +1,7 @@
 package com.bantads.gerente.strategy;
 
-import com.bantads.auth.orchestration.OrchestrationKeys;
-import com.bantads.auth.strategy.strategies.SagaCreateCredentialsStrategy;
+import com.bantads.gerente.orchestration.OrchestrationKeys;
+import com.bantads.gerente.strategy.strategies.SagaDefinirGerenteStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 public class SagaCommandStrategyFactory {
 
     @Autowired
-    private SagaCreateCredentialsStrategy createCredentialsStrategy;
+    private SagaDefinirGerenteStrategy findGerenteStrategy;
 
     public SagaCommandStrategy newCommand(String commandType) {
         return switch(commandType) {
-            case OrchestrationKeys.CREATE_CREDENTIALS_COMMAND -> createCredentialsStrategy;
+            case OrchestrationKeys.FIND_GERENTE_COMMAND -> findGerenteStrategy;
             default -> throw new IllegalStateException("Unexpected value: " + commandType);
         };
     }

@@ -33,6 +33,8 @@ public class OrchestratorService {
                 dto.uuid(),
                 dto.commands().size(),
                 false,
+                false,
+                dto.autoConfirm(),
                 new HashMap<>(),
                 dto.commands(),
                 new HashMap<>()
@@ -41,8 +43,6 @@ public class OrchestratorService {
         var orchestrationKey = "orchestration:" + orchestration.getId().toString();
 
         redisTemplate.opsForValue().set(orchestrationKey, orchestration);
-
-        CountDownLatch latch = new CountDownLatch(orchestration.getCommands().size());
 
         for(var cmd : orchestration.getCommands()) {
             String queueName = cmd.serviceName() + ".command";

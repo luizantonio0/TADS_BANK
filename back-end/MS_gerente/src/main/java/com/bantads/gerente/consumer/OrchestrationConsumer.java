@@ -27,6 +27,11 @@ public class OrchestrationConsumer {
     @Autowired
     private GerenteService gerenteService;
 
+    @RabbitListener(queues = "ms-gerente.orchestration.finished")
+    public void onFinished(OrchestrationRequestResultDTO dto) {
+
+    }
+
     @RabbitListener(queues = "ms-gerente.command")
     public void onCommand(OrchestrationCommandDTO dto) {
         var strategy = cmdFactory.newCommand(dto.commandType());

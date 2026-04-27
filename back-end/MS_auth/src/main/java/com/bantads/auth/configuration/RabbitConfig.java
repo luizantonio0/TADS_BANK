@@ -42,4 +42,19 @@ public class RabbitConfig {
         return BindingBuilder.bind(confirmQueue).to(confirmExchange).with("orchestration.confirm");
     }
 
+    @Bean
+    public TopicExchange finishedExchange() {
+        return new TopicExchange("orchestration.finished");
+    }
+
+    @Bean
+    public Queue finishedQueue() {
+        return new Queue("ms-auth.orchestration.finished", true);
+    }
+
+    @Bean
+    public Binding finishedBinding(Queue finishedQueue, TopicExchange finishedExchange) {
+        return BindingBuilder.bind(finishedQueue).to(finishedExchange).with("orchestration.finished");
+    }
+
 }

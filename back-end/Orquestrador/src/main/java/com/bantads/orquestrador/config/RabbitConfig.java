@@ -51,5 +51,9 @@ public class RabbitConfig {
         return new TopicExchange("orchestration.confirm");
     }
 
+    @Bean
+    public TopicExchange finishedExchange() {
+        return new TopicExchange("orchestration.finished");
+    }
 
 }

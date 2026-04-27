@@ -34,6 +34,9 @@ public class Cliente {
 
     private BigDecimal salario;
 
+    @Column
+    private String endereco;
+
     @Column(length = 8)
     private String cep;
 
@@ -111,6 +114,10 @@ public class Cliente {
 
     public void setGerente(UUID id) {
         this.idGerente = id;
+    }
+
+    public String getEndereco() {
+        return endereco;
     }
 }
         

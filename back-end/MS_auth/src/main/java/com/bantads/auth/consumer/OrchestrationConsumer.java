@@ -26,6 +26,9 @@ public class OrchestrationConsumer {
 
     @Autowired private AuthService authService;
 
+    @RabbitListener(queues = "ms-auth.orchestration.finished")
+    public void onFinished(OrchestrationRequestResultDTO dto) {}
+
     @RabbitListener(queues = "ms-auth.command")
     public void onCommand(OrchestrationCommandDTO dto) {
         var strategy = cmdFactory.newCommand(dto.commandType());

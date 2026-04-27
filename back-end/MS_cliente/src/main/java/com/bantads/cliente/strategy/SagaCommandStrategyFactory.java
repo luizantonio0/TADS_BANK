@@ -1,12 +1,21 @@
 package com.bantads.cliente.strategy;
 
+import com.bantads.cliente.orchestration.OrchestrationKeys;
+import com.bantads.cliente.strategy.strategies.SagaCreateClienteStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SagaCommandStrategyFactory {
 
+    @Autowired
+    private SagaCreateClienteStrategy createClienteStrategy;
+
     public SagaCommandStrategy newCommand(String commandType) {
-        throw new IllegalStateException("Unexpected value: " + commandType);
+        return switch(commandType) {
+            case OrchestrationKeys.CREATE_CLIENTE_COMMAND -> createClienteStrategy;
+            default -> throw new IllegalStateException("Unexpected value: " + commandType);
+        };
     }
 
 }

@@ -1,4 +1,4 @@
-package com.bantads.cliente.dto.conta;
+package com.bantads.cliente.dto.saga.output;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 

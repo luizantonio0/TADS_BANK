@@ -25,6 +25,11 @@ public class RabbitConsumer {
 
     @Autowired private RabbitTemplate rabbitTemplate;
 
+    @RabbitListener(queues = "ms-conta.orchestration.finished")
+    public void onFinished(OrchestrationRequestResultDTO dto) {
+
+    }
+
     @RabbitListener(queues = OrchestrationKeys.MS_CONTA + ".command")
     public void onCommand(OrchestrationCommandDTO dto) {
         var strategy = cmdFactory.newCommand(dto.commandType());
