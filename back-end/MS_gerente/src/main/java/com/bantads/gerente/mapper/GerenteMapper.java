@@ -7,5 +7,8 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface GerenteMapper {
-    void ataualizaGerentePeloDto(AtualizaGerenteDTO dto, @MappingTarget Gerente gerente);
+    void ataualizaGerentePeloDto (
+            AtualizaGerenteDTO dto,
+            @MappingTarget Gerente gerente
+    );
 }

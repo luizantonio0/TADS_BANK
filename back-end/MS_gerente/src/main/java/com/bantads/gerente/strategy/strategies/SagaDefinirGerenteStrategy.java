@@ -13,14 +13,17 @@ import tools.jackson.databind.ObjectMapper;
 @Component
 public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {
 
-    @Autowired
-    private GerenteService gerenteService;
+    private final GerenteService gerenteService;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    public SagaDefinirGerenteStrategy(GerenteService gerenteService, RedisTemplate<String, String> redisTemplate) {
+        this.gerenteService = gerenteService;
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
-    public Object handle(OrchestrationCommandDTO cmd) throws Exception {
+    public Object handle(OrchestrationCommandDTO cmd){
         try {
 
             ObjectMapper mapper = new ObjectMapper();
@@ -31,8 +34,14 @@ public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {
                 throw new IllegalArgumentException("Nenhum gerente disponível");
             }
 
-            redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:gerente", gerente.get().getId().toString());
-            return new DefinirGerenteOutputDTO(gerente.get().getId(), gerente.get().getNome());
+            redisTemplate.opsForValue().set(
+                    cmd.idOrchestration().toString() + ":touched:gerente",
+                    gerente.get().getId().toString()
+            );
+            return new DefinirGerenteOutputDTO(
+                    gerente.get().getId(),
+                    gerente.get().getNome()
+            );
 
         } catch (Exception ex) {
             throw ex;

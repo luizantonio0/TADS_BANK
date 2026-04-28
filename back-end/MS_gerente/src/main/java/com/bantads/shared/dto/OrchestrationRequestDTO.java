@@ -10,4 +10,5 @@ public record OrchestrationRequestDTO(
         UUID uuid,
         boolean autoConfirm,
         List<OrchestrationCommandDTO> commands
-) { }
+)
+{ }

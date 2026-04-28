@@ -20,22 +20,25 @@ public class GerenteController {
     }
 
 
-    @GetMapping("product/{cpf}")
+    @GetMapping("gerente/{cpf}")
     public ResponseEntity<Gerente> findById(@PathVariable String cpf){
         return new ResponseEntity<>(gerenteService.findByCpf(cpf), HttpStatus.OK);
     }
 
-    @PostMapping("product")
+    @PostMapping("gerente")
     public ResponseEntity<Gerente> save(@RequestBody CriaGerenteDTO criaGerenteDTO){
-        return new ResponseEntity<>(gerenteService.save(criaGerenteDTO), HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                gerenteService.save(criaGerenteDTO),
+                HttpStatus.CREATED
+        );
     }
     
-    @PutMapping("product/{cpf}")
+    @PutMapping("gerente/{cpf}")
     public ResponseEntity<GerenteAtualizadoDTO> update(@PathVariable String cpf , @RequestBody AtualizaGerenteDTO atualizaGerenteDTO){
         return new ResponseEntity<>(gerenteService.updateByCpf(cpf, atualizaGerenteDTO), HttpStatus.OK);
     }
     
-    @DeleteMapping("product/{cpf}")
+    @DeleteMapping("gerente/{cpf}")
     public void delete(@PathVariable String cpf){
         gerenteService.deleteByCpf(cpf);
     }

@@ -8,8 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SagaCommandStrategyFactory {
 
-    @Autowired
-    private SagaDefinirGerenteStrategy findGerenteStrategy;
+    private final SagaDefinirGerenteStrategy findGerenteStrategy;
+
+    public SagaCommandStrategyFactory(SagaDefinirGerenteStrategy findGerenteStrategy) {
+        this.findGerenteStrategy = findGerenteStrategy;
+    }
 
     public SagaCommandStrategy newCommand(String commandType) {
         return switch(commandType) {

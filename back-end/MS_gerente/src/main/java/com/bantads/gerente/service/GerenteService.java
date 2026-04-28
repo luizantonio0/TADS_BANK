@@ -38,25 +38,33 @@ public class GerenteService {
     }
 
 
+    @Transactional
     public void deleteByCpf(String cpf) {
         this.gerenteRepository.deleteByCpf(cpf);
     }
-    
+
+    @Transactional
     public void incrementarCliente(UUID idGerente) {
 
         Optional<Gerente> gerente = gerenteRepository.findById(idGerente);
+
         if (gerente.isEmpty()) throw new IllegalArgumentException("Gerente não encontrado");
 
-        Gerente ger = gerente.get();
+        Gerente gerenteAtualizado = gerente.get();
 
-        ger.incrementTotalClientes();
-        gerenteRepository.save(ger);
+        gerenteAtualizado.incrementTotalClientes();
 
+        gerenteRepository.save(gerenteAtualizado);
     }
-
+    @Transactional
     public void rollbackGerente(UUID idGerente) {
-        Page<Revision<Integer, Gerente>> revisions = gerenteRepository.findRevisions(idGerente, PageRequest.of(0, 2));
+        Page<Revision<Integer, Gerente>> revisions = gerenteRepository.findRevisions(
+                idGerente,
+                PageRequest.of(0, 2)
+        );
+
         List<Revision<Integer, Gerente>> content = revisions.getContent();
+
         if (content.size() >= 2) {
             var revision = content.get(1).getEntity();
             gerenteRepository.save(revision);
@@ -65,6 +73,7 @@ public class GerenteService {
         }
     }
 
+    @Transactional
     public GerenteAtualizadoDTO updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) {
 
         @Valid
