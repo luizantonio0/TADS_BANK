@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Repository
 public interface GerenteRepository extends JpaRepository<Gerente, UUID>, RevisionRepository<Gerente, UUID, Integer> {
-    Gerente findByCpf(String cpf);
+    Optional<Gerente> findByCpf(String cpf);
     void deleteByCpf(String cpf);
 
     @Query(value = "SELECT * FROM tb_gerente ORDER BY CAST(total_clientes AS INTEGER) ASC LIMIT 1", nativeQuery = true)
