@@ -24,34 +24,20 @@ public class GerenteController {
 
     @GetMapping("gerente/{cpf}")
     public ResponseEntity<Gerente> findById(@PathVariable String cpf){
-        try
-        {
             return new ResponseEntity<>(gerenteService.findByCpf(cpf), HttpStatus.OK);
-        } catch (ChangeSetPersister.NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
     }
 
     @PostMapping("gerente")
     public ResponseEntity<Gerente> save(@RequestBody CriaGerenteDTO criaGerenteDTO){
-        try{
             return new ResponseEntity<>(
                     gerenteService.save(criaGerenteDTO),
                     HttpStatus.CREATED
             );
-        } catch (AccountAlredyExists e) {
-            return ResponseEntity.status(409).build();
-        }
     }
-    
+
     @PutMapping("gerente/{cpf}")
     public ResponseEntity<GerenteAtualizadoDTO> update(@PathVariable String cpf , @RequestBody AtualizaGerenteDTO atualizaGerenteDTO){
-        try
-        {
-            return new ResponseEntity<>(gerenteService.updateByCpf(cpf, atualizaGerenteDTO), HttpStatus.OK);
-        } catch (ChangeSetPersister.NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return new ResponseEntity<>(gerenteService.updateByCpf(cpf, atualizaGerenteDTO), HttpStatus.OK);
     }
     
     @DeleteMapping("gerente/{cpf}")

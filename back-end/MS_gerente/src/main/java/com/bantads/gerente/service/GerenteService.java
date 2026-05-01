@@ -3,13 +3,13 @@ package com.bantads.gerente.service;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.request.CriaGerenteDTO;
 import com.bantads.gerente.exception.AccountAlredyExists;
+import com.bantads.gerente.exception.NotFoundExecption;
 import com.bantads.gerente.model.Gerente;
 import com.bantads.gerente.repository.GerenteRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
 import com.bantads.gerente.mapper.GerenteMapper;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.history.Revision;
@@ -81,11 +81,11 @@ public class GerenteService {
     }
 
     @Transactional
-    public GerenteAtualizadoDTO updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) throws ChangeSetPersister.NotFoundException {
+    public GerenteAtualizadoDTO updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) throws NotFoundExecption {
 
         @Valid
         Gerente gerente = gerenteRepository.findByCpf(cpf).orElseThrow(
-                ChangeSetPersister.NotFoundException::new
+                () -> new NotFoundExecption("")
         );
 
         gerenteMapper.ataualizaGerentePeloDto(atualizaGerenteDTO, gerente);
@@ -95,11 +95,11 @@ public class GerenteService {
         return new GerenteAtualizadoDTO(gerente);
     }
 
-    public Gerente findByCpf(String cpf) throws ChangeSetPersister.NotFoundException {
+    public Gerente findByCpf(String cpf) throws NotFoundExecption {
 
         return gerenteRepository.findByCpf(cpf).
                 orElseThrow(
-                        ChangeSetPersister.NotFoundException::new
+                        () -> new NotFoundExecption("")
                 );
     }
 
