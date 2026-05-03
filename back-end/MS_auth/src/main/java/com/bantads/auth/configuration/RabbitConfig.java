@@ -1,6 +1,9 @@
 package com.bantads.auth.configuration;
 
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +28,33 @@ public class RabbitConfig {
     }
 
     @Bean
+    public TopicExchange confirmExchange() {
+        return new TopicExchange("orchestration.confirm");
+    }
+
+    @Bean
     public Queue confirmQueue() {
-        return new Queue("orchestration.confirm", true);
+        return new Queue("ms-auth.orchestration.confirm", true);
+    }
+
+    @Bean
+    public Binding binding(Queue confirmQueue, TopicExchange confirmExchange) {
+        return BindingBuilder.bind(confirmQueue).to(confirmExchange).with("orchestration.confirm");
+    }
+
+    @Bean
+    public TopicExchange finishedExchange() {
+        return new TopicExchange("orchestration.finished");
+    }
+
+    @Bean
+    public Queue finishedQueue() {
+        return new Queue("ms-auth.orchestration.finished", true);
+    }
+
+    @Bean
+    public Binding finishedBinding(Queue finishedQueue, TopicExchange finishedExchange) {
+        return BindingBuilder.bind(finishedQueue).to(finishedExchange).with("orchestration.finished");
     }
 
 }

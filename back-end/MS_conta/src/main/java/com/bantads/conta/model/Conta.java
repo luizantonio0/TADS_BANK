@@ -1,14 +1,20 @@
 package com.bantads.conta.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "tb_conta")
+@Data
+@Audited
 public class Conta {
 
     @Id
@@ -18,7 +24,7 @@ public class Conta {
     @Column(unique = true, nullable = false, length = 11)
     private String cpf;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 10)
     private String conta;
 
     @Column(nullable = false)
@@ -28,15 +34,21 @@ public class Conta {
     private BigDecimal limite;
 
     @Column(nullable = false)
-    private Date criacao;
+    private LocalDateTime criacao;
 
-    public Conta(Date criacao, BigDecimal limite, BigDecimal saldo, String conta, String cpf) {
+    @Column(nullable = false, length = 11)
+    private String gerenteCpf;
+
+    public Conta(LocalDateTime criacao, BigDecimal limite, BigDecimal saldo, String conta, String cpf, String gerenteCpf) {
         this.criacao = criacao;
         this.limite = limite;
         this.saldo = saldo;
         this.conta = conta;
-        this.cpf = cpf;
+        this.cpf = cpf.replaceAll("[^0-9]", "");
+        this.gerenteCpf = gerenteCpf;
     }
+
+    public Conta() {}
 
     public UUID getId() {
         return id;
@@ -58,7 +70,31 @@ public class Conta {
         return limite;
     }
 
-    public Date getCriacao() {
+    public LocalDateTime getCriacao() {
         return criacao;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public void setConta(String conta) {
+        this.conta = conta;
+    }
+
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
+    }
+
+    public void setLimite(BigDecimal limite) {
+        this.limite = limite;
+    }
+
+    public void setCriacao(LocalDateTime criacao) {
+        this.criacao = criacao;
     }
 }

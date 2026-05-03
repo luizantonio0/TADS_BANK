@@ -20,6 +20,8 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.data:spring-data-envers:4.1.0-RC1'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'jakarta.mail:jakarta.mail-api:2.2.0-M1'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'

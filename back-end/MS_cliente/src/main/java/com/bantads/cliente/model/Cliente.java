@@ -5,16 +5,18 @@ import com.bantads.cliente.enums.UF;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
 @Table(name = "tb_cliente")
-@NoArgsConstructor
-@AllArgsConstructor
+@Audited
 public class Cliente {
 
     @Id
+    @Column
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
@@ -32,6 +34,9 @@ public class Cliente {
 
     private BigDecimal salario;
 
+    @Column
+    private String endereco;
+
     @Column(length = 8)
     private String cep;
 
@@ -42,10 +47,17 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private UF estado;
 
+    @Column
     private boolean aprovado;
 
+    @Column
+    private UUID idGerente;
+
+    public Cliente() {
+    }
+
     public Cliente(ClienteRequestDTO clienteRequestDTO) {
-        this.cpf = clienteRequestDTO.cpf();
+        this.cpf = clienteRequestDTO.cpf().replaceAll("[^0-9]", "");
         this.email = clienteRequestDTO.email();
         this.nome = clienteRequestDTO.nome();
         this.telefone = clienteRequestDTO.telefone();
@@ -96,5 +108,16 @@ public class Cliente {
         return estado;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setGerente(UUID id) {
+        this.idGerente = id;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
 }
         

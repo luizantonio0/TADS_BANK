@@ -50,7 +50,7 @@ services:
       - tadsbank
 
   redis:
-    image: redis:8.6.2-alpine
+    image: redis:7.2-alpine
     container_name: tads-redis
     restart: always
     ports:
@@ -130,6 +130,26 @@ services:
     networks:
       - cliente
       - tadsbank
+
+  ms-conta:
+    build:
+      context: ./back-end/MS_conta
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ms_contas
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    networks:
+      - conta
+      - tadsbank
+    ports:
+      - "8082:8080"
     
 
 
