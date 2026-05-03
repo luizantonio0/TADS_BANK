@@ -1,15 +1,15 @@
 package com.bantads.conta.controller;
 
-import com.bantads.conta.dto.ContaCreateInputDTO;
-import com.bantads.conta.dto.DepositoDTO;
-import com.bantads.conta.dto.SaqueDTO;
-import com.bantads.conta.dto.TransferenciaDTO;
+import com.bantads.conta.dto.*;
 import com.bantads.conta.service.ContaService;
 import com.bantads.conta.service.MovimentacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/contas")
@@ -47,6 +47,14 @@ public class ContaController {
     @GetMapping("/{numConta}")
     public ResponseEntity<Object> getSaldo(@PathVariable String numConta) {
         return ResponseEntity.ok(contaService.getConta(numConta));
+    }
+
+    @GetMapping("/{numConta}/extrato")
+    public ResponseEntity<ExtratoResponseDTO> getExtrato(
+            @PathVariable String numConta,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+        return ResponseEntity.ok(movimentacaoService.getExtrato(numConta, inicio, fim));
     }
 
 }
