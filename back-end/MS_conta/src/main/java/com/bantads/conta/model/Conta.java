@@ -36,12 +36,16 @@ public class Conta {
     @Column(nullable = false)
     private LocalDateTime criacao;
 
-    public Conta(LocalDateTime criacao, BigDecimal limite, BigDecimal saldo, String conta, String cpf) {
+    @Column(nullable = false, length = 11)
+    private String gerenteCpf;
+
+    public Conta(LocalDateTime criacao, BigDecimal limite, BigDecimal saldo, String conta, String cpf, String gerenteCpf) {
         this.criacao = criacao;
         this.limite = limite;
         this.saldo = saldo;
         this.conta = conta;
-        this.cpf = cpf.replaceAll("[^0-9]", "");;
+        this.cpf = cpf.replaceAll("[^0-9]", "");
+        this.gerenteCpf = gerenteCpf;
     }
 
     public Conta() {}
