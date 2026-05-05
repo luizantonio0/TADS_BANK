@@ -1,6 +1,9 @@
 package com.bantads.cliente.strategy.strategies;
 
+
 import com.bantads.cliente.dto.ClienteRequestDTO;
+import com.bantads.cliente.dto.saga.input.AprovarClienteInputDTO;
+import com.bantads.cliente.dto.saga.output.AprovarClienteOutputDTO;
 import com.bantads.cliente.dto.saga.output.CreateClienteOutputDTO;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.strategy.SagaCommandStrategy;
@@ -11,7 +14,7 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 @Component
-public class SagaCreateClienteStrategy implements SagaCommandStrategy {
+public class SagaAprovarClienteStrategy implements SagaCommandStrategy {
 
     @Autowired private RedisTemplate<String, String> redisTemplate;
     @Autowired private ClienteService clienteService;
@@ -20,13 +23,13 @@ public class SagaCreateClienteStrategy implements SagaCommandStrategy {
     public Object handle(OrchestrationCommandDTO cmd) throws Exception {
 
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            ClienteRequestDTO dto = mapper.readValue(cmd.payload(), ClienteRequestDTO.class);
+            var mapper = new ObjectMapper();
+            var dto = mapper.readValue(cmd.payload(), AprovarClienteInputDTO.class);
 
-            var cli = clienteService.cadastrarCliente(dto);
+            var cli = clienteService.aprovarCliente(dto.cpf());
             redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
 
-            return new CreateClienteOutputDTO(dto.cpf());
+            return new AprovarClienteOutputDTO(dto.cpf());
         } catch (IllegalArgumentException ex) {
             throw ex;
         }

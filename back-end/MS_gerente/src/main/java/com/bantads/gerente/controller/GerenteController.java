@@ -23,8 +23,8 @@ public class GerenteController {
 
 
     @GetMapping("gerente/{cpf}")
-    public ResponseEntity<Gerente> findById(@PathVariable String cpf){
-            return new ResponseEntity<>(gerenteService.findByCpf(cpf), HttpStatus.OK);
+    public ResponseEntity<Gerente> findById(@PathVariable String cpf) throws Exception {
+            return new ResponseEntity<>(gerenteService.findByCpf(cpf).orElseThrow(() -> new Exception("Cliente não encontrado")), HttpStatus.OK);
     }
 
     @PostMapping("gerente")

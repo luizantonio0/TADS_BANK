@@ -37,6 +37,9 @@ public class OrchestrationConsumer {
         if(orchestrationService.isCriarClienteSaga(dto.idOrchestration())) {
             orchestrationService.finishCriarCliente(dto);
         }
+        if(orchestrationService.isAprovarClienteSaga(dto.idOrchestration())) {
+            orchestrationService.finishAprovarCliente(dto);
+        }
     }
 
     @RabbitListener(queues = "ms-cliente.command")

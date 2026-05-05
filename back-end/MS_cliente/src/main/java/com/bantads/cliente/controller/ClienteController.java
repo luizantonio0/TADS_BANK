@@ -36,12 +36,21 @@ public class ClienteController {
         return orchestrationService.startCriarCliente(dto)
                 .thenApply(ResponseEntity::ok)
                 .orTimeout(15, TimeUnit.SECONDS)
-                .exceptionally(ex -> ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build());
+                .exceptionally(ex -> {
+                    ex.printStackTrace(); // Veja no console qual é a exceção real
+                    return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+                });
     }
 
     @PostMapping("/{cpf}/aprovar")
-    public ResponseEntity<AprovarClienteResponseDTO> aprovar(@PathVariable String cpf) throws Exception {
-        return ResponseEntity.ok(null);
+    public CompletableFuture<ResponseEntity<AprovarClienteResponseDTO>> aprovar(@PathVariable String cpf) throws Exception {
+        return orchestrationService.startAprovarCliente(new AprovarClienteDTO(cpf.replaceAll("[^0-9]", "")))
+                .thenApply(ResponseEntity::ok)
+                .orTimeout(15, TimeUnit.SECONDS)
+                .exceptionally(ex -> {
+                    ex.printStackTrace(); // Veja no console qual é a exceção real
+                    return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+                });
     }
 
 

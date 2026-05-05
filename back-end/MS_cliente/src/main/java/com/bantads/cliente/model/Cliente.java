@@ -104,6 +104,10 @@ public class Cliente {
         return cidade;
     }
 
+    public UUID getIdGerente() {
+        return idGerente;
+    }
+
     public UF getEstado() {
         return estado;
     }

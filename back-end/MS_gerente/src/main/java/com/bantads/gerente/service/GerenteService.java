@@ -44,6 +44,10 @@ public class GerenteService {
         return gerenteRepository.save(gerente);
     }
 
+    public Optional<Gerente> findById(UUID id) {
+        return gerenteRepository.findById(id);
+    }
+
 
     @Transactional
     public void deleteByCpf(String cpf) {
@@ -95,12 +99,8 @@ public class GerenteService {
         return new GerenteAtualizadoDTO(gerente);
     }
 
-    public Gerente findByCpf(String cpf) throws NotFoundExecption {
-
-        return gerenteRepository.findByCpf(cpf).
-                orElseThrow(
-                        () -> new NotFoundExecption("")
-                );
+    public Optional<Gerente> findByCpf(String cpf) throws NotFoundExecption {
+        return gerenteRepository.findByCpf(cpf);
     }
 
     public Optional<Gerente> findGerenteMenosClientes() {
