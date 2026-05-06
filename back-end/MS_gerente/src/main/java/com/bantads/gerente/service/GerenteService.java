@@ -3,6 +3,7 @@ package com.bantads.gerente.service;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.request.CriaGerenteDTO;
 import com.bantads.gerente.exception.AccountAlredyExists;
+import com.bantads.gerente.exception.BadRequestException;
 import com.bantads.gerente.exception.NotFoundExecption;
 import com.bantads.gerente.model.Gerente;
 import com.bantads.gerente.repository.GerenteRepository;
@@ -23,22 +24,36 @@ import java.util.UUID;
 public class GerenteService {
     private final GerenteRepository gerenteRepository;
     private final GerenteMapper gerenteMapper;
+    private final ValidatorService validatorService;
 
-    public GerenteService(GerenteRepository gerenteRepository, GerenteMapper gerenteMapper) {
+    public GerenteService(GerenteRepository gerenteRepository, GerenteMapper gerenteMapper, ValidatorService validatorService) {
         this.gerenteRepository = gerenteRepository;
         this.gerenteMapper = gerenteMapper;
+        this.validatorService = validatorService;
     }
 
     @Transactional
     public Gerente save(CriaGerenteDTO criaGerenteDTO) throws AccountAlredyExists {
 
-        gerenteRepository.findByCpf(criaGerenteDTO.cpf())
+        String cpf = validatorService.cpfValidator(criaGerenteDTO.cpf()).
+                orElseThrow(
+                        () -> new BadRequestException("Cpf informado não é válido")
+                );
+
+        String email = validatorService.emailValidator(criaGerenteDTO.email()).
+                orElseThrow(
+                        () -> new BadRequestException("Email informado não é válido")
+                );
+
+        gerenteRepository.findByCpf(cpf)
                 .orElseThrow(
                         () -> new AccountAlredyExists("Já existe um gerente com esse CPF")
                 );
 
         @Valid
         Gerente gerente = new Gerente(criaGerenteDTO);
+        gerente.setCpf(cpf);
+        gerente.setEmail(email);
 
 
         return gerenteRepository.save(gerente);
@@ -87,12 +102,18 @@ public class GerenteService {
     @Transactional
     public GerenteAtualizadoDTO updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) throws NotFoundExecption {
 
+        String email = validatorService.emailValidator(atualizaGerenteDTO.email()).
+                orElseThrow(
+                        () -> new BadRequestException("Email informado não é válido")
+                );
         @Valid
         Gerente gerente = gerenteRepository.findByCpf(cpf).orElseThrow(
                 () -> new NotFoundExecption("")
         );
 
         gerenteMapper.ataualizaGerentePeloDto(atualizaGerenteDTO, gerente);
+
+        gerente.setEmail(email);
 
         gerenteRepository.save(gerente);
 
