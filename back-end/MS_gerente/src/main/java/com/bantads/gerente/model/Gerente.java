@@ -102,5 +102,28 @@ public class Gerente {
         return totalClientes;
     }
 
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public void setTotalClientes(Integer totalClientes) {
+        this.totalClientes = totalClientes;
+    }
 }
         

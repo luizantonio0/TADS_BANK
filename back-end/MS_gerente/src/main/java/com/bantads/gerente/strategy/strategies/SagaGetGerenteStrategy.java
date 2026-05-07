@@ -30,7 +30,7 @@ public class SagaGetGerenteStrategy implements SagaCommandStrategy {
             var mapper = new ObjectMapper();
             var dto = mapper.readValue(cmd.payload(), GetGerenteInputDTO.class);
 
-            var gerente = gerenteService.findByCpf(cmd.payload());
+            var gerente = gerenteService.findById(dto.uuid());
             if (gerente.isEmpty()) {
                 throw new IllegalArgumentException("Nenhum gerente encontrado");
             }

@@ -25,7 +25,7 @@ spring:
     virtual-host: /
     connection-timeout: 5s
     template:
-      reply-timeout: 1000000
+      reply-timeout: 30
 logging:
   level:
     org.springframework.web: DEBUG
