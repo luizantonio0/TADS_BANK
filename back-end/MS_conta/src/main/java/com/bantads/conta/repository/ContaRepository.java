@@ -14,4 +14,5 @@ public interface ContaRepository extends JpaRepository<Conta, UUID>, RevisionRep
     boolean existsByCpf(String cpf);
     boolean existsByConta(String conta);
     Optional<Conta> findByConta(String conta);
+    Optional<Conta> findByCpf(String cpf);
 }

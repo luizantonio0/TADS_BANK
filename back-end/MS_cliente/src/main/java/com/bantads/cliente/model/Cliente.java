@@ -1,6 +1,6 @@
 package com.bantads.cliente.model;
 
-import com.bantads.cliente.dto.ClienteRequestDTO;
+import com.bantads.cliente.dto.http.ClienteRequestDTO;
 import com.bantads.cliente.enums.UF;
 import jakarta.persistence.*;
 import org.hibernate.envers.Audited;
@@ -64,7 +64,7 @@ public class Cliente {
         this.nome = clienteRequestDTO.nome();
         this.telefone = clienteRequestDTO.telefone();
         this.salario = clienteRequestDTO.salario();
-        this.cep = clienteRequestDTO.CEP();
+        this.cep = clienteRequestDTO.CEP().replaceAll("[^0-9]", "");
         this.cidade = clienteRequestDTO.cidade();
         this.estado = clienteRequestDTO.estado();
         this.aprovado = false;

@@ -3,7 +3,6 @@ package com.bantads.conta.consumer;
 import com.bantads.shared.dto.*;
 import com.bantads.conta.orchestration.OrchestrationKeys;
 import com.bantads.conta.service.ContaService;
-import com.bantads.conta.strategy.SagaCommandStrategy;
 import com.bantads.conta.strategy.SagaCommandStrategyFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

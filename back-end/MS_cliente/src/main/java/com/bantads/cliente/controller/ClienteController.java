@@ -1,7 +1,10 @@
 package com.bantads.cliente.controller;
 
-import com.bantads.cliente.dto.*;
-import com.bantads.cliente.exceptions.AccountAlredyExists;
+import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
+import com.bantads.cliente.dto.http.AprovarClienteDTO;
+import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
+import com.bantads.cliente.dto.http.ClienteCreateResponseDTO;
+import com.bantads.cliente.dto.http.ClienteRequestDTO;
 import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.service.OrchestrationService;
@@ -27,36 +30,30 @@ public class ClienteController {
     }
 
     @GetMapping("/{cpf}")
-    public ResponseEntity<Cliente> findByCpf(@PathVariable String cpf){
+    public ResponseEntity<Cliente> findByCpf(@PathVariable("cpf") String cpf){
         return new ResponseEntity<>(clienteService.findByCpf(cpf), HttpStatus.OK);
     }
 
     @PostMapping
-    public CompletableFuture<ResponseEntity<ClienteCreateResponseDTO>> save(@RequestBody ClienteRequestDTO dto) throws Exception {
+    public CompletableFuture<ResponseEntity<ClienteCreateResponseDTO>> save(@RequestBody ClienteRequestDTO dto) throws Exception {    
         return orchestrationService.startCriarCliente(dto)
-                .thenApply(ResponseEntity::ok)
-                .orTimeout(15, TimeUnit.SECONDS)
-                .exceptionally(ex -> {
-                    ex.printStackTrace(); // Veja no console qual é a exceção real
-                    return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
-                });
+            .thenApply(ResponseEntity::ok)
+            .orTimeout(15, TimeUnit.SECONDS);
     }
 
     @PostMapping("/{cpf}/aprovar")
     public CompletableFuture<ResponseEntity<AprovarClienteResponseDTO>> aprovar(@PathVariable("cpf") String cpf) throws Exception {
         return orchestrationService.startAprovarCliente(new AprovarClienteDTO(cpf.replaceAll("[^0-9]", "")))
                 .thenApply(ResponseEntity::ok)
-                .orTimeout(15, TimeUnit.SECONDS)
-                .exceptionally(ex -> {
-                    ex.printStackTrace(); // Veja no console qual é a exceção real
-                    return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
-                });
+                .orTimeout(15, TimeUnit.SECONDS);
     }
 
 
     @PutMapping(value = "/{cpf}")
-    public ResponseEntity<Cliente> update(@PathVariable String cpf, @RequestBody AlterarDadosClienteDTO cliente){
-        return new ResponseEntity<>(clienteService.update(cliente, cpf), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<Object>> update(@PathVariable("cpf") String cpf, @RequestBody AlterarDadosClienteDTO dto) throws Exception{
+        return orchestrationService.startAtualizarCliente(cpf.replaceAll("[^0-9]", ""), dto)
+                .thenApply(ResponseEntity::ok)
+                .orTimeout(15, TimeUnit.HOURS);
     }
 
 }        

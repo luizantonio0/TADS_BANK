@@ -1,6 +1,6 @@
 package com.bantads.cliente.strategy.strategies;
 
-import com.bantads.cliente.dto.ClienteRequestDTO;
+import com.bantads.cliente.dto.http.ClienteRequestDTO;
 import com.bantads.cliente.dto.saga.output.CreateClienteOutputDTO;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.strategy.SagaCommandStrategy;

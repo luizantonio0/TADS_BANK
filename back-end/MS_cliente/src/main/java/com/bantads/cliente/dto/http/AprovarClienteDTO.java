@@ -1,7 +1,6 @@
-package com.bantads.cliente.dto;
+package com.bantads.cliente.dto.http;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 public record AprovarClienteDTO(
         String cpf

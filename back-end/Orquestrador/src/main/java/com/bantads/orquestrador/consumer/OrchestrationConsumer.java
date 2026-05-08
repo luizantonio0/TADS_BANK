@@ -1,9 +1,6 @@
 package com.bantads.orquestrador.consumer;
 
-
 import com.bantads.orquestrador.model.Orchestration;
-import com.bantads.orquestrador.service.OrchestratorService;
-import com.bantads.shared.dto.OrchestrationCommandDTO;
 import com.bantads.shared.dto.OrchestrationCommandResultDTO;
 import com.bantads.shared.dto.OrchestrationConfirmDTO;
 import com.bantads.shared.dto.OrchestrationRequestResultDTO;
@@ -15,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -23,8 +19,6 @@ public class OrchestrationConsumer {
 
 
     @Autowired private RedisTemplate<String, Orchestration> redisTemplate;
-
-    @Autowired private OrchestratorService orchestrationService;
 
     @Autowired private RabbitTemplate rabbitTemplate;
 
@@ -71,7 +65,7 @@ public class OrchestrationConsumer {
                                 new OrchestrationConfirmDTO(
                                         dto.idOrchestration(),
                                         String.join(",", orchestration.getErrors().values()),
-                                        orchestration.isFailed()
+                                        !orchestration.isFailed()
                         ));
                     }
                 }

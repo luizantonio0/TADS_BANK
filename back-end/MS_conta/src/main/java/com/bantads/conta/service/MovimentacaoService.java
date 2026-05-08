@@ -9,7 +9,6 @@ import com.bantads.conta.model.Movimentacao;
 import com.bantads.conta.model.TipoMovimentacao;
 import com.bantads.conta.repository.ContaRepository;
 import com.bantads.conta.repository.MovimentacaoRepository;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class MovimentacaoService {
@@ -29,9 +27,6 @@ public class MovimentacaoService {
 
     @Autowired
     private MovimentacaoRepository movimentacaoRepository;
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
 
     public ExtratoResponseDTO getExtrato(String numConta, LocalDate inicio, LocalDate fim) {
         LocalDateTime dataInicio = inicio.atStartOfDay();
