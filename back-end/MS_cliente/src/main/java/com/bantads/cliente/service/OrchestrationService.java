@@ -230,7 +230,7 @@ public class OrchestrationService {
                     contaOutput.saldo(),
                     contaOutput.limite(),
                     gerenteOutput.nome(),
-                    ""
+                    clienteOutput.criacao()
             );
 
             completableFuture.complete(dto);

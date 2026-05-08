@@ -29,7 +29,7 @@ public class SagaAprovarClienteStrategy implements SagaCommandStrategy {
             var cli = clienteService.aprovarCliente(dto.cpf());
             redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
 
-            return new AprovarClienteOutputDTO(dto.cpf());
+            return new AprovarClienteOutputDTO(dto.cpf(), cli.getCriacao().toString());
         } catch (IllegalArgumentException ex) {
             throw ex;
         }

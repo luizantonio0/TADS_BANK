@@ -3,11 +3,10 @@ package com.bantads.cliente.model;
 import com.bantads.cliente.dto.ClienteRequestDTO;
 import com.bantads.cliente.enums.UF;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -53,6 +52,9 @@ public class Cliente {
     @Column
     private UUID idGerente;
 
+    @Column
+    private LocalDateTime criacao;
+
     public Cliente() {
     }
 
@@ -66,6 +68,15 @@ public class Cliente {
         this.cidade = clienteRequestDTO.cidade();
         this.estado = clienteRequestDTO.estado();
         this.aprovado = false;
+        this.criacao = LocalDateTime.now();
+    }
+
+    public LocalDateTime getCriacao() {
+        return criacao;
+    }
+
+    public boolean isAprovado() {
+        return aprovado;
     }
 
     public void setAprovado(boolean aprovado) {
