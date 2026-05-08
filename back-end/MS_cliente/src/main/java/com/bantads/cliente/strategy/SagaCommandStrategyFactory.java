@@ -19,7 +19,7 @@ public class SagaCommandStrategyFactory {
         return switch(commandType) {
             case OrchestrationKeys.CREATE_CLIENTE_COMMAND -> createClienteStrategy;
             case OrchestrationKeys.APPROVE_CLIENTE_COMMAND -> aprovarClienteStrategy;
-            default -> throw new IllegalStateException("Unexpected value: " + commandType);
+            default -> null;
         };
     }
 

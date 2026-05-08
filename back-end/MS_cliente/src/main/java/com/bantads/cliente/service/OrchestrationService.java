@@ -4,7 +4,6 @@ import com.bantads.cliente.dto.AprovarClienteDTO;
 import com.bantads.cliente.dto.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.ClienteCreateResponseDTO;
 import com.bantads.cliente.dto.ClienteRequestDTO;
-import com.bantads.cliente.dto.saga.input.AprovarClienteInputDTO;
 import com.bantads.cliente.dto.saga.input.ContaCreateInputDTO;
 import com.bantads.cliente.dto.saga.input.CredentialsCreateInputDTO;
 import com.bantads.cliente.dto.saga.input.GetGerenteInputDTO;
@@ -15,7 +14,6 @@ import com.bantads.shared.dto.OrchestrationCommandDTO;
 import com.bantads.shared.dto.OrchestrationConfirmDTO;
 import com.bantads.shared.dto.OrchestrationRequestDTO;
 import com.bantads.shared.dto.OrchestrationRequestResultDTO;
-import com.zaxxer.hikari.util.Credentials;
 import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,7 +177,8 @@ public class OrchestrationService {
                     List.of(
                             new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, mapper.writeValueAsString(contaDTO)),
                             new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, mapper.writeValueAsString(authDTO)),
-                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CLIENTE, OrchestrationKeys.GET_GERENTE_COMMAND, mapper.writeValueAsString(gerenteDTO))
+                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_GERENTE, OrchestrationKeys.GET_GERENTE_COMMAND, mapper.writeValueAsString(gerenteDTO)),
+                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CLIENTE, OrchestrationKeys.APPROVE_CLIENTE_COMMAND, mapper.writeValueAsString(dto))
                     )
             );
 

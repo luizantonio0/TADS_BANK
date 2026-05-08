@@ -1,8 +1,8 @@
 package com.bantads.cliente.strategy.strategies;
 
 
+import com.bantads.cliente.dto.AprovarClienteDTO;
 import com.bantads.cliente.dto.ClienteRequestDTO;
-import com.bantads.cliente.dto.saga.input.AprovarClienteInputDTO;
 import com.bantads.cliente.dto.saga.output.AprovarClienteOutputDTO;
 import com.bantads.cliente.dto.saga.output.CreateClienteOutputDTO;
 import com.bantads.cliente.service.ClienteService;
@@ -24,7 +24,7 @@ public class SagaAprovarClienteStrategy implements SagaCommandStrategy {
 
         try {
             var mapper = new ObjectMapper();
-            var dto = mapper.readValue(cmd.payload(), AprovarClienteInputDTO.class);
+            var dto = mapper.readValue(cmd.payload(), AprovarClienteDTO.class);
 
             var cli = clienteService.aprovarCliente(dto.cpf());
             redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());

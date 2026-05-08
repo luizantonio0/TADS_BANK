@@ -56,8 +56,7 @@ public class ContaService {
                 limite,
                 BigDecimal.ZERO,
                 numConta,
-                dto.cpf(),
-                dto.gerenteCpf()
+                dto.cpf()
                 );
         contaRepository.save(conta);
         return conta;

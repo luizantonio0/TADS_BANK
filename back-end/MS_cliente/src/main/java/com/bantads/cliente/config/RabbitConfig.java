@@ -7,6 +7,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,7 +35,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Binding binding(Queue confirmQueue, TopicExchange confirmExchange) {
+    public Binding binding(@Qualifier("confirmQueue") Queue confirmQueue, @Qualifier("confirmExchange") TopicExchange confirmExchange) {
         return BindingBuilder.bind(confirmQueue).to(confirmExchange).with("orchestration.confirm");
     }
 
@@ -49,7 +50,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Binding finishedBinding(Queue finishedQueue, TopicExchange finishedExchange) {
+    public Binding finishedBinding(@Qualifier("finishedQueue") Queue finishedQueue, @Qualifier("finishedExchange") TopicExchange finishedExchange) {
         return BindingBuilder.bind(finishedQueue).to(finishedExchange).with("orchestration.finished");
     }
 

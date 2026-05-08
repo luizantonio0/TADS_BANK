@@ -43,7 +43,7 @@ public class ClienteController {
     }
 
     @PostMapping("/{cpf}/aprovar")
-    public CompletableFuture<ResponseEntity<AprovarClienteResponseDTO>> aprovar(@PathVariable String cpf) throws Exception {
+    public CompletableFuture<ResponseEntity<AprovarClienteResponseDTO>> aprovar(@PathVariable("cpf") String cpf) throws Exception {
         return orchestrationService.startAprovarCliente(new AprovarClienteDTO(cpf.replaceAll("[^0-9]", "")))
                 .thenApply(ResponseEntity::ok)
                 .orTimeout(15, TimeUnit.SECONDS)
