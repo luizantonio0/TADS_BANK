@@ -16,5 +16,6 @@ public class OrchestrationKeys {
     public static final String CREATE_CONTA_COMMAND = "CreateConta";
     public static final String CREATE_CLIENTE_COMMAND = "CreateCliente";
     public static final String FIND_GERENTE_COMMAND = "FindGerente";
+    public static final String GET_GERENTE_COMMAND = "GetGerente";
 
 }

@@ -2,6 +2,7 @@ package com.bantads.gerente.config;
 
 import com.bantads.gerente.dto.ErroDTO;
 import com.bantads.gerente.exception.AccountAlredyExists;
+import com.bantads.gerente.exception.BadRequestException;
 import com.bantads.gerente.exception.NotFoundExecption;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +45,16 @@ public class GlobalExceptionHandler {
                 Arrays.toString(ex.getStackTrace()),
                 409);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErroDTO> handleNotFound(BadRequestException ex)
+    {
+        ErroDTO erro = new ErroDTO(
+                "Dados Inválidos:" + ex.getMessage(),
+                Arrays.toString(ex.getStackTrace()),
+                400);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 }

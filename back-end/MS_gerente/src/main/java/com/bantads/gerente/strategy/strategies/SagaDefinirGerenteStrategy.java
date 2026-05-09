@@ -13,21 +13,15 @@ import tools.jackson.databind.ObjectMapper;
 @Component
 public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {
 
-    private final GerenteService gerenteService;
+    @Autowired
+    private GerenteService gerenteService;
 
-    private final RedisTemplate<String, String> redisTemplate;
-
-    public SagaDefinirGerenteStrategy(GerenteService gerenteService, RedisTemplate<String, String> redisTemplate) {
-        this.gerenteService = gerenteService;
-        this.redisTemplate = redisTemplate;
-    }
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     public Object handle(OrchestrationCommandDTO cmd){
         try {
-
-            ObjectMapper mapper = new ObjectMapper();
-            DefinirGerenteInputDTO dto = mapper.readValue(cmd.payload(), DefinirGerenteInputDTO.class);
 
             var gerente = gerenteService.findGerenteMenosClientes();
             if (gerente.isEmpty()) {
@@ -38,11 +32,12 @@ public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {
                     cmd.idOrchestration().toString() + ":touched:gerente",
                     gerente.get().getId().toString()
             );
-            return new DefinirGerenteOutputDTO(
+
+            var res = new DefinirGerenteOutputDTO(
                     gerente.get().getId(),
                     gerente.get().getNome()
             );
-
+            return res;
         } catch (Exception ex) {
             throw ex;
         }

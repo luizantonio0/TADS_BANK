@@ -13,5 +13,6 @@ public class OrchestrationKeys {
     public static final String MS_CLIENTE = "ms-cliente";
 
     public static final String CREATE_CONTA_COMMAND = "CreateConta";
+    public static final String UPDATE_LIMITE_COMMAND = "UpdateLimite";
 
 }

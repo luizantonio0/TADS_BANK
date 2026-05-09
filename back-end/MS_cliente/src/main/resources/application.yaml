@@ -25,7 +25,7 @@ spring:
     virtual-host: /
     connection-timeout: 5s
     template:
-      reply-timeout: 1000000
+      reply-timeout: 30
 logging:
   level:
     org.springframework.web: DEBUG
@@ -33,5 +33,5 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 mail:
-  username: ${GMAIL_USERNAME}
-  password: ${GMAIL_PASSWORD}
+  username: test@gmail.com
+  password: 1234

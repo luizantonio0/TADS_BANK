@@ -21,7 +21,7 @@ public class GerenteApplication {
 			gerenteService.save(new CriaGerenteDTO(
 					"Victor",
 					"fsdfsdf@gmail.com",
-					"46464464233",
+					"29004446087",
 					"1242",
 					GerenteTipo.GERENTE
 			));

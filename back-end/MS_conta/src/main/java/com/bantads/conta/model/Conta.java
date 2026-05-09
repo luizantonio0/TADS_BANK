@@ -1,10 +1,7 @@
 package com.bantads.conta.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
@@ -36,16 +33,12 @@ public class Conta {
     @Column(nullable = false)
     private LocalDateTime criacao;
 
-    @Column(nullable = false, length = 11)
-    private String gerenteCpf;
-
-    public Conta(LocalDateTime criacao, BigDecimal limite, BigDecimal saldo, String conta, String cpf, String gerenteCpf) {
+    public Conta(LocalDateTime criacao, BigDecimal limite, BigDecimal saldo, String conta, String cpf) {
         this.criacao = criacao;
         this.limite = limite;
         this.saldo = saldo;
         this.conta = conta;
         this.cpf = cpf.replaceAll("[^0-9]", "");
-        this.gerenteCpf = gerenteCpf;
     }
 
     public Conta() {}

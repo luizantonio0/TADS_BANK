@@ -6,7 +6,7 @@ spring:
     name: conta
   rabbitmq:
     template:
-      reply-timeout: 1000000
+      reply-timeout: 30
   jpa:
     hibernate:
       ddl-auto: create

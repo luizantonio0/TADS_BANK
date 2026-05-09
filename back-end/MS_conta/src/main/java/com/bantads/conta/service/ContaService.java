@@ -1,13 +1,11 @@
 package com.bantads.conta.service;
 
 import com.bantads.conta.dto.ContaCreateInputDTO;
-import com.bantads.conta.dto.ContaCreateOutputDTO;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.repository.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +40,17 @@ public class ContaService {
                 .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
     }
 
+    public Conta atualizarLimite(String cpf, BigDecimal salario) {
+        var optConta = contaRepository.findByConta(cpf);
+        if (optConta.isEmpty()) {
+            throw new IllegalArgumentException("Conta não encontrada");
+        }
+        var conta = optConta.get();
+        conta.setLimite(salario.divide(new BigDecimal(2), RoundingMode.UNNECESSARY));
+        contaRepository.save(conta);
+        return conta;
+    }
+
     public Conta createConta(ContaCreateInputDTO dto) throws Exception {
 
         if(contaRepository.existsByCpf(dto.cpf())) {
@@ -56,8 +65,7 @@ public class ContaService {
                 limite,
                 BigDecimal.ZERO,
                 numConta,
-                dto.cpf(),
-                dto.gerenteCpf()
+                dto.cpf()
                 );
         contaRepository.save(conta);
         return conta;

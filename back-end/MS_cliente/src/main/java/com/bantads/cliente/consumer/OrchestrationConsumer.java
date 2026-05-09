@@ -4,7 +4,6 @@ import com.bantads.cliente.service.OrchestrationService;
 import com.bantads.shared.dto.*;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.strategy.SagaCommandStrategyFactory;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +35,9 @@ public class OrchestrationConsumer {
     public void onResult(OrchestrationRequestResultDTO dto) {
         if(orchestrationService.isCriarClienteSaga(dto.idOrchestration())) {
             orchestrationService.finishCriarCliente(dto);
+        }
+        if(orchestrationService.isAprovarClienteSaga(dto.idOrchestration())) {
+            orchestrationService.finishAprovarCliente(dto);
         }
     }
 

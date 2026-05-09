@@ -1,6 +1,6 @@
 package com.bantads.cliente.mapper;
 
-import com.bantads.cliente.dto.AlterarDadosClienteDTO;
+import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.model.Cliente;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
