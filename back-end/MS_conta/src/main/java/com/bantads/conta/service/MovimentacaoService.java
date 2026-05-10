@@ -1,19 +1,17 @@
 package com.bantads.conta.service;
 
-import com.bantads.conta.dto.DepositoDTO;
-import com.bantads.conta.dto.ExtratoResponseDTO;
-import com.bantads.conta.dto.MovimentacaoDTO;
-import com.bantads.conta.dto.SaqueDTO;
-import com.bantads.conta.dto.TransferenciaDTO;
+import com.bantads.conta.dto.*;
 import com.bantads.conta.model.Movimentacao;
 import com.bantads.conta.model.TipoMovimentacao;
 import com.bantads.conta.repository.ContaRepository;
 import com.bantads.conta.repository.MovimentacaoRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -28,11 +26,106 @@ public class MovimentacaoService {
     @Autowired
     private MovimentacaoRepository movimentacaoRepository;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Transactional
+    public void depositar(DepositoDTO dto) {
+        var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
+        var conta = contaRepository.findByConta(dto.numeroConta())
+                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
+
+        conta.setSaldo(conta.getSaldo().add(valor).setScale(2, RoundingMode.HALF_UP));
+        contaRepository.save(conta);
+
+        var movimentacao = Movimentacao.builder()
+                .dataHora(LocalDateTime.now())
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .valor(valor)
+                .contaOrigem(dto.numeroConta())
+                .build();
+
+        movimentacaoRepository.save(movimentacao);
+        
+        publicarEventoCQRS(dto.numeroConta(), conta.getSaldo(), TipoMovimentacao.DEPOSITO, valor, null);
+    }
+
+    @Transactional
+    public void sacar(SaqueDTO dto) {
+        var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
+        var conta = contaRepository.findByConta(dto.numeroConta())
+                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
+
+        BigDecimal saldoDisponivel = conta.getSaldo().add(conta.getLimite());
+        if (saldoDisponivel.compareTo(valor) < 0) {
+            throw new IllegalStateException("Saldo insuficiente (considerando limite)");
+        }
+
+        conta.setSaldo(conta.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
+        contaRepository.save(conta);
+
+        var movimentacao = Movimentacao.builder()
+                .dataHora(LocalDateTime.now())
+                .tipo(TipoMovimentacao.SAQUE)
+                .valor(valor)
+                .contaOrigem(dto.numeroConta())
+                .build();
+
+        movimentacaoRepository.save(movimentacao);
+
+        publicarEventoCQRS(dto.numeroConta(), conta.getSaldo(), TipoMovimentacao.SAQUE, valor, null);
+    }
+
+    @Transactional
+    public void transferir(TransferenciaDTO dto) {
+        var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
+        var origem = contaRepository.findByConta(dto.numeroContaOrigem())
+                .orElseThrow(() -> new IllegalArgumentException("Conta de origem não encontrada"));
+        var destino = contaRepository.findByConta(dto.numeroContaDestino())
+                .orElseThrow(() -> new IllegalArgumentException("Conta de destino não encontrada"));
+
+        BigDecimal saldoDisponivel = origem.getSaldo().add(origem.getLimite());
+        if (saldoDisponivel.compareTo(valor) < 0) {
+            throw new IllegalStateException("Saldo insuficiente na conta de origem");
+        }
+
+        origem.setSaldo(origem.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
+        destino.setSaldo(destino.getSaldo().add(valor).setScale(2, RoundingMode.HALF_UP));
+
+        contaRepository.save(origem);
+        contaRepository.save(destino);
+
+        var movimentacao = Movimentacao.builder()
+                .dataHora(LocalDateTime.now())
+                .tipo(TipoMovimentacao.TRANSFERENCIA)
+                .valor(valor)
+                .contaOrigem(dto.numeroContaOrigem())
+                .contaDestino(dto.numeroContaDestino())
+                .build();
+
+        movimentacaoRepository.save(movimentacao);
+
+        publicarEventoCQRS(dto.numeroContaOrigem(), origem.getSaldo(), TipoMovimentacao.TRANSFERENCIA, valor, dto.numeroContaDestino());
+        publicarEventoCQRS(dto.numeroContaDestino(), destino.getSaldo(), TipoMovimentacao.TRANSFERENCIA, valor, dto.numeroContaOrigem());
+    }
+
+    private void publicarEventoCQRS(String numConta, BigDecimal novoSaldo, TipoMovimentacao tipo, BigDecimal valor, String outraConta) {
+        var evento = new CQRSEventDTO(
+            numConta,
+            novoSaldo,
+            tipo,
+            valor,
+            LocalDateTime.now(),
+            (tipo == TipoMovimentacao.TRANSFERENCIA ? numConta : null),
+            outraConta
+        );
+        rabbitTemplate.convertAndSend("ms-conta.movimentacao.event", evento);
+    }
+
     public ExtratoResponseDTO getExtrato(String numConta, LocalDate inicio, LocalDate fim) {
         LocalDateTime dataInicio = inicio.atStartOfDay();
         LocalDateTime dataFim = fim.atTime(LocalTime.MAX);
 
-        // 1. Buscar todas as movimentações antes do período para calcular o saldo inicial
         List<Movimentacao> anteriores = movimentacaoRepository.findByContaBefore(numConta, dataInicio);
         BigDecimal saldoAtual = BigDecimal.ZERO;
 
@@ -50,7 +143,6 @@ public class MovimentacaoService {
             }
         }
 
-        // 2. Buscar as movimentações do período
         List<Movimentacao> periodo = movimentacaoRepository.findByContaAndPeriodo(numConta, dataInicio, dataFim);
         List<MovimentacaoDTO> dtos = new ArrayList<>();
         Map<String, BigDecimal> saldosDiarios = new LinkedHashMap<>();
@@ -66,9 +158,6 @@ public class MovimentacaoService {
 
                 if (m.getTipo() == TipoMovimentacao.SAQUE || (m.getTipo() == TipoMovimentacao.TRANSFERENCIA && numConta.equals(m.getContaOrigem()))) {
                     cor = "vermelho";
-                    saldoAtual = saldoAtual.subtract(valor);
-                } else {
-                    saldoAtual = saldoAtual.add(valor);
                 }
 
                 dtos.add(new MovimentacaoDTO(
@@ -81,79 +170,11 @@ public class MovimentacaoService {
                 ));
                 indexMov++;
             }
-            saldosDiarios.put(dataCorrente.toString(), saldoAtual);
+            
+            saldosDiarios.put(dataCorrente.toString(), saldoAtual.setScale(2, RoundingMode.HALF_UP));
             dataCorrente = dataCorrente.plusDays(1);
         }
 
         return new ExtratoResponseDTO(dtos, saldosDiarios);
-    }
-
-    @Transactional
-    public void depositar(DepositoDTO dto) {
-        var conta = contaRepository.findByConta(dto.numeroConta())
-                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
-
-        conta.setSaldo(conta.getSaldo().add(dto.valor()));
-        contaRepository.save(conta);
-
-        var movimentacao = Movimentacao.builder()
-                .dataHora(LocalDateTime.now())
-                .tipo(TipoMovimentacao.DEPOSITO)
-                .valor(dto.valor())
-                .contaOrigem(dto.numeroConta())
-                .build();
-
-        movimentacaoRepository.save(movimentacao);
-
-    }
-
-    @Transactional
-    public void sacar(SaqueDTO dto) {
-        var conta = contaRepository.findByConta(dto.numeroConta())
-                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
-
-        if (conta.getSaldo().add(conta.getLimite()).compareTo(dto.valor()) < 0) {
-            throw new IllegalArgumentException("Saldo insuficiente");
-        }
-
-        conta.setSaldo(conta.getSaldo().subtract(dto.valor()));
-        contaRepository.save(conta);
-
-        var movimentacao = Movimentacao.builder()
-                .dataHora(LocalDateTime.now())
-                .tipo(TipoMovimentacao.SAQUE)
-                .valor(dto.valor())
-                .contaOrigem(dto.numeroConta())
-                .build();
-
-        movimentacaoRepository.save(movimentacao);
-    }
-
-    @Transactional
-    public void transferir(TransferenciaDTO dto) {
-        var origem = contaRepository.findByConta(dto.numeroContaOrigem())
-                .orElseThrow(() -> new IllegalArgumentException("Conta de origem não encontrada"));
-        var destino = contaRepository.findByConta(dto.numeroContaDestino())
-                .orElseThrow(() -> new IllegalArgumentException("Conta de destino não encontrada"));
-
-        if (origem.getSaldo().add(origem.getLimite()).compareTo(dto.valor()) < 0) {
-            throw new IllegalArgumentException("Saldo insuficiente");
-        }
-
-        origem.setSaldo(origem.getSaldo().subtract(dto.valor()));
-        destino.setSaldo(destino.getSaldo().add(dto.valor()));
-
-        contaRepository.save(origem);
-        contaRepository.save(destino);
-
-        var movimentacao = Movimentacao.builder()
-                .dataHora(LocalDateTime.now())
-                .tipo(TipoMovimentacao.TRANSFERENCIA)
-                .valor(dto.valor())
-                .contaOrigem(dto.numeroContaOrigem())
-                .contaDestino(dto.numeroContaDestino())
-                .build();
-
-        movimentacaoRepository.save(movimentacao);
     }
 }
