@@ -10,15 +10,25 @@ public class Credentials {
     private String cpf;
     private String email;
     private String password;
+    private String profile;
 
-    public Credentials(String cpf, String email, String password) {
+    public Credentials(String cpf, String email, String password, String profile) {
         this.cpf = cpf;
         this.email = email;
         this.password = password;
+        this.profile = profile;
     }
 
     public String getCpf() {
         return cpf;
+    }
+    
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 
     public void setCpf(String cpf) {

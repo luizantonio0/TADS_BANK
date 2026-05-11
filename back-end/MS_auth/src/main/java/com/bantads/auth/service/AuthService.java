@@ -1,6 +1,8 @@
 package com.bantads.auth.service;
 
 import com.bantads.auth.document.Credentials;
+import com.bantads.auth.dto.TokenClaimsDTO;
+import com.bantads.auth.dto.response.LoginResponseDTO;
 import com.bantads.auth.exception.CredentialsAlreadyExistsException;
 import com.bantads.auth.repository.CredentialsRepository;
 import org.javers.core.Javers;
@@ -30,14 +32,14 @@ public class AuthService {
         return credentials.filter(value -> encoder.matches(senha, value.getPassword())).isPresent();
     }
 
-    public void createCredentials(String email, String cpf, String cryptoPw) {
+    public void createCredentials(String email, String cpf, String cryptoPw, String profile) {
         if(email == null || cpf == null || cryptoPw == null || email.trim().isEmpty() || cpf.trim().isEmpty() || cryptoPw.trim().isEmpty()) {
             throw new IllegalArgumentException("Email, CPF e Senha devem ser preenchidos.");
         }
         if(credentialsRepository.existsById(cpf)) {
             throw new CredentialsAlreadyExistsException();
         }
-        var creds = new Credentials(cpf, email, cryptoPw);
+        var creds = new Credentials(cpf, email, cryptoPw, profile);
         credentialsRepository.insert(creds);
         javers.commit("system", creds);
     }

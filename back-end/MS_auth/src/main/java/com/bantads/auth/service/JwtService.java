@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.bantads.auth.dto.TokenClaimsDTO;
+
 @Service
 public class JwtService {
     @Value("${security.jwt.secret-key}")
@@ -23,8 +25,10 @@ public class JwtService {
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public TokenClaimsDTO extractUsuario(String token) {
+        return extractClaim(token, (c) ->
+            new TokenClaimsDTO(c.getSubject(), c.get("profile", String.class))
+        );
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -59,9 +63,11 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token) {
-        final String username = extractUsername(token);
-        return username != null && !isTokenExpired(token);
+    public TokenClaimsDTO parseToken(String token) {
+        if (isTokenExpired(token)) {
+            return null;
+        }
+        return extractUsuario(token);
     }
 
     private boolean isTokenExpired(String token) {
