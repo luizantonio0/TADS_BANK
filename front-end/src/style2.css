@@ -37,11 +37,58 @@
   align-items: center;
   gap: 8px;
   transition: var(--tads-transition);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 .tads-btn-main:hover {
   background-color: var(--tads-secondary);
   filter: brightness(1.1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 .tads-btn-outline {
@@ -52,6 +99,23 @@
   border-radius: 8px;
   font-weight: 500;
   transition: var(--tads-transition);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 .tads-badge-status {
@@ -87,6 +151,20 @@
   color: var(--tads-dark-gray);
   margin-bottom: 0.5rem;
   font-weight: 500;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 .tads-input-field {
@@ -112,125 +190,6 @@
     width: 100%;
     justify-content: center;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
