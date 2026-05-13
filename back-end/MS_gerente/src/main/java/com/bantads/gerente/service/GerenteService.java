@@ -2,7 +2,7 @@ package com.bantads.gerente.service;
 
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.request.CriaGerenteDTO;
-import com.bantads.gerente.exception.AccountAlredyExists;
+import com.bantads.gerente.exception.AccountAlreadyExistsException;
 import com.bantads.gerente.exception.BadRequestException;
 import com.bantads.gerente.exception.NotFoundExecption;
 import com.bantads.gerente.model.Gerente;
@@ -33,7 +33,7 @@ public class GerenteService {
     }
 
     @Transactional
-    public Gerente novoGerente(CriaGerenteDTO criaGerenteDTO) throws AccountAlredyExists {
+    public Gerente novoGerente(CriaGerenteDTO criaGerenteDTO) throws AccountAlreadyExistsException {
 
         String cpf = validatorService.cpfValidator(criaGerenteDTO.cpf()).
                 orElseThrow(
@@ -43,7 +43,7 @@ public class GerenteService {
         String email = validatorService.emailValidator(criaGerenteDTO.email()).orElseThrow(() -> new BadRequestException("Email informado não é válido"));
 
         if(gerenteRepository.existsByCpf(cpf)) {
-            throw new AccountAlredyExists("Já existe um gerente com esse CPF");
+            throw new AccountAlreadyExistsException("Já existe um gerente com esse CPF");
         }
 
         @Valid
