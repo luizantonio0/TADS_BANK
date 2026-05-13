@@ -2,6 +2,7 @@ package com.bantads.auth.controller;
 
 import com.bantads.auth.dto.LoginDTO;
 import com.bantads.auth.dto.LoginResponseDTO;
+import com.bantads.auth.dto.LogoutResponseDTO;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.service.JwtService;
 
@@ -31,6 +32,13 @@ public class AuthController {
             return ResponseEntity.ok(user);
         }
         return ResponseEntity.status(401).build();
+    }
+
+    @PostMapping("/logout")
+    public CompletableFuture<ResponseEntity<LogoutResponseDTO>> login(@RequestHeader("Authorization") String token) throws Exception {
+        return authService.startLogout(token)
+                .thenApply(ResponseEntity::ok)
+                .orTimeout(15, TimeUnit.SECONDS);
     }
 
     @PostMapping("/login")

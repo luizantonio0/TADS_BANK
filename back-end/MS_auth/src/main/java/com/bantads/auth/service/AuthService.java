@@ -4,6 +4,7 @@ import com.bantads.auth.document.Credentials;
 import com.bantads.auth.dto.LoginDTO;
 import com.bantads.auth.dto.LoginResponseDTO;
 import com.bantads.auth.dto.LoginUsuarioResponseDTO;
+import com.bantads.auth.dto.LogoutResponseDTO;
 import com.bantads.auth.dto.TokenClaimsDTO;
 import com.bantads.auth.dto.saga.AuthResponseDTO;
 import com.bantads.auth.dto.saga.ClienteDTO;
@@ -36,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 public class AuthService {
 
     private Map<UUID, CompletableFuture<LoginResponseDTO>> loginsRequests = new HashMap<>();
+    private Map<UUID, CompletableFuture<LogoutResponseDTO>> logoutRequests = new HashMap<>();
 
     @Autowired private RabbitTemplate rabbitTemplate;
     @Autowired private CredentialsRepository credentialsRepository;
@@ -43,8 +45,14 @@ public class AuthService {
     @Autowired private Javers javers;
     @Autowired private ObjectMapper mapper;
 
-    public boolean isLoginSaga(UUID id) {
+    @Autowired private JwtService jwtService;
+
+    public boolean isLoginRequest(UUID id) {
         return loginsRequests.containsKey(id);
+    }
+
+    public boolean isLogoutRequest(UUID id) {
+        return logoutRequests.containsKey(id);
     }
 
      public void assertPayloads(OrchestrationRequestResultDTO result, String... payloads) throws Exception {
@@ -53,6 +61,87 @@ public class AuthService {
                 throw new IllegalArgumentException("Payload " + p + " não encontrado");
             }
         }
+    }
+
+    public void finishLogout(OrchestrationRequestResultDTO result) {
+        CompletableFuture<LogoutResponseDTO> completableFuture = null;
+
+        try {
+            if (result == null) {
+                throw new IllegalStateException("Resposta nula do orquestrador");
+            }
+
+            completableFuture = logoutRequests.get(result.idOrchestration());
+
+            if (completableFuture == null) {
+                throw new IllegalStateException("CompletableFuture para idOrchestration " + result.idOrchestration() + " não encontrado.");
+            }
+
+            if(result.failed()) {
+                throw new IllegalArgumentException(result.errors().values().iterator().next());
+            }
+
+            ClienteDTO cliente = result.payloads().containsKey("ms-cliente")
+                ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
+                : null;
+
+            GerenteDTO gerente = result.payloads().containsKey("ms-gerente")
+                ? mapper.readValue(result.payloads().get("ms-gerente"), GerenteDTO.class)
+                : null;
+
+            if(cliente == null && gerente == null) {
+                throw new NoSuchElementException("Usuário não encontrado");
+            }            
+
+            var dto = new LogoutResponseDTO(
+                
+            );
+
+            completableFuture.complete(dto);
+
+        } catch (Exception ex) {
+            if (completableFuture != null) {
+                completableFuture.completeExceptionally(ex);
+            }
+        } finally {
+            if (result != null && loginsRequests.containsKey(result.idOrchestration())) {
+                loginsRequests.remove(result.idOrchestration());
+            }
+        }
+    }
+
+    public CompletableFuture<LogoutResponseDTO> startLogout(String token) throws Exception {
+        if(token == null || token.isEmpty()) {
+            throw new IllegalAccessError("Usuário não está logado");
+        }
+    
+        token = token.replace("Bearer ", "");
+        var claims = jwtService.parseToken(token);
+        if(claims == null) {
+            throw new IllegalAccessError("Usuário não está logado");
+        }
+
+        var orchestrationId = UUID.randomUUID();
+        var input = new GetProfileInputDTO(claims.cpf());
+
+        OrchestrationCommandDTO command;
+        if(claims.profile().equalsIgnoreCase("cliente")) {
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", mapper.writeValueAsString(input));
+        } else {
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente", mapper.writeValueAsString(input));
+        }
+
+        var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
+            command,
+            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "Logout", token)
+        ));
+    
+        var completable = new CompletableFuture<LogoutResponseDTO>();
+        logoutRequests.put(orchestrationId, completable);
+        rabbitTemplate.convertAndSend(OrchestrationKeys.ORCHESTRATE_QUEUE, request);
+
+        return completable;
+
     }
 
     public void finishLogin(OrchestrationRequestResultDTO result) {
@@ -122,7 +211,7 @@ public class AuthService {
 
         var orchestrationId = UUID.randomUUID();
         var input = new GetProfileInputDTO(credentials.get().getCpf());
-        
+
         OrchestrationCommandDTO command;
         if(credentials.get().getProfile().equalsIgnoreCase("cliente")) {
             command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", mapper.writeValueAsString(input));

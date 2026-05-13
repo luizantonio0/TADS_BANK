@@ -11,25 +11,16 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-
-
-// Original
-// const services = {
-//     ms_auth: "http://auth-ms:8055",
-// };
-
-
-//Mockado
 const services = {
-    ms_auth: "http://localhost:3001",
-    clientes: "http://localhost:3001",
-    contas: "http://localhost:3001",
-    gerentes: "http://localhost:3001"
+    ms_auth: "http://localhost:8055",
+    clientes: "http://localhost:4729",
+    contas: "http://localhost:4873",
+    gerentes: "http://localhost:2563"
 };
 
 /*
 
-const publicRoutes = ['/ms_auth/auth/login', '/ms_auth/auth/validate'];
+const publicRoutes = ['/login', '/auth/validate'];
 
 app.use(async (req, res, next) => {
 

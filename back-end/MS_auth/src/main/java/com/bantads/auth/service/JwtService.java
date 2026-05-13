@@ -75,6 +75,7 @@ public class JwtService {
     }
 
     public TokenClaimsDTO parseToken(String token) {
+        token = token.replace("Bearer ", "").trim();
         if (isTokenExpired(token)) {
             return null;
         }

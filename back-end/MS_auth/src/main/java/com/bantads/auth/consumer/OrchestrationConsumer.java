@@ -24,8 +24,11 @@ public class OrchestrationConsumer {
 
     @RabbitListener(queues = "ms-auth.orchestration.finished")
     public void onFinished(OrchestrationRequestResultDTO dto) {
-        if(authService.isLoginSaga(dto.idOrchestration())) {
+        if(authService.isLoginRequest(dto.idOrchestration())) {
             authService.finishLogin(dto);
+        }
+        if(authService.isLogoutRequest(dto.idOrchestration())) {
+            authService.finishLogout(dto);(dto);
         }
     }
 
