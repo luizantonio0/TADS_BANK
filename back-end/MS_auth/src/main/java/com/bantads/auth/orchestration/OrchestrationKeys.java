@@ -13,5 +13,6 @@ public class OrchestrationKeys {
     public static final String MS_CLIENTE = "ms-cliente";
 
     public static final String CREATE_CREDENTIALS_COMMAND = "CreateCredentials";
+    public static final String LOGIN_COMMAND = "Login";
 
 }

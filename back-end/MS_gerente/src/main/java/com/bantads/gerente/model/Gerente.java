@@ -2,14 +2,10 @@ package com.bantads.gerente.model;
 
 import com.bantads.gerente.dto.request.CriaGerenteDTO;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.enums.GerenteTipo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.envers.Audited;
 
 import java.util.UUID;
@@ -23,7 +19,6 @@ public class Gerente {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Setter
     @Column(nullable = false, length = 11)
     private String cpf;
 
@@ -32,7 +27,6 @@ public class Gerente {
     @Column(name = "nome", nullable = false, length = 20)
     private String nome;
 
-    @Setter
     @NotBlank
     @Size(min = 3, max = 128)
     @Column(name = "email", nullable = false, length = 128)

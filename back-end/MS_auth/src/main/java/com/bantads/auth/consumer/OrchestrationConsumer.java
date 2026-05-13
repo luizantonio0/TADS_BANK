@@ -1,9 +1,7 @@
 package com.bantads.auth.consumer;
 
 import com.bantads.shared.dto.*;
-import com.bantads.auth.orchestration.OrchestrationKeys;
 import com.bantads.auth.service.AuthService;
-import com.bantads.auth.strategy.SagaCommandStrategy;
 import com.bantads.auth.strategy.SagaCommandStrategyFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -11,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.UUID;
 
 @Component
 public class OrchestrationConsumer {
@@ -27,7 +23,11 @@ public class OrchestrationConsumer {
     @Autowired private AuthService authService;
 
     @RabbitListener(queues = "ms-auth.orchestration.finished")
-    public void onFinished(OrchestrationRequestResultDTO dto) {}
+    public void onFinished(OrchestrationRequestResultDTO dto) {
+        if(authService.isLoginSaga(dto.idOrchestration())) {
+            authService.finishLogin(dto);
+        }
+    }
 
     @RabbitListener(queues = "ms-auth.command")
     public void onCommand(OrchestrationCommandDTO dto) {

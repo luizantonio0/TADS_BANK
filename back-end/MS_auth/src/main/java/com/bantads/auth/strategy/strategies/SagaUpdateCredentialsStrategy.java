@@ -1,7 +1,7 @@
 package com.bantads.auth.strategy.strategies;
 
-import com.bantads.auth.dto.CredentialsUpdateInputDTO;
 import com.bantads.shared.dto.*;
+import com.bantads.auth.dto.saga.CredentialsUpdateInputDTO;
 import com.bantads.auth.exception.CredentialsAlreadyExistsException;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.strategy.SagaCommandStrategy;

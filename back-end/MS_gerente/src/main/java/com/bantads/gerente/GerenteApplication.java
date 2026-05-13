@@ -18,7 +18,7 @@ public class GerenteApplication {
 	@Bean
 	public CommandLineRunner run(GerenteService gerenteService) {
 		return args -> {
-			gerenteService.save(new CriaGerenteDTO(
+			gerenteService.novoGerente(new CriaGerenteDTO(
 					"Victor",
 					"fsdfsdf@gmail.com",
 					"29004446087",

@@ -14,6 +14,7 @@ import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -27,7 +28,7 @@ public class ClienteService {
     }
     
     public Cliente findByCpf(String cpf){
-        return clienteRepository.findByCpf(cpf).orElse(null);
+        return clienteRepository.findByCpf(cpf).orElseThrow(() -> new NoSuchElementException("Cliente não encontrado!"));
     }
 
     public Cliente cadastrarCliente(ClienteRequestDTO dto) throws AccountAlredyExists {

@@ -1,6 +1,5 @@
 package com.bantads.gerente.strategy.strategies;
 
-import com.bantads.gerente.dto.DefinirGerenteInputDTO;
 import com.bantads.gerente.dto.DefinirGerenteOutputDTO;
 import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.strategy.SagaCommandStrategy;
@@ -8,7 +7,6 @@ import com.bantads.shared.dto.OrchestrationCommandDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {

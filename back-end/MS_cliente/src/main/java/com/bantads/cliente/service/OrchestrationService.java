@@ -5,6 +5,7 @@ import com.bantads.cliente.dto.http.AprovarClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.http.ClienteCreateResponseDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
+import com.bantads.cliente.dto.saga.GerenteDTO;
 import com.bantads.cliente.dto.saga.input.AtualizarClienteInputDTO;
 import com.bantads.cliente.dto.saga.input.AtualizarLimiteInputDTO;
 import com.bantads.cliente.dto.saga.input.ContaCreateInputDTO;
@@ -205,7 +206,7 @@ public class OrchestrationService {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            var gerenteOutput = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_GERENTE), GetGerenteOutputDTO.class);
+            var gerenteOutput = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_GERENTE), GerenteDTO.class);
             var contaOutput = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_CONTA), ContaCreateOutputDTO.class);
             var clienteOutput = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_CLIENTE), AprovarClienteOutputDTO.class);
 

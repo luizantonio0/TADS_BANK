@@ -33,7 +33,7 @@ public class GerenteService {
     }
 
     @Transactional
-    public Gerente save(CriaGerenteDTO criaGerenteDTO) throws AccountAlredyExists {
+    public Gerente novoGerente(CriaGerenteDTO criaGerenteDTO) throws AccountAlredyExists {
 
         String cpf = validatorService.cpfValidator(criaGerenteDTO.cpf()).
                 orElseThrow(
@@ -42,10 +42,7 @@ public class GerenteService {
 
         String email = validatorService.emailValidator(criaGerenteDTO.email()).orElseThrow(() -> new BadRequestException("Email informado não é válido"));
 
-        //gerenteRepository.findByCpf(cpf).orElseThrow(() -> new AccountAlredyExists("Já existe um gerente com esse CPF"));
-        if(gerenteRepository.findByCpf(cpf).isPresent()) {
-            return gerenteRepository.findByCpf(cpf).get();
-        }
+        gerenteRepository.findByCpf(cpf).orElseThrow(() -> new AccountAlredyExists("Já existe um gerente com esse CPF"));
 
         @Valid
         Gerente gerente = new Gerente(criaGerenteDTO);

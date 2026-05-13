@@ -20,6 +20,7 @@ public class OrchestrationKeys {
     public static final String APPROVE_CLIENTE_COMMAND = "ApproveGerente";
     public static final String UPDATE_LIMITE_COMMAND = "UpdateLimite";
     public static final String UPDATE_CLIENTE_COMMAND = "UpdateCliente";
+    public static final String GET_CLIENTE_COMMAND = "GetCliente";
 
 
 }

@@ -1,7 +1,7 @@
 package com.bantads.auth.strategy.strategies;
 
-import com.bantads.auth.dto.CredentialsCreateInputDTO;
 import com.bantads.shared.dto.*;
+import com.bantads.auth.dto.saga.CredentialsCreateInputDTO;
 import com.bantads.auth.exception.CredentialsAlreadyExistsException;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.strategy.SagaCommandStrategy;
@@ -26,7 +26,7 @@ public class SagaCreateCredentialsStrategy implements SagaCommandStrategy {
             ObjectMapper mapper = new ObjectMapper();
             CredentialsCreateInputDTO dto = mapper.readValue(cmd.payload(), CredentialsCreateInputDTO.class);
 
-            authService.createCredentials(dto.email(), dto.cpf(), dto.password());
+            authService.createCredentials(dto.email(), dto.cpf(), dto.password(), dto.profile());
             redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", dto.cpf());
 
         } catch (CredentialsAlreadyExistsException | IllegalArgumentException ex) {

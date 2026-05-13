@@ -1,12 +1,11 @@
 package com.bantads.gerente.controller;
 
 import com.bantads.gerente.dto.request.CriaGerenteDTO;
-import com.bantads.gerente.exception.AccountAlredyExists;
 import com.bantads.gerente.model.Gerente;
+import com.bantads.gerente.dto.GerenteDTO;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
 import com.bantads.gerente.service.GerenteService;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,16 +22,13 @@ public class GerenteController {
 
 
     @GetMapping("gerente/{cpf}")
-    public ResponseEntity<Gerente> findById(@PathVariable String cpf) throws Exception {
-            return new ResponseEntity<>(gerenteService.findByCpf(cpf).orElseThrow(() -> new Exception("Cliente não encontrado")), HttpStatus.OK);
+    public ResponseEntity<GerenteDTO> findById(@PathVariable String cpf) throws Exception {
+            return new ResponseEntity<>(GerenteDTO.from(gerenteService.findByCpf(cpf).orElseThrow(() -> new Exception("Cliente não encontrado"))), HttpStatus.OK);
     }
 
     @PostMapping("gerente")
     public ResponseEntity<Gerente> save(@RequestBody CriaGerenteDTO criaGerenteDTO){
-            return new ResponseEntity<>(
-                    gerenteService.save(criaGerenteDTO),
-                    HttpStatus.CREATED
-            );
+            return new ResponseEntity<>(gerenteService.novoGerente(criaGerenteDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("gerente/{cpf}")

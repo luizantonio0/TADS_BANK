@@ -1,11 +1,14 @@
 package com.bantads.auth.controller;
 
 import com.bantads.auth.dto.LoginDTO;
+import com.bantads.auth.dto.LoginResponseDTO;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.service.JwtService;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,11 +34,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
-        if(authService.login(loginDTO.login(), loginDTO.senha()) != null) {
-            return ResponseEntity.ok("Login efetuado com sucesso");
-        }
-        return ResponseEntity.status(401).body("Usuário/Senha inválidos");
+    public CompletableFuture<ResponseEntity<LoginResponseDTO>> login(@RequestBody LoginDTO loginDTO) throws Exception {
+        return authService.startLogin(loginDTO.login(), loginDTO.senha())
+                .thenApply(ResponseEntity::ok)
+                .orTimeout(15, TimeUnit.SECONDS);
     }
 
 }

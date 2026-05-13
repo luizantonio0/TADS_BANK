@@ -1,5 +1,6 @@
 package com.bantads.cliente.controller;
 
+import com.bantads.cliente.dto.ClienteDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -30,8 +32,8 @@ public class ClienteController {
     }
 
     @GetMapping("/{cpf}")
-    public ResponseEntity<Cliente> findByCpf(@PathVariable("cpf") String cpf){
-        return new ResponseEntity<>(clienteService.findByCpf(cpf), HttpStatus.OK);
+    public ResponseEntity<ClienteDTO> findByCpf(@PathVariable("cpf") String cpf) throws NoSuchElementException {
+        return new ResponseEntity<>(ClienteDTO.from(clienteService.findByCpf(cpf)), HttpStatus.OK);
     }
 
     @PostMapping
