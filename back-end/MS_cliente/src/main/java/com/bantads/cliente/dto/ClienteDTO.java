@@ -1,6 +1,8 @@
 package com.bantads.cliente.dto;
 
 import com.bantads.cliente.model.Cliente;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,10 +19,17 @@ public record ClienteDTO(
     String cidade,
     String estado,
     boolean aprovado,
-    UUID idGerente,
-    LocalDateTime criacao
+    @JsonProperty("cpf_gerente")
+    String cpfGerente,
+    String criacao
 ) {
 
+    public ClienteDTO {
+        cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+        cep = (cep != null) ? cep.replaceAll("\\D", "") : null;
+        telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
+    }
+    
     public static ClienteDTO from(Cliente c) {
         if (c == null) return null;
         return new ClienteDTO(
@@ -35,8 +44,8 @@ public record ClienteDTO(
             c.getCidade(),
             c.getEstado() != null ? c.getEstado().name() : null,
             c.isAprovado(),
-            c.getIdGerente(),
-            c.getCriacao()
+            c.getCpfGerente(),
+            c.getCriacao().toString()
         );
     }
 

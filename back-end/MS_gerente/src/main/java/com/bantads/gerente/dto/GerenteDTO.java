@@ -11,6 +11,11 @@ public record GerenteDTO(
         String tipo,
         Integer totalClientes
 ) {
+
+    public GerenteDTO {
+        cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+    }
+
     public static GerenteDTO from(Gerente gerente) {
         if (gerente == null) return null;
         return new GerenteDTO(

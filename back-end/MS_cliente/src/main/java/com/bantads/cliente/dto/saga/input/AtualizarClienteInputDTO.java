@@ -15,6 +15,11 @@ public record AtualizarClienteInputDTO (
     String estado
 ) {
 
+    public AtualizarClienteInputDTO {
+        cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+        CEP = (CEP != null) ? CEP.replaceAll("\\D", "") : null;
+    }
+
     public static AtualizarClienteInputDTO from(String cpf, AlterarDadosClienteDTO dto) {
         return new AtualizarClienteInputDTO(cpf, dto.nome(), dto.email(), dto.salario(), dto.endereco(), dto.CEP(), dto.cidade(), dto.estado());
     }

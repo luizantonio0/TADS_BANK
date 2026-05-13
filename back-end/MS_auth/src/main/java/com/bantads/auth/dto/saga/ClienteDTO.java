@@ -1,8 +1,9 @@
 package com.bantads.auth.dto.saga;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record ClienteDTO(
     UUID id,
@@ -16,6 +17,13 @@ public record ClienteDTO(
     String cidade,
     String estado,
     boolean aprovado,
-    UUID idGerente,
-    LocalDateTime criacao
-) {}
+    @JsonProperty("cpf_gerente")
+    String cpfGerente,
+    String criacao
+) {
+    public ClienteDTO {
+        cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+        cep = (cep != null) ? cep.replaceAll("\\D", "") : null;
+        telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
+    }
+}

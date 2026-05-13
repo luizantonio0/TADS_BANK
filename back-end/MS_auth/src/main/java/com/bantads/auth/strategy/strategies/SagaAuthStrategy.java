@@ -3,7 +3,6 @@ package com.bantads.auth.strategy.strategies;
 import com.bantads.shared.dto.*;
 import com.bantads.auth.dto.LoginDTO;
 import com.bantads.auth.dto.saga.AuthResponseDTO;
-import com.bantads.auth.exception.CredentialsAlreadyExistsException;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.service.JwtService;
 import com.bantads.auth.strategy.SagaCommandStrategy;
@@ -23,12 +22,18 @@ public class SagaAuthStrategy implements SagaCommandStrategy {
             ObjectMapper mapper = new ObjectMapper();
             LoginDTO dto = mapper.readValue(cmd.payload(), LoginDTO.class);
             var claims = authService.auth(dto.login(), dto.senha());
+            
             if(claims == null) {
                 throw new Exception("Credenciais inválidas");
             }
+
             var token = jwtService.generateToken(claims.cpf(), claims.profile());
+            
+            jwtService.revokeAllTokens(claims.cpf());
+            jwtService.saveToken(null, null);
+
             return new AuthResponseDTO(token, "bearer", claims.profile());
-        } catch (CredentialsAlreadyExistsException | IllegalArgumentException ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }

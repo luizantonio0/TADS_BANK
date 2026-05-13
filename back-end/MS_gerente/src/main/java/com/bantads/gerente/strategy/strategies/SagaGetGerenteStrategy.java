@@ -1,7 +1,7 @@
 package com.bantads.gerente.strategy.strategies;
 
 import com.bantads.gerente.dto.GerenteDTO;
-import com.bantads.gerente.dto.GetGerenteInputDTO;
+import com.bantads.gerente.dto.saga.GetGerenteInputDTO;
 import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.strategy.SagaCommandStrategy;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
@@ -22,7 +22,7 @@ public class SagaGetGerenteStrategy implements SagaCommandStrategy {
             var mapper = new ObjectMapper();
             var dto = mapper.readValue(cmd.payload(), GetGerenteInputDTO.class);
 
-            var gerente = gerenteService.findById(dto.uuid());
+            var gerente = gerenteService.findByCpf(dto.cpf());
             if (gerente.isEmpty()) {
                 throw new IllegalArgumentException("Nenhum gerente ou administrador encontrado");
             }

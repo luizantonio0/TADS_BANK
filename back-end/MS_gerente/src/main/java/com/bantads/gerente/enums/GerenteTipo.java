@@ -4,7 +4,13 @@ public enum GerenteTipo {
     ADMINISTRADOR("ADMINISTRADOR"),
     GERENTE("GERENTE");
 
-    GerenteTipo(String valor) {
+    private String nome;
 
+    GerenteTipo(String nome) {
+        this.nome = nome;
+    }
+
+    public String getNome() {
+        return nome;
     }
 }

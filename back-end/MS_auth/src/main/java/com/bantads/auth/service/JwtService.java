@@ -10,10 +10,13 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.bantads.auth.document.Token;
 import com.bantads.auth.dto.TokenClaimsDTO;
+import com.bantads.auth.repository.TokenRepository;
 
 @Service
 public class JwtService {
@@ -22,6 +25,24 @@ public class JwtService {
 
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
+
+    @Autowired private TokenRepository tokenRepository;
+
+    private boolean tokenExists(String token) {
+        return tokenRepository.existsByToken(token);
+    }
+
+    public void saveToken(String cpf, String token) {
+        tokenRepository.save(new Token(cpf, token));
+    }
+
+    public void revokeToken(String token) {
+        tokenRepository.deleteByToken(token);
+    }
+
+    public void revokeAllTokens(String cpf) {
+        tokenRepository.deleteByCpf(cpf);
+    }
 
     public TokenClaimsDTO extractUsuario(String token) {
         return extractClaim(token, (c) ->
@@ -62,7 +83,7 @@ public class JwtService {
 
     private boolean isTokenExpired(String token) {
         var expiration = extractExpiration(token);
-        return expiration.before(new Date());
+        return expiration.before(new Date()) || !tokenExists(token);
     }
 
     private Date extractExpiration(String token) {

@@ -41,6 +41,7 @@ public class AuthService {
     @Autowired private CredentialsRepository credentialsRepository;
     @Autowired private PasswordEncoder encoder;
     @Autowired private Javers javers;
+    @Autowired private ObjectMapper mapper;
 
     public boolean isLoginSaga(UUID id) {
         return loginsRequests.containsKey(id);
@@ -72,19 +73,17 @@ public class AuthService {
                 throw new IllegalArgumentException(result.errors().values().iterator().next());
             }
 
-            ObjectMapper mapper = new ObjectMapper();
+            assertPayloads(result, "ms-auth");
 
-            assertPayloads(result, OrchestrationKeys.MS_AUTH);
-
-            ClienteDTO cliente = result.payloads().containsKey(OrchestrationKeys.MS_CLIENTE)
-                ? mapper.readValue(result.payloads().get(OrchestrationKeys.MS_CLIENTE), ClienteDTO.class)
+            ClienteDTO cliente = result.payloads().containsKey("ms-cliente")
+                ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
                 : null;
 
-            GerenteDTO gerente = result.payloads().containsKey(OrchestrationKeys.MS_GERENTE)
-                ? mapper.readValue(result.payloads().get(OrchestrationKeys.MS_GERENTE), GerenteDTO.class)
+            GerenteDTO gerente = result.payloads().containsKey("ms-gerente")
+                ? mapper.readValue(result.payloads().get("ms-gerente"), GerenteDTO.class)
                 : null;
 
-            AuthResponseDTO auth = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_AUTH), AuthResponseDTO.class);
+            AuthResponseDTO auth = mapper.readValue(result.payloads().get("ms-auth"), AuthResponseDTO.class);
 
             if(cliente == null && gerente == null) {
                 throw new NoSuchElementException("Nenhum usuário encontrado!");
@@ -118,23 +117,22 @@ public class AuthService {
 
         var credentials = credentialsRepository.findByEmail(login);
         if(credentials.isEmpty() || credentials.filter(value -> encoder.matches(senha, value.getPassword())).isEmpty()) {
-            return null;
+            throw new IllegalArgumentException("Credenciais inválidas");
         }
 
         var orchestrationId = UUID.randomUUID();
         var input = new GetProfileInputDTO(credentials.get().getCpf());
-        var mapper = new ObjectMapper();
-
+        
         OrchestrationCommandDTO command;
         if(credentials.get().getProfile().equalsIgnoreCase("cliente")) {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), OrchestrationKeys.MS_CLIENTE, "GetCliente", mapper.writeValueAsString(input));
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", mapper.writeValueAsString(input));
         } else {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), OrchestrationKeys.MS_GERENTE, "GetGerente", mapper.writeValueAsString(input));
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente", mapper.writeValueAsString(input));
         }
 
         var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
             command,
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), OrchestrationKeys.MS_AUTH, "Login", mapper.writeValueAsString(new LoginDTO(login, senha)))
+            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "Login", mapper.writeValueAsString(new LoginDTO(login, senha)))
         ));
         
         var completable = new CompletableFuture<LoginResponseDTO>();
@@ -160,6 +158,9 @@ public class AuthService {
         if(credentialsRepository.existsById(cpf)) {
             throw new CredentialsAlreadyExistsException();
         }
+        if(credentialsRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email já está em uso.");
+        }
         var creds = new Credentials(cpf, email, cryptoPw, profile);
         credentialsRepository.insert(creds);
         javers.commit("system", creds);
@@ -168,6 +169,9 @@ public class AuthService {
     public void updateCredentials(String cpf, String email) {
         if(email == null || cpf == null || email.trim().isEmpty() || cpf.trim().isEmpty()) {
             throw new IllegalArgumentException("Email e CPF devem ser preenchidos.");
+        }
+        if(credentialsRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email já está em uso.");
         }
         credentialsRepository.findById(cpf).ifPresent(usuario -> {
             usuario.setEmail(email);

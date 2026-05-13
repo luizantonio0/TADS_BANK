@@ -9,4 +9,8 @@ public record GerenteDTO(
         String email,
         String tipo,
         Integer totalClientes
-) {}
+) {
+        public GerenteDTO {
+                cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+        }
+}

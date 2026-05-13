@@ -9,4 +9,8 @@ public record AprovarClienteResponseDTO(
         BigDecimal limite,
         String gerente,
         String criacao
-) { }
+) {
+        public AprovarClienteResponseDTO {
+                cliente = (cliente != null) ? cliente.replaceAll("\\D", "") : null;
+        }
+}

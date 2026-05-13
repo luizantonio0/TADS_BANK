@@ -12,4 +12,10 @@ public record ClienteCreateResponseDTO(
         String CEP,
         String cidade,
         String estado
-) { }
+) {
+        public ClienteCreateResponseDTO {
+                cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+                CEP = (CEP != null) ? CEP.replaceAll("\\D", "") : null;
+                telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
+        }
+}

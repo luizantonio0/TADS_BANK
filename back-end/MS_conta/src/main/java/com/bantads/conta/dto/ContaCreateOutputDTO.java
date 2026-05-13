@@ -6,4 +6,7 @@ import java.math.BigDecimal;
 
 @JsonTypeName("ContaCreateInputDTO")
 public record ContaCreateOutputDTO(String cpf, String numero, BigDecimal saldo, BigDecimal limite) {
+    public ContaCreateOutputDTO {
+        cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+    }
 }

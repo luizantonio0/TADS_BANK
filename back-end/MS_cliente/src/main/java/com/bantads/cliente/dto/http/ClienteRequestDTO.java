@@ -15,4 +15,10 @@ public record ClienteRequestDTO
     String CEP,
     String cidade,
     UF estado
-) { }
+) {
+    public ClienteRequestDTO {
+        cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+        CEP = (CEP != null) ? CEP.replaceAll("\\D", "") : null;
+        telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
+    }
+}

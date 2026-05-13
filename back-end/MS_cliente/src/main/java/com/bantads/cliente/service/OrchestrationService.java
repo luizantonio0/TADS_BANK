@@ -98,23 +98,23 @@ public class OrchestrationService {
                 throw new IllegalArgumentException(result.errors().values().iterator().next());
             }
 
-            if (!result.payloads().containsKey(OrchestrationKeys.MS_GERENTE)
-                    || !result.payloads().containsKey(OrchestrationKeys.MS_CLIENTE)) {
+            if (!result.payloads().containsKey("ms-gerente")
+                    || !result.payloads().containsKey("ms-cliente")) {
                 throw new IllegalArgumentException("Payloads esperados não encontrados");
             }
 
             ObjectMapper mapper = new ObjectMapper();
 
-            var gerenteOutput = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_GERENTE), DefinirGerenteOutputDTO.class);
-            var clienteDTO = mapper.readValue(result.payloads().get(OrchestrationKeys.MS_CLIENTE), CreateClienteOutputDTO.class);
+            var gerenteOutput = mapper.readValue(result.payloads().get("ms-gerente"), DefinirGerenteOutputDTO.class);
+            var clienteDTO = mapper.readValue(result.payloads().get("ms-cliente"), CreateClienteOutputDTO.class);
 
-            var clienteOptional = repository.findByCpf(clienteDTO.cpf());
+            var clienteOptional = repository.findByCpf(clienteDTO.cpf().replaceAll("[^0-9]", ""));;
             if(clienteOptional.isEmpty()) {
                 throw new IllegalArgumentException("Cliente não encontrado");
             }
 
             var cliente = clienteOptional.get();
-            cliente.setGerente(gerenteOutput.idGerente());
+            cliente.setCpfGerente(gerenteOutput.cpf());
             repository.save(cliente);
 
             ClienteCreateResponseDTO dto = new ClienteCreateResponseDTO(
@@ -153,21 +153,20 @@ public class OrchestrationService {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            Random random = new Random();
-            int numero = 1000 + random.nextInt(9000);
+            var senha = new Random().nextInt(9000) + 1000 + "";
 
             var contaDTO = new ContaCreateInputDTO(dto.cpf(), cliente.get().getSalario());
-            var authDTO = new CredentialsCreateInputDTO(cliente.get().getEmail(), dto.cpf(), numero + "");
-            var gerenteDTO = new GetGerenteInputDTO(cliente.get().getIdGerente());
+            var authDTO = new CredentialsCreateInputDTO(cliente.get().getEmail(), dto.cpf(), senha, "CLIENTE");
+            var gerenteDTO = new GetGerenteInputDTO(cliente.get().getCpfGerente());
 
             var request = new OrchestrationRequestDTO(
                     idOrchestration,
                     true,
                     List.of(
-                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CONTA, OrchestrationKeys.CREATE_CONTA_COMMAND, mapper.writeValueAsString(contaDTO)),
-                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_AUTH, OrchestrationKeys.CREATE_CREDENTIALS_COMMAND, mapper.writeValueAsString(authDTO)),
-                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_GERENTE, OrchestrationKeys.GET_GERENTE_COMMAND, mapper.writeValueAsString(gerenteDTO)),
-                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CLIENTE, OrchestrationKeys.APPROVE_CLIENTE_COMMAND, mapper.writeValueAsString(dto))
+                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-conta", "CreateConta", mapper.writeValueAsString(contaDTO)),
+                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-auth", "CreateCredentials", mapper.writeValueAsString(authDTO)),
+                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "GetGerente", mapper.writeValueAsString(gerenteDTO)),
+                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente", "ApproveCliente", mapper.writeValueAsString(dto))
                     )
             );
 

@@ -42,7 +42,9 @@ public class GerenteService {
 
         String email = validatorService.emailValidator(criaGerenteDTO.email()).orElseThrow(() -> new BadRequestException("Email informado não é válido"));
 
-        gerenteRepository.findByCpf(cpf).orElseThrow(() -> new AccountAlredyExists("Já existe um gerente com esse CPF"));
+        if(gerenteRepository.existsByCpf(cpf)) {
+            throw new AccountAlredyExists("Já existe um gerente com esse CPF");
+        }
 
         @Valid
         Gerente gerente = new Gerente(criaGerenteDTO);

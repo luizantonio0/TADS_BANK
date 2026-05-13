@@ -50,7 +50,7 @@ public class Cliente {
     private boolean aprovado;
 
     @Column
-    private UUID idGerente;
+    private String cpfGerente;
 
     @Column
     private LocalDateTime criacao;
@@ -62,11 +62,12 @@ public class Cliente {
         this.cpf = clienteRequestDTO.cpf().replaceAll("[^0-9]", "");
         this.email = clienteRequestDTO.email();
         this.nome = clienteRequestDTO.nome();
-        this.telefone = clienteRequestDTO.telefone();
+        this.telefone = clienteRequestDTO.telefone().replaceAll("[^0-9]", "");
         this.salario = clienteRequestDTO.salario();
         this.cep = clienteRequestDTO.CEP().replaceAll("[^0-9]", "");
         this.cidade = clienteRequestDTO.cidade();
         this.estado = clienteRequestDTO.estado();
+        this.endereco = clienteRequestDTO.endereco();
         this.aprovado = false;
         this.criacao = LocalDateTime.now();
     }
@@ -115,8 +116,8 @@ public class Cliente {
         return cidade;
     }
 
-    public UUID getIdGerente() {
-        return idGerente;
+    public String getCpfGerente() {
+        return cpfGerente;
     }
 
     public UF getEstado() {
@@ -127,8 +128,8 @@ public class Cliente {
         this.id = id;
     }
 
-    public void setGerente(UUID id) {
-        this.idGerente = id;
+    public void setCpfGerente(String cpfGerente) {
+        this.cpfGerente = cpfGerente;
     }
 
     public String getEndereco() {

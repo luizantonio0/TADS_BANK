@@ -17,7 +17,7 @@ public class OrchestrationKeys {
     public static final String CREATE_CLIENTE_COMMAND = "CreateCliente";
     public static final String FIND_GERENTE_COMMAND = "FindGerente";
     public static final String GET_GERENTE_COMMAND = "GetGerente";
-    public static final String APPROVE_CLIENTE_COMMAND = "ApproveGerente";
+    public static final String APPROVE_CLIENTE_COMMAND = "ApproveCliente";
     public static final String UPDATE_LIMITE_COMMAND = "UpdateLimite";
     public static final String UPDATE_CLIENTE_COMMAND = "UpdateCliente";
     public static final String GET_CLIENTE_COMMAND = "GetCliente";

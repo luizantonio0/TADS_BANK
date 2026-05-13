@@ -1,4 +1,4 @@
-package com.bantads.cliente.service;
+package com.bantads.auth.service;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Properties;
 
 @Service
-public class MailService {
+public class EmailService {
 
     @Value("${mail.username}")
     private String username;

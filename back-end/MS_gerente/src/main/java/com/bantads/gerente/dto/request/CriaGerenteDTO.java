@@ -9,5 +9,7 @@ public record CriaGerenteDTO(
         String senha,
         GerenteTipo tipo
 ) {
-
+        public CriaGerenteDTO {
+                cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+        }
 }

@@ -32,7 +32,8 @@ public class ClienteService {
     }
 
     public Cliente cadastrarCliente(ClienteRequestDTO dto) throws AccountAlredyExists {
-        if(clienteRepository.existsByCpf(dto.cpf())) {
+        var cpf = dto.cpf().replaceAll("[^0-9]", "");
+        if(clienteRepository.existsByCpf(cpf)) {
             throw new AccountAlredyExists("Este CPF já está em uso!");
         }
         Cliente cliente = new Cliente(dto);

@@ -1,4 +1,4 @@
-package com.bantads.gerente.dto;
+package com.bantads.gerente.dto.saga;
 
 import java.util.UUID;
 

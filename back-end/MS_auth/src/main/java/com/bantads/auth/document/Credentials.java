@@ -11,6 +11,9 @@ public class Credentials {
     private String password;
     private String profile;
 
+    public Credentials() {
+    }
+
     public Credentials(String cpf, String email, String password, String profile) {
         this.cpf = cpf;
         this.email = email;

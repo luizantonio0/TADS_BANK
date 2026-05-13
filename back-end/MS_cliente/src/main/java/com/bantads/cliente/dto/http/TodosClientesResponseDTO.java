@@ -14,4 +14,8 @@ public record TodosClientesResponseDTO(
         BigDecimal saldo,
         BigDecimal limite
 ) {
+        public TodosClientesResponseDTO {
+                cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+                telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
+        }
 }

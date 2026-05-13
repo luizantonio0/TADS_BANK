@@ -1,4 +1,4 @@
-package com.bantads.cliente.dto.saga.input;
+package com.bantads.gerente.dto.saga;
 
 public record CredentialsCreateInputDTO(String email, String cpf, String password, String profile) {
     public CredentialsCreateInputDTO {
