@@ -1,5 +1,6 @@
 package com.bantads.auth.controller;
 
+import com.azul.crs.client.Response;
 import com.bantads.auth.dto.LoginDTO;
 import com.bantads.auth.dto.LoginResponseDTO;
 import com.bantads.auth.dto.LogoutResponseDTO;
@@ -25,12 +26,14 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/validate")
+    @PostMapping("/validate")
     public ResponseEntity<TokenClaimsDTO> validateToken(@RequestHeader("Authorization") String token) {
         token = token == null ? "" : token.replace("Bearer ", "");
         if (!token.isEmpty()) {
             var user = jwtService.parseToken(token);
-            return ResponseEntity.ok(user);
+            if(user != null) {
+                return ResponseEntity.ok(user);
+            }
         }
         return ResponseEntity.status(401).build();
     }

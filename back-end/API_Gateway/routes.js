@@ -1,5 +1,5 @@
 export const services = {
-    auth: "http://localhost:8055/auth",
+    auth: "http://localhost:8055",
     clientes: "http://localhost:4729",
     contas: "http://localhost:4873",
     gerentes: "http://localhost:2563"

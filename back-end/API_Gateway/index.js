@@ -30,6 +30,7 @@ app.use(async (req, res, next) => {
         return res.status(404).json({ error: "Rota não definida" });
     }
 
+    let claims;
     if (!targetRoute.public) {
         const authHeader = req.headers['authorization'];
         if (!authHeader) {
@@ -41,11 +42,15 @@ app.use(async (req, res, next) => {
                 'Authorization': authHeader, 
             }
         });
+        console.log(authResp.status)
         if(authResp.status < 200 || authResp >= 300) {
             return res.status(authResp.status).json("Algo deu errado. Tente novamente mais tarde.");
         }
-        const claims = await response.json();
-        if(targetRoute.profiles !== "*" && !targetRoute.toUpperCase().split(",").includes(claims.profile.toUpperCase())) {
+        claims = await authResp.json();
+        if(claims.error) {
+            return res.status(authResp.status).json({"error": claims.error})
+        }
+        if(targetRoute.profiles !== "*" && !targetRoute.profiles.toUpperCase().split(",").includes(claims.profile.toUpperCase())) {
             return res.status(401).json("Você não tem permissão para performar essa ação.");
         }
     }
@@ -62,6 +67,10 @@ app.use(async (req, res, next) => {
                 const bodyData = JSON.stringify(req.body);
                 proxyReq.setHeader('Content-Type', 'application/json');
                 proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+                if(claims) {
+                    proxyReq.setHeader("X-User-Id", claims.cpf);
+                    proxyReq.setHeader("X-User-Profile", claims.profile);
+                }
                 proxyReq.write(bodyData);
             }
         }

@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-# O comando psql usará as variáveis que definimos no docker-compose
 psql -v ON_ERROR_STOP=1 --username "admin" --dbname "postgres" <<-EOSQL
     CREATE DATABASE ms_cliente;
     CREATE DATABASE ms_gerente;
@@ -11,3 +10,8 @@ psql -v ON_ERROR_STOP=1 --username "admin" --dbname "postgres" <<-EOSQL
     GRANT ALL PRIVILEGES ON DATABASE ms_gerente TO admin;
     GRANT ALL PRIVILEGES ON DATABASE ms_contas TO admin;
 EOSQL
+
+echo "Iniciando migrations"
+psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_cliente" -f /docker-entrypoint-initdb.d/clientes.sql
+psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_gerente" -f /docker-entrypoint-initdb.d/gerentes.sql
+psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_contas" -f /docker-entrypoint-initdb.d/contas.sql

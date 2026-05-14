@@ -72,6 +72,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    volumes:
+      - ./init-db/setup.js:/docker-entrypoint-initdb.d/setup.js:ro
     networks:
       - auth
     ports:

@@ -142,12 +142,16 @@ public class OrchestrationService {
         }
     }
 
-    public CompletableFuture<AprovarClienteResponseDTO> startAprovarCliente(AprovarClienteDTO dto) throws Exception {
+    public CompletableFuture<AprovarClienteResponseDTO> startAprovarCliente(String cpfGerente, AprovarClienteDTO dto) throws Exception {
 
         var idOrchestration = UUID.randomUUID();
         var cliente = repository.findByCpf(dto.cpf());
         if(cliente.isEmpty()) {
             throw new IllegalArgumentException("Cliente não encontrado");
+        }
+
+        if(cliente.get().getCpfGerente() == null || !cliente.get().getCpfGerente().equalsIgnoreCase(cpfGerente)) {
+            throw new IllegalArgumentException("Você não tem permissão para isso.");
         }
 
         try {
