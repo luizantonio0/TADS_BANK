@@ -28,7 +28,7 @@ public class OrchestrationConsumer {
             authService.finishLogin(dto);
         }
         if(authService.isLogoutRequest(dto.idOrchestration())) {
-            authService.finishLogout(dto);(dto);
+            authService.finishLogout(dto);
         }
     }
 

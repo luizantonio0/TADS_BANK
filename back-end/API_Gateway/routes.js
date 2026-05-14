@@ -1,22 +1,34 @@
-const services = {
-    auth: "http://localhost:8055",
+export const services = {
+    auth: "http://localhost:8055/auth",
     clientes: "http://localhost:4729",
     contas: "http://localhost:4873",
     gerentes: "http://localhost:2563"
 };
 
-const routeMappings = {
+export const routeMappings = {
     '/login': {
-        service: services.auth,
-        redirect: "/auth/login",
+        target: services.auth,
         public: true,
         profiles: '*'
     },
     '/logout': {
-        service: services.auth,
-        redirect: "/auth/logout",
+        target: services.auth,
         public: true,
         profiles: '*'
     },
-
+    '/gerente': {
+        target: services.gerentes,
+        public: true,
+        profiles: '*'
+    },
+    '/clientes': {
+        target: services.clientes,
+        public: true,
+        profiles: '*'
+    },
+    '/clientes/:cpf/aprovar': {
+        target: services.clientes,
+        public: false,
+        profiles: 'GERENTE,ADMINISTRADOR'
+    }
 }

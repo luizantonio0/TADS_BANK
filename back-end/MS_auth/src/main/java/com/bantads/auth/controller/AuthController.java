@@ -3,6 +3,7 @@ package com.bantads.auth.controller;
 import com.bantads.auth.dto.LoginDTO;
 import com.bantads.auth.dto.LoginResponseDTO;
 import com.bantads.auth.dto.LogoutResponseDTO;
+import com.bantads.auth.dto.TokenClaimsDTO;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.service.JwtService;
 
@@ -25,7 +26,7 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<TokenClaimsDTO> validateToken(@RequestHeader("Authorization") String token) {
         token = token == null ? "" : token.replace("Bearer ", "");
         if (!token.isEmpty()) {
             var user = jwtService.parseToken(token);

@@ -1,6 +1,8 @@
 //require('dotenv').config();
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const { match } = require('path-to-regexp');
+const { services, routeMappings } = require("./routes")
 const cors = require('cors');
 const app = express();
 const PORT = 3000;
@@ -11,89 +13,60 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-const services = {
-    ms_auth: "http://localhost:8055",
-    clientes: "http://localhost:4729",
-    contas: "http://localhost:4873",
-    gerentes: "http://localhost:2563"
-};
-
-/*
-
-const publicRoutes = ['/login', '/auth/validate'];
-
 app.use(async (req, res, next) => {
+    let targetRoute = null;
 
-    console.log(req.path)
+    for (const pattern in routeMappings) {
+        const checker = match(pattern, { decode: decodeURIComponent });
+        const result = checker(req.path);
 
-    if (publicRoutes.some(route => req.path.startsWith(route))) {
-        return next();
+        if (result) {
+            targetRoute = routeMappings[pattern];
+            break;
+        }
     }
 
-    if (req.path.startsWith('/ms_auth')) {
-        return next();
+    if (!targetRoute) {
+        return res.status(404).json({ error: "Rota não definida" });
     }
 
-    try {
-        const token = req.headers['authorization'];
-        if (!token) return res.status(401).json({ error: "Token ausente." });
-
-        const authResp = await fetch(`${services.ms_auth}/auth/validate`, {
-            method: 'GET',
+    if (!targetRoute.public) {
+        const authHeader = req.headers['authorization'];
+        if (!authHeader) {
+           return res.status(401).json({ error: "Faça login para continuar!" });
+        }
+        const authResp = await fetch(services.auth + "/auth/validate", {
+            method: 'POST',
             headers: {
-                'Authorization': token,
+                'Authorization': authHeader, 
             }
         });
-
-        if (!authResp.ok) {
-            return res.status(401).json({ error: "Faça login novamente." });
+        if(authResp.status < 200 || authResp >= 300) {
+            return res.status(authResp.status).json("Algo deu errado. Tente novamente mais tarde.");
         }
-        
-        next();
-    } catch (err) {
-        console.error("Erro no Gateway:", err.message);
-        res.status(500).json({ error: "Serviço de autenticação indisponível." });
+        const claims = await response.json();
+        if(targetRoute.profiles !== "*" && !targetRoute.toUpperCase().split(",").includes(claims.profile.toUpperCase())) {
+            return res.status(401).json("Você não tem permissão para performar essa ação.");
+        }
     }
+
+    return createProxyMiddleware({
+        target: targetRoute.target,
+        changeOrigin: true,
+        pathRewrite: (path, req) => {
+            if (path === '/login' || path === '/logout') return `/auth${path}`;
+            return path;
+        },
+        onProxyReq: (proxyReq, req, res) => {
+            if (req.body && Object.keys(req.body).length) {
+                const bodyData = JSON.stringify(req.body);
+                proxyReq.setHeader('Content-Type', 'application/json');
+                proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+                proxyReq.write(bodyData);
+            }
+        }
+    })(req, res, next);
 });
-*/
-
-app.use(createProxyMiddleware({
-    pathFilter: '/clientes',
-    target: services.clientes,
-    changeOrigin: true
-}));
-
-app.use(createProxyMiddleware({
-    pathFilter: '/logout',
-    target: services.ms_auth,
-    changeOrigin: true
-}));
-
-app.use(createProxyMiddleware({
-    pathFilter: '/gerentes',
-    target: services.gerentes,
-    changeOrigin: true
-}));
-
-app.use(createProxyMiddleware({
-    pathFilter: '/contas',
-    target: services.contas,
-    changeOrigin: true
-}));
-
-app.use(createProxyMiddleware({
-    pathFilter: '/login',
-    target: services.ms_auth,
-    changeOrigin: true
-}));
-
-// app.use(createProxyMiddleware({
-//     pathFilter: '/ms_auth',
-//     target: services.ms_auth,
-//     changeOrigin: true,
-//     pathRewrite: { '^/ms_auth': '' }
-// }));
-
 
 app.listen(PORT, () => {
     console.log(`API Gateway rodando em http://localhost:${PORT}`);
