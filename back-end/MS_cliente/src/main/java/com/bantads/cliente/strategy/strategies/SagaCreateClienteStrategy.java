@@ -1,5 +1,6 @@
 package com.bantads.cliente.strategy.strategies;
 
+
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
 import com.bantads.cliente.dto.saga.output.CreateClienteOutputDTO;
 import com.bantads.cliente.service.ClienteService;
@@ -18,19 +19,13 @@ public class SagaCreateClienteStrategy implements SagaCommandStrategy {
 
     @Override
     public Object handle(OrchestrationCommandDTO cmd) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        ClienteRequestDTO dto = mapper.readValue(cmd.payload(), ClienteRequestDTO.class);
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            ClienteRequestDTO dto = mapper.readValue(cmd.payload(), ClienteRequestDTO.class);
+        var cli = clienteService.cadastrarCliente(dto);
+        redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
 
-            var cli = clienteService.cadastrarCliente(dto);
-            redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
-
-            return new CreateClienteOutputDTO(dto.cpf());
-        } catch (IllegalArgumentException ex) {
-            throw ex;
-        }
-
+        return new CreateClienteOutputDTO(dto.cpf());
     }
 
 }

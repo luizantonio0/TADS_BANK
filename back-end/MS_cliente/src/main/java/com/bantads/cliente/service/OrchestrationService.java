@@ -12,6 +12,11 @@ import com.bantads.cliente.dto.saga.input.ContaCreateInputDTO;
 import com.bantads.cliente.dto.saga.input.CredentialsCreateInputDTO;
 import com.bantads.cliente.dto.saga.input.GetGerenteInputDTO;
 import com.bantads.cliente.dto.saga.output.*;
+import com.bantads.cliente.exception.BadRequestException;
+import com.bantads.cliente.exception.HttpException;
+import com.bantads.cliente.exception.InternalServerErrorException;
+import com.bantads.cliente.exception.NotFoundException;
+import com.bantads.cliente.exception.UnauthorizedException;
 import com.bantads.cliente.orchestration.OrchestrationKeys;
 import com.bantads.cliente.repository.ClienteRepository;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
@@ -46,16 +51,36 @@ public class OrchestrationService {
         return aprovarClienteResponses.containsKey(idOrchestration);
     }
 
-    public void assertPayloads(OrchestrationRequestResultDTO result, String... payloads) throws Exception {
-        for(var p : payloads) {
-            if(!result.payloads().containsKey(p)) {
-                throw new IllegalArgumentException("Payload " + p + " não encontrado");
+    private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID,T> orchMap, String... payloads) throws HttpException {
+        if (dto == null)
+            throw new InternalServerErrorException("Resposta nula do orquestrador");
+        
+        if(!orchMap.containsKey(dto.idOrchestration()))
+            throw new InternalServerErrorException("CompletableFuture para idOrchestration " + dto.idOrchestration() + " não encontrado.");
+        
+        for(var p : payloads)
+            if(!dto.payloads().containsKey(p))
+                throw new InternalServerErrorException("Payload " + p + " não encontrado");
+
+        if(dto.failed()) {
+            var err = dto.errors().values().iterator().next();
+            if (err == null) {
+                throw new HttpException(500, "Algo deu errado. Tente novamente mais tarde.");
             }
+            throw HttpException.wrap(err.status(), err.message());
         }
     }
 
     public CompletableFuture<ClienteCreateResponseDTO> startCriarCliente(ClienteRequestDTO dto) throws Exception {
         var idOrchestration = UUID.randomUUID();
+        
+        if(repository.existsByCpf(dto.cpf().trim())) {
+            throw new BadRequestException("CPF já cadastrado!");
+        }
+
+        if(repository.existsByEmail(dto.email().trim())) {
+            throw new BadRequestException("Email já está em uso!");
+        }
 
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -84,24 +109,8 @@ public class OrchestrationService {
         CompletableFuture<ClienteCreateResponseDTO> completableFuture = null;
 
         try {
-            if (result == null) {
-                throw new IllegalStateException("Resposta nula do orquestrador");
-            }
-
+            prepareResult(result, criarClienteResponses, "ms-gerente", "ms-cliente");
             completableFuture = criarClienteResponses.get(result.idOrchestration());
-
-            if (completableFuture == null) {
-                throw new IllegalStateException("CompletableFuture para idOrchestration " + result.idOrchestration() + " não encontrado.");
-            }
-
-            if(result.failed()) {
-                throw new IllegalArgumentException(result.errors().values().iterator().next());
-            }
-
-            if (!result.payloads().containsKey("ms-gerente")
-                    || !result.payloads().containsKey("ms-cliente")) {
-                throw new IllegalArgumentException("Payloads esperados não encontrados");
-            }
 
             ObjectMapper mapper = new ObjectMapper();
 
@@ -110,7 +119,7 @@ public class OrchestrationService {
 
             var clienteOptional = repository.findByCpf(clienteDTO.cpf().replaceAll("[^0-9]", ""));;
             if(clienteOptional.isEmpty()) {
-                throw new IllegalArgumentException("Cliente não encontrado");
+                throw new NotFoundException("Cliente não encontrado");
             }
 
             var cliente = clienteOptional.get();
@@ -147,11 +156,15 @@ public class OrchestrationService {
         var idOrchestration = UUID.randomUUID();
         var cliente = repository.findByCpf(dto.cpf());
         if(cliente.isEmpty()) {
-            throw new IllegalArgumentException("Cliente não encontrado");
+            throw new NotFoundException("Cliente não encontrado");
         }
 
         if(cliente.get().getCpfGerente() == null || !cliente.get().getCpfGerente().equalsIgnoreCase(cpfGerente)) {
-            throw new IllegalArgumentException("Você não tem permissão para isso.");
+            throw new UnauthorizedException("Você não tem permissão para isso.");
+        }
+
+        if(cliente.get().isAprovado()) {
+            throw new BadRequestException("Cliente já está aprovado.");
         }
 
         try {
@@ -191,21 +204,8 @@ public class OrchestrationService {
         CompletableFuture<AprovarClienteResponseDTO> completableFuture = null;
 
         try {
-            if (result == null) {
-                throw new IllegalStateException("Resposta nula do orquestrador");
-            }
-
+            prepareResult(result, aprovarClienteResponses, "ms-conta", "ms-gerente", "ms-cliente");
             completableFuture = aprovarClienteResponses.get(result.idOrchestration());
-
-            if (completableFuture == null) {
-                throw new IllegalStateException("CompletableFuture para idOrchestration " + result.idOrchestration() + " não encontrado.");
-            }
-
-            if(result.failed()) {
-                throw new IllegalArgumentException(result.errors().values().iterator().next());
-            }
-
-            assertPayloads(result, OrchestrationKeys.MS_CONTA, OrchestrationKeys.MS_GERENTE, OrchestrationKeys.MS_CLIENTE);
 
             ObjectMapper mapper = new ObjectMapper();
 
@@ -273,19 +273,8 @@ public class OrchestrationService {
         CompletableFuture<Object> completableFuture = null;
 
         try {
-            if (result == null) {
-                throw new IllegalStateException("Resposta nula do orquestrador");
-            }
-
+            prepareResult(result, atualizarClienteResponses);
             completableFuture = atualizarClienteResponses.get(result.idOrchestration());
-
-            if (completableFuture == null) {
-                throw new IllegalStateException("CompletableFuture para idOrchestration " + result.idOrchestration() + " não encontrado.");
-            }
-
-            if(result.failed()) {
-                throw new IllegalArgumentException(result.errors().values().iterator().next());
-            }
 
             completableFuture.complete(null);
 

@@ -20,26 +20,20 @@ public class SagaAtualizarClienteStrategy implements SagaCommandStrategy {
 
     @Override
     public Object handle(OrchestrationCommandDTO cmd) throws Exception {
+        var mapper = new ObjectMapper();
+        var dto = mapper.readValue(cmd.payload(), AtualizarClienteInputDTO.class);
 
-        try {
-            var mapper = new ObjectMapper();
-            var dto = mapper.readValue(cmd.payload(), AtualizarClienteInputDTO.class);
+        var cli = clienteService.update(new AlterarDadosClienteDTO(
+                dto.nome(),
+                dto.email(),
+                dto.salario(),
+                dto.endereco(),
+                dto.CEP(),
+                dto.cidade(),
+                dto.estado()
+        ), dto.cpf());
+        redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
 
-            var cli = clienteService.update(new AlterarDadosClienteDTO(
-                    dto.nome(),
-                    dto.email(),
-                    dto.salario(),
-                    dto.endereco(),
-                    dto.CEP(),
-                    dto.cidade(),
-                    dto.estado()
-            ), dto.cpf());
-            redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
-
-            return new AprovarClienteOutputDTO(dto.cpf(), cli.getCriacao().toString());
-        } catch (IllegalArgumentException ex) {
-            throw ex;
-        }
-
+        return new AprovarClienteOutputDTO(dto.cpf(), cli.getCriacao().toString());
     }
 }

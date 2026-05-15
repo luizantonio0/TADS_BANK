@@ -1,12 +1,13 @@
 package com.bantads.auth.controller;
 
-import com.azul.crs.client.Response;
 import com.bantads.auth.dto.LoginDTO;
 import com.bantads.auth.dto.LoginResponseDTO;
 import com.bantads.auth.dto.LogoutResponseDTO;
 import com.bantads.auth.dto.TokenClaimsDTO;
+import com.bantads.auth.exception.UnauthorizedException;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.service.JwtService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -39,14 +40,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public CompletableFuture<ResponseEntity<LogoutResponseDTO>> login(@RequestHeader("Authorization") String token) throws Exception {
+    public CompletableFuture<ResponseEntity<LogoutResponseDTO>> login(@RequestHeader("Authorization") String token) throws UnauthorizedException, JsonProcessingException {
         return authService.startLogout(token)
                 .thenApply(ResponseEntity::ok)
                 .orTimeout(15, TimeUnit.SECONDS);
     }
 
     @PostMapping("/login")
-    public CompletableFuture<ResponseEntity<LoginResponseDTO>> login(@RequestBody LoginDTO loginDTO) throws Exception {
+    public CompletableFuture<ResponseEntity<LoginResponseDTO>> login(@RequestBody LoginDTO loginDTO) throws UnauthorizedException, JsonProcessingException {
         return authService.startLogin(loginDTO.login(), loginDTO.senha())
                 .thenApply(ResponseEntity::ok)
                 .orTimeout(15, TimeUnit.SECONDS);

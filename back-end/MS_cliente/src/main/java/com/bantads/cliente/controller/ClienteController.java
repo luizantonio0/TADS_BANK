@@ -6,6 +6,7 @@ import com.bantads.cliente.dto.http.AprovarClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.http.ClienteCreateResponseDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
+import com.bantads.cliente.exception.NotFoundException;
 import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.service.OrchestrationService;
@@ -15,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +32,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{cpf}")
-    public ResponseEntity<ClienteDTO> findByCpf(@PathVariable("cpf") String cpf) throws NoSuchElementException {
+    public ResponseEntity<ClienteDTO> findByCpf(@PathVariable("cpf") String cpf) throws NotFoundException {
         return new ResponseEntity<>(ClienteDTO.from(clienteService.findByCpf(cpf)), HttpStatus.OK);
     }
 

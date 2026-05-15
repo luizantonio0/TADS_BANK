@@ -4,7 +4,6 @@ import com.bantads.cliente.model.Cliente;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ClienteDTO(

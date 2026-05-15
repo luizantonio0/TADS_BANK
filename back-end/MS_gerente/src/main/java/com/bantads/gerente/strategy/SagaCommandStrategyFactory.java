@@ -1,11 +1,8 @@
 package com.bantads.gerente.strategy;
 
-import com.bantads.gerente.orchestration.OrchestrationKeys;
 import com.bantads.gerente.strategy.strategies.SagaCreateGerenteStrategy;
 import com.bantads.gerente.strategy.strategies.SagaDefinirGerenteStrategy;
 import com.bantads.gerente.strategy.strategies.SagaGetGerenteStrategy;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

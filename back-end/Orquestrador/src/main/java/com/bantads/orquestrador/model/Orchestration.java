@@ -1,6 +1,7 @@
 package com.bantads.orquestrador.model;
 
 import com.bantads.shared.dto.OrchestrationCommandDTO;
+import com.bantads.shared.dto.OrchestrationErrorDTO;
 
 import java.io.Serializable;
 import java.util.*;
@@ -11,13 +12,13 @@ public class Orchestration implements Serializable {
     private boolean failed;
     private boolean autoConfirm;
     private boolean finished;
-    private Map<String, String> errors = new HashMap<>();
+    private Map<String, OrchestrationErrorDTO> errors = new HashMap<>();
     private List<OrchestrationCommandDTO> commands = new ArrayList<>();
     private Map<String, String> payloads = new HashMap<>();
 
     public Orchestration() {}
 
-    public Orchestration(UUID id, int latch, boolean failed, boolean finished, boolean autoConfirm, Map<String, String> errors, List<OrchestrationCommandDTO> commands, Map<String, String> payloads) {
+    public Orchestration(UUID id, int latch, boolean failed, boolean finished, boolean autoConfirm, Map<String, OrchestrationErrorDTO> errors, List<OrchestrationCommandDTO> commands, Map<String, String> payloads) {
         this.id = id;
         this.latch = latch;
         this.commands = commands;
@@ -56,8 +57,8 @@ public class Orchestration implements Serializable {
     public List<OrchestrationCommandDTO> getCommands() { return commands; }
     public void setCommands(List<OrchestrationCommandDTO> commands) { this.commands = commands; }
 
-    public Map<String, String> getErrors() { return errors; }
-    public void setErrors(Map<String, String> errors) { this.errors = errors; }
+    public Map<String, OrchestrationErrorDTO> getErrors() { return errors; }
+    public void setErrors(Map<String, OrchestrationErrorDTO> errors) { this.errors = errors; }
 
     public Map<String, String> getPayloads() { return payloads; }
     public void setPayloads(Map<String, String> payloads) { this.payloads = payloads; }

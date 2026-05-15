@@ -1,6 +1,7 @@
 package com.bantads.auth.consumer;
 
 import com.bantads.shared.dto.*;
+import com.bantads.auth.exception.HttpException;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.strategy.SagaCommandStrategyFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -38,31 +39,38 @@ public class OrchestrationConsumer {
         ObjectMapper mapper = new ObjectMapper();
         if (strategy == null) {
              rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(
-                     dto.idCommand(),
-                     dto.idOrchestration(),
-                     "ms-auth",
-                     "Nenhuma estratégia para o comando " + dto.commandType(),
-                     false,
+                    dto.idCommand(),
+                    dto.idOrchestration(),
+                    "ms-auth",
+                    new OrchestrationErrorDTO(500, "Nenhuma estratégia para o comando " + dto.commandType()),
                     null
              ));
              return;
         }
 
         String payload = null;
-        String message = "";
-        boolean ok = true;
+        OrchestrationErrorDTO message = null;
 
         try {
             var obj = strategy.handle(dto);
             if(obj != null) {
                 payload = mapper.writeValueAsString(obj);
             }
+        } catch (HttpException ex) {
+            message = new OrchestrationErrorDTO(ex.getStatusCode(), ex.getMessage());
         } catch (Exception ex) {
-            ok = false;
-            message = ex.getMessage();
+            message = new OrchestrationErrorDTO(500, ex.getMessage());
         }
 
-        rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(dto.idCommand(), dto.idOrchestration(), "ms-auth", message, ok, payload));
+        rabbitTemplate.convertAndSend(
+            "orchestration.result",
+            new OrchestrationCommandResultDTO(
+                dto.idCommand(),
+                dto.idOrchestration(),
+                "ms-auth", 
+                message, 
+                payload
+            ));
     }
 
     @RabbitListener(queues = "ms-auth.orchestration.confirm")

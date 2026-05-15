@@ -9,9 +9,10 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgxMaskDirective } from 'ngx-mask';
-import { ClienteService } from '../../../shared/service/requests/cliente';
+import { ClienteService } from '../../../shared/service/requests/cliente.service';
 import { ToastService } from '../../../shared/service/toast/toast';
 import { cpfValidator } from '../../../shared/validators/cpf.validator';
+import { CEPService } from '../../../shared/service/cep.service';
 @Component({
   selector: 'app-autocadastro',
   imports: [ReactiveFormsModule, FormsModule, NgxMaskDirective],
@@ -19,6 +20,7 @@ import { cpfValidator } from '../../../shared/validators/cpf.validator';
 })
 export class Autocadastro {
   clienteService = inject(ClienteService);
+  cepService = inject(CEPService);
   private toastr = inject(ToastService);
   formCadastro: FormGroup;
 
@@ -37,6 +39,7 @@ export class Autocadastro {
       cidade: ['', [Validators.required]],
       estado: ['', [Validators.required]],
       salario: ['', [Validators.required]],
+      numero: ['', [Validators.required]]
     });
   }
 
@@ -47,8 +50,43 @@ export class Autocadastro {
     }
   }
 
-  autocadastrar(cliente: Cliente) {
-    this.clienteService.autoCadastrar(cliente).subscribe({
+  onlyNumbers(event: KeyboardEvent) {
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    if (!allowedKeys.includes(event.key) && isNaN(Number(event.key))) {
+      event.preventDefault();
+    }
+  }
+
+  async buscarCep() {
+    const cepAtual = this.formCadastro.get('cep')?.value;
+    if(!cepAtual || cepAtual.replaceAll("\\D", "").length != 8) {
+      this.toastr.error('Digite um CEP válido!');
+      return;
+    }
+    debugger
+    this.cepService.buscarCEP(cepAtual).subscribe({
+      next: (endereco) => {
+        debugger
+        this.formCadastro.patchValue({
+          cidade: endereco.localidade,
+          estado: endereco.uf,
+          endereco: endereco.logradouro + ", " + endereco.bairro
+        })
+      },
+      error: (err) => {
+        this.toastr.error('Algo deu errado!');
+      }
+    })
+  }
+
+  autocadastrar(val: any) {
+    this.clienteService.autoCadastrar({
+      cpf: val.cpf,
+      cidade: val.cidade,
+      email: val.email,
+      endereco: val.ender
+
+    }).subscribe({
       next: (response) => {
         console.log('Cadastro realizado com sucesso', response);
       },

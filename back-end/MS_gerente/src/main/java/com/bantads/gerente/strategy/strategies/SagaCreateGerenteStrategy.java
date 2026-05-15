@@ -22,19 +22,15 @@ public class SagaCreateGerenteStrategy implements SagaCommandStrategy {
 
     @Override
     public Object handle(OrchestrationCommandDTO cmd) throws Exception{
-        try {
-            var mapper = new ObjectMapper();
-            CriaGerenteDTO dto = mapper.readValue(cmd.payload(), CriaGerenteDTO.class);
+        var mapper = new ObjectMapper();
+        CriaGerenteDTO dto = mapper.readValue(cmd.payload(), CriaGerenteDTO.class);
 
-            var ger = gerenteService.novoGerente(dto);
-            redisTemplate.opsForValue().set(
-                    cmd.idOrchestration().toString() + ":touched:gerente",
-                    ger.getId().toString()
-            );
+        var ger = gerenteService.novoGerente(dto);
+        redisTemplate.opsForValue().set(
+            cmd.idOrchestration().toString() + ":touched:gerente",
+            ger.getId().toString()
+        );
 
-            return GerenteDTO.from(ger);
-        } catch (Exception ex) {
-            throw ex;
-        }
+        return GerenteDTO.from(ger);
     }
 }

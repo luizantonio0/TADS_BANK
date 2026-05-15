@@ -2,7 +2,7 @@ package com.bantads.auth.strategy.strategies;
 
 import com.bantads.shared.dto.*;
 import com.bantads.auth.dto.saga.CredentialsUpdateInputDTO;
-import com.bantads.auth.exception.CredentialsAlreadyExistsException;
+import com.bantads.auth.exception.BadRequestException;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.strategy.SagaCommandStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +20,12 @@ public class SagaUpdateCredentialsStrategy implements SagaCommandStrategy {
     private RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public Object handle(OrchestrationCommandDTO cmd) throws CredentialsAlreadyExistsException, IllegalArgumentException {
-        try {
+    public Object handle(OrchestrationCommandDTO cmd) throws BadRequestException {
+        ObjectMapper mapper = new ObjectMapper();
+        CredentialsUpdateInputDTO dto = mapper.readValue(cmd.payload(), CredentialsUpdateInputDTO.class);
 
-            ObjectMapper mapper = new ObjectMapper();
-            CredentialsUpdateInputDTO dto = mapper.readValue(cmd.payload(), CredentialsUpdateInputDTO.class);
-
-            authService.updateCredentials(dto.cpf(), dto.email());
-            redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", dto.cpf());
-
-        } catch (CredentialsAlreadyExistsException | IllegalArgumentException ex) {
-            throw ex;
-        }
+        authService.updateCredentials(dto.cpf(), dto.email());
+        redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", dto.cpf());
         return null;
     }
 

@@ -14,6 +14,7 @@ import com.bantads.gerente.dto.GerenteDTO;
 import com.bantads.gerente.dto.request.CriaGerenteDTO;
 import com.bantads.gerente.dto.response.GerenteCriadoDTO;
 import com.bantads.gerente.dto.saga.CredentialsCreateInputDTO;
+import com.bantads.gerente.exception.HttpException;
 import com.bantads.gerente.orchestration.OrchestrationKeys;
 import com.bantads.gerente.repository.GerenteRepository;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
@@ -56,7 +57,11 @@ public class OrchestrationService {
             }
 
             if(result.failed()) {
-                throw new IllegalArgumentException(result.errors().values().iterator().next());
+                var err = result.errors().values().iterator().next();
+                if (err == null) {
+                    throw new HttpException(500, "Algo deu errado. Tente novamente mais tarde.");
+                }
+                throw HttpException.wrap(err.status(), err.message());
             }
 
             ObjectMapper mapper = new ObjectMapper();

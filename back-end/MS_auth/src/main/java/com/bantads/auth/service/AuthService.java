@@ -10,12 +10,17 @@ import com.bantads.auth.dto.saga.AuthResponseDTO;
 import com.bantads.auth.dto.saga.ClienteDTO;
 import com.bantads.auth.dto.saga.GerenteDTO;
 import com.bantads.auth.dto.saga.GetProfileInputDTO;
-import com.bantads.auth.exception.CredentialsAlreadyExistsException;
+import com.bantads.auth.exception.BadRequestException;
+import com.bantads.auth.exception.HttpException;
+import com.bantads.auth.exception.InternalServerErrorException;
+import com.bantads.auth.exception.NotFoundException;
+import com.bantads.auth.exception.UnauthorizedException;
 import com.bantads.auth.orchestration.OrchestrationKeys;
 import com.bantads.auth.repository.CredentialsRepository;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
 import com.bantads.shared.dto.OrchestrationRequestDTO;
 import com.bantads.shared.dto.OrchestrationRequestResultDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.javers.core.Javers;
@@ -29,7 +34,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -55,11 +59,23 @@ public class AuthService {
         return logoutRequests.containsKey(id);
     }
 
-     public void assertPayloads(OrchestrationRequestResultDTO result, String... payloads) throws Exception {
-        for(var p : payloads) {
-            if(!result.payloads().containsKey(p)) {
-                throw new IllegalArgumentException("Payload " + p + " não encontrado");
+    private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID,T> orchMap, String... payloads) throws HttpException {
+        if (dto == null)
+            throw new InternalServerErrorException("Resposta nula do orquestrador");
+        
+        if(!orchMap.containsKey(dto.idOrchestration()))
+            throw new InternalServerErrorException("CompletableFuture para idOrchestration " + dto.idOrchestration() + " não encontrado.");
+        
+        for(var p : payloads)
+            if(!dto.payloads().containsKey(p))
+                throw new InternalServerErrorException("Payload " + p + " não encontrado");
+
+        if(dto.failed()) {
+            var err = dto.errors().values().iterator().next();
+            if (err == null) {
+                throw new HttpException(500, "Algo deu errado. Tente novamente mais tarde.");
             }
+            throw HttpException.wrap(err.status(), err.message());
         }
     }
 
@@ -67,19 +83,8 @@ public class AuthService {
         CompletableFuture<LogoutResponseDTO> completableFuture = null;
 
         try {
-            if (result == null) {
-                throw new IllegalStateException("Resposta nula do orquestrador");
-            }
-
+            prepareResult(result, logoutRequests);
             completableFuture = logoutRequests.get(result.idOrchestration());
-
-            if (completableFuture == null) {
-                throw new IllegalStateException("CompletableFuture para idOrchestration " + result.idOrchestration() + " não encontrado.");
-            }
-
-            if(result.failed()) {
-                throw new IllegalArgumentException(result.errors().values().iterator().next());
-            }
 
             ClienteDTO cliente = result.payloads().containsKey("ms-cliente")
                 ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
@@ -90,7 +95,7 @@ public class AuthService {
                 : null;
 
             if(cliente == null && gerente == null) {
-                throw new NoSuchElementException("Usuário não encontrado");
+                throw new NotFoundException("Usuário não encontrado");
             }            
 
             var dto = new LogoutResponseDTO(
@@ -110,15 +115,15 @@ public class AuthService {
         }
     }
 
-    public CompletableFuture<LogoutResponseDTO> startLogout(String token) throws Exception {
+    public CompletableFuture<LogoutResponseDTO> startLogout(String token) throws UnauthorizedException, JsonProcessingException {
         if(token == null || token.isEmpty()) {
-            throw new IllegalAccessError("Usuário não está logado");
+            throw new UnauthorizedException("Usuário não está logado");
         }
     
         token = token.replace("Bearer ", "");
         var claims = jwtService.parseToken(token);
         if(claims == null) {
-            throw new IllegalAccessError("Usuário não está logado");
+            throw new UnauthorizedException("Usuário não está logado");
         }
 
         var orchestrationId = UUID.randomUUID();
@@ -148,21 +153,8 @@ public class AuthService {
         CompletableFuture<LoginResponseDTO> completableFuture = null;
 
         try {
-            if (result == null) {
-                throw new IllegalStateException("Resposta nula do orquestrador");
-            }
-
+            prepareResult(result, loginsRequests, "ms-auth");
             completableFuture = loginsRequests.get(result.idOrchestration());
-
-            if (completableFuture == null) {
-                throw new IllegalStateException("CompletableFuture para idOrchestration " + result.idOrchestration() + " não encontrado.");
-            }
-
-            if(result.failed()) {
-                throw new IllegalArgumentException(result.errors().values().iterator().next());
-            }
-
-            assertPayloads(result, "ms-auth");
 
             ClienteDTO cliente = result.payloads().containsKey("ms-cliente")
                 ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
@@ -175,7 +167,7 @@ public class AuthService {
             AuthResponseDTO auth = mapper.readValue(result.payloads().get("ms-auth"), AuthResponseDTO.class);
 
             if(cliente == null && gerente == null) {
-                throw new NoSuchElementException("Nenhum usuário encontrado!");
+                throw new NotFoundException("Nenhum usuário encontrado!");
             }
 
             var dto = new LoginResponseDTO(
@@ -202,11 +194,11 @@ public class AuthService {
         }
     }
 
-    public CompletableFuture<LoginResponseDTO> startLogin(String login, String senha) throws Exception {
+    public CompletableFuture<LoginResponseDTO> startLogin(String login, String senha) throws UnauthorizedException, JsonProcessingException {
 
         var credentials = credentialsRepository.findByEmail(login);
         if(credentials.isEmpty() || credentials.filter(value -> encoder.matches(senha, value.getPassword())).isEmpty()) {
-            throw new IllegalArgumentException("Credenciais inválidas");
+            throw new UnauthorizedException("Credenciais inválidas");
         }
 
         var orchestrationId = UUID.randomUUID();
@@ -240,27 +232,27 @@ public class AuthService {
         return new TokenClaimsDTO(credentials.get().getCpf(), credentials.get().getProfile());
     }
 
-    public void createCredentials(String email, String cpf, String cryptoPw, String profile) {
+    public void createCredentials(String email, String cpf, String cryptoPw, String profile) throws BadRequestException {
         if(email == null || cpf == null || cryptoPw == null || email.trim().isEmpty() || cpf.trim().isEmpty() || cryptoPw.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email, CPF e Senha devem ser preenchidos.");
+            throw new BadRequestException("Email, CPF e Senha devem ser preenchidos.");
         }
         if(credentialsRepository.existsById(cpf)) {
-            throw new CredentialsAlreadyExistsException();
+            throw new BadRequestException("Credenciais já foram definidas para esse usuário.");
         }
         if(credentialsRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email já está em uso.");
+            throw new BadRequestException("Email já está em uso.");
         }
         var creds = new Credentials(cpf, email, cryptoPw, profile);
         credentialsRepository.insert(creds);
         javers.commit("system", creds);
     }
 
-    public void updateCredentials(String cpf, String email) {
+    public void updateCredentials(String cpf, String email) throws BadRequestException {
         if(email == null || cpf == null || email.trim().isEmpty() || cpf.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email e CPF devem ser preenchidos.");
+            throw new BadRequestException("Email e CPF devem ser preenchidos.");
         }
         if(credentialsRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email já está em uso.");
+            throw new BadRequestException("Email já está em uso.");
         }
         credentialsRepository.findById(cpf).ifPresent(usuario -> {
             usuario.setEmail(email);

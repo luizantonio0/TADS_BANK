@@ -3,6 +3,7 @@ package com.bantads.orquestrador.consumer;
 import com.bantads.orquestrador.model.Orchestration;
 import com.bantads.shared.dto.OrchestrationCommandResultDTO;
 import com.bantads.shared.dto.OrchestrationConfirmDTO;
+import com.bantads.shared.dto.OrchestrationErrorDTO;
 import com.bantads.shared.dto.OrchestrationRequestResultDTO;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -43,9 +44,9 @@ public class OrchestrationConsumer {
                     return;
                 }
                 orchestration.getPayloads().put(dto.sourceService(), dto.payload());
-                if(!dto.ok()) {
+                if(dto.error() != null) {
                     orchestration.setFailed(true);
-                    orchestration.getErrors().put(dto.sourceService(), dto.message());
+                    orchestration.getErrors().put(dto.sourceService(), dto.error());
                 }
                 if (ended) {
                     orchestration.setFinished(true);
@@ -64,7 +65,7 @@ public class OrchestrationConsumer {
                                 "orchestration.confirm",
                                 new OrchestrationConfirmDTO(
                                         dto.idOrchestration(),
-                                        String.join(",", orchestration.getErrors().values()),
+                                        String.join(",", orchestration.getErrors().values().stream().map(OrchestrationErrorDTO::message).toList()),
                                         !orchestration.isFailed()
                         ));
                     }

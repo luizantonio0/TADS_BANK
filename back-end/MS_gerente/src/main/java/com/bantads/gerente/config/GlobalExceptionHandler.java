@@ -1,60 +1,26 @@
 package com.bantads.gerente.config;
 
-import com.bantads.gerente.dto.ErroDTO;
-import com.bantads.gerente.exception.AccountAlreadyExistsException;
-import com.bantads.gerente.exception.BadRequestException;
-import com.bantads.gerente.exception.NotFoundExecption;
+import com.bantads.gerente.exception.HttpException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Arrays;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(NotFoundExecption.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErroDTO> handleNotFound(NotFoundExecption ex)
-    {
-        ErroDTO erro = new ErroDTO(
-                "Recurso não encontrado:" + ex.getMessage(),
-                Arrays.toString(ex.getStackTrace()),
-                404);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
-    }
-
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ErroDTO> handleGeneric(Exception ex)
-    {
-        ErroDTO erro = new ErroDTO(
-                "Erro interno no servidor:" + ex.getMessage(),
-                Arrays.toString(ex.getStackTrace()),
-                500);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erro);
+    public ResponseEntity<?> handleGeneric(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Algo deu errado. Tente novamente mais tarde."));
     }
 
-    @ExceptionHandler(AccountAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<ErroDTO> handleGeneric(AccountAlreadyExistsException ex)
-    {
-        ErroDTO erro = new ErroDTO(ex.getMessage(),
-                Arrays.toString(ex.getStackTrace()),
-                409);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    @ExceptionHandler(HttpException.class)
+    public ResponseEntity<?> handleHttpException(HttpException ex) {
+        var status = HttpStatus.valueOf(ex.getStatusCode());
+        String msg = status.is5xxServerError() ? "Algo deu errado. Tente novamente mais tarde." : ex.getMessage();
+        return ResponseEntity.status(status).body(Map.of("error", msg));
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErroDTO> handleNotFound(BadRequestException ex)
-    {
-        ErroDTO erro = new ErroDTO(
-                "Dados Inválidos:" + ex.getMessage(),
-                Arrays.toString(ex.getStackTrace()),
-                400);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
-    }
 }

@@ -2,7 +2,7 @@ import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ModalEditarGerente } from '../modal-editar-gerente/modal-editar-gerente';
 import { ModalExcluirGerente } from '../modal-excluir-gerente/modal-excluir-gerente';
 import { ModalAdicionarGerente } from '../modal-adicionar-gerente/modal-adicionar-gerente';
-import { GerenteService } from '../../../shared/service/requests/gerente';
+import { GerenteService } from '../../../shared/service/requests/gerente.service';
 import { GerenteResponse } from '../../../shared/models/gerente.model';
 import { CommonModule } from '@angular/common';
 

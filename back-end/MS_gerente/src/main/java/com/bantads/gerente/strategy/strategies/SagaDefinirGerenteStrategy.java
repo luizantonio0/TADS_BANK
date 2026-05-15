@@ -18,26 +18,19 @@ public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {
     private RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public Object handle(OrchestrationCommandDTO cmd){
-        try {
-
-            var gerente = gerenteService.findGerenteMenosClientes();
-            if (gerente.isEmpty()) {
-                throw new IllegalArgumentException("Nenhum gerente disponível");
-            }
-
-            redisTemplate.opsForValue().set(
-                    cmd.idOrchestration().toString() + ":touched:gerente",
-                    gerente.get().getId().toString()
-            );
-
-            var res = new DefinirGerenteOutputDTO(
-                    gerente.get().getCpf(),
-                    gerente.get().getNome()
-            );
-            return res;
-        } catch (Exception ex) {
-            throw ex;
+    public Object handle(OrchestrationCommandDTO cmd) {
+        var gerente = gerenteService.findGerenteMenosClientes();
+        if (gerente.isEmpty()) {
+            throw new IllegalArgumentException("Nenhum gerente disponível");
         }
+
+        redisTemplate.opsForValue().set(
+                cmd.idOrchestration().toString() + ":touched:gerente",
+                gerente.get().getId().toString());
+
+        var res = new DefinirGerenteOutputDTO(
+                gerente.get().getCpf(),
+                gerente.get().getNome());
+        return res;
     }
 }

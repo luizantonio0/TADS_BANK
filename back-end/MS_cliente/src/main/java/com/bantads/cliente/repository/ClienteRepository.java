@@ -13,6 +13,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID>, Revisio
 
     Optional<Cliente> findByCpf(String cpf);
     boolean existsByCpf(String cpf);
+    boolean existsByEmail(String email);
 
 }
         

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../../../shared/service/requests/auth';
+import { AuthService } from '../../../shared/service/requests/auth.service';
 import { LoginRequestModel} from '../../../shared/models/BarrelFile';
 import {
   FormBuilder,
@@ -9,7 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ClienteService } from '../../../shared/service/requests/cliente';
+import { ClienteService } from '../../../shared/service/requests/cliente.service';
 
 @Component({
   selector: 'app-login',

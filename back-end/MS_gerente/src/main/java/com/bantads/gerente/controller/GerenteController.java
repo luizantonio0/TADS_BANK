@@ -5,6 +5,8 @@ import com.bantads.gerente.dto.GerenteDTO;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
 import com.bantads.gerente.dto.response.GerenteCriadoDTO;
+import com.bantads.gerente.exception.BadRequestException;
+import com.bantads.gerente.exception.NotFoundException;
 import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.service.OrchestrationService;
 
@@ -36,7 +38,7 @@ public class GerenteController {
     }
 
     @PutMapping("/{cpf}")
-    public ResponseEntity<GerenteAtualizadoDTO> update(@PathVariable("cpf") String cpf , @RequestBody AtualizaGerenteDTO atualizaGerenteDTO){
+    public ResponseEntity<GerenteAtualizadoDTO> update(@PathVariable("cpf") String cpf , @RequestBody AtualizaGerenteDTO atualizaGerenteDTO) throws NotFoundException, BadRequestException{
         return new ResponseEntity<>(gerenteService.updateByCpf(cpf, atualizaGerenteDTO), HttpStatus.OK);
     }
     

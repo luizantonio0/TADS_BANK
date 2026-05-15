@@ -3,7 +3,7 @@ import { Modal } from '../../../components/modal/modal';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ToastService } from '../../../shared/service/toast/toast';
-import { ContaService } from '../../../shared/service/requests/conta';
+import { ContaService } from '../../../shared/service/requests/conta.service';
 
 @Component({
   selector: 'modal-depositar-sacar',

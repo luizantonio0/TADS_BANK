@@ -29,7 +29,7 @@ public class JwtService {
     @Autowired private TokenRepository tokenRepository;
 
     private boolean tokenExists(String token) {
-        return tokenRepository.existsByToken(token);
+        return tokenRepository.existsById(token);
     }
 
     public void saveToken(String cpf, String token) {
@@ -37,7 +37,7 @@ public class JwtService {
     }
 
     public void revokeToken(String token) {
-        tokenRepository.deleteByToken(token);
+        tokenRepository.deleteById(token);
     }
 
     public void revokeAllTokens(String cpf) {

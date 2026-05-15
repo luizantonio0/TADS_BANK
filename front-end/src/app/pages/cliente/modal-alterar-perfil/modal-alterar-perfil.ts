@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastService } from '../../../shared/service/toast/toast';
 import { Modal } from "../../../components/modal/modal";
 import { NgxMaskDirective } from 'ngx-mask';
-import {ClienteService} from '../../../shared/service/requests/cliente';
+import {ClienteService} from '../../../shared/service/requests/cliente.service';
 import {Cliente} from '../../../shared/models/cliente.model';
 
 @Component({

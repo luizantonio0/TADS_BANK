@@ -2,9 +2,8 @@ package com.bantads.gerente.service;
 
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.request.CriaGerenteDTO;
-import com.bantads.gerente.exception.AccountAlreadyExistsException;
 import com.bantads.gerente.exception.BadRequestException;
-import com.bantads.gerente.exception.NotFoundExecption;
+import com.bantads.gerente.exception.NotFoundException;
 import com.bantads.gerente.model.Gerente;
 import com.bantads.gerente.repository.GerenteRepository;
 import jakarta.transaction.Transactional;
@@ -33,7 +32,7 @@ public class GerenteService {
     }
 
     @Transactional
-    public Gerente novoGerente(CriaGerenteDTO criaGerenteDTO) throws AccountAlreadyExistsException {
+    public Gerente novoGerente(CriaGerenteDTO criaGerenteDTO) throws BadRequestException {
 
         String cpf = validatorService.cpfValidator(criaGerenteDTO.cpf()).
                 orElseThrow(
@@ -43,7 +42,7 @@ public class GerenteService {
         String email = validatorService.emailValidator(criaGerenteDTO.email()).orElseThrow(() -> new BadRequestException("Email informado não é válido"));
 
         if(gerenteRepository.existsByCpf(cpf)) {
-            throw new AccountAlreadyExistsException("Já existe um gerente com esse CPF");
+            throw new BadRequestException("Já existe um gerente com esse CPF");
         }
 
         @Valid
@@ -96,16 +95,14 @@ public class GerenteService {
     }
 
     @Transactional
-    public GerenteAtualizadoDTO updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) throws NotFoundExecption {
+    public GerenteAtualizadoDTO updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) throws NotFoundException, BadRequestException {
 
         String email = validatorService.emailValidator(atualizaGerenteDTO.email()).
                 orElseThrow(
                         () -> new BadRequestException("Email informado não é válido")
                 );
         @Valid
-        Gerente gerente = gerenteRepository.findByCpf(cpf).orElseThrow(
-                () -> new NotFoundExecption("")
-        );
+        Gerente gerente = gerenteRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Gerente não encontrado!"));
 
         gerenteMapper.ataualizaGerentePeloDto(atualizaGerenteDTO, gerente);
 
@@ -116,7 +113,7 @@ public class GerenteService {
         return new GerenteAtualizadoDTO(gerente);
     }
 
-    public Optional<Gerente> findByCpf(String cpf) throws NotFoundExecption {
+    public Optional<Gerente> findByCpf(String cpf) throws NotFoundException {
         return gerenteRepository.findByCpf(cpf);
     }
 

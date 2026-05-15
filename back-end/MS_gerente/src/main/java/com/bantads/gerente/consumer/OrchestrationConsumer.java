@@ -1,5 +1,6 @@
 package com.bantads.gerente.consumer;
 
+import com.bantads.gerente.exception.HttpException;
 import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.service.OrchestrationService;
 import com.bantads.gerente.strategy.SagaCommandStrategyFactory;
@@ -50,26 +51,23 @@ public class OrchestrationConsumer {
                     dto.idCommand(),
                     dto.idOrchestration(),
                     "ms-gerente",
-                    "Nenhuma estratégia para o comando " + dto.commandType(),
-                    false,
+                    new OrchestrationErrorDTO(500, "Nenhuma estratégia para o comando " + dto.commandType()),
                     null
             ));
         }
 
         String payload = null;
-        String message = "";
-        boolean ok = true;
+        OrchestrationErrorDTO message = null;
 
         try {
             var obj = strategy.handle(dto);
             if(obj != null) {
                 payload = mapper.writeValueAsString(obj);
             }
-            log.debug(String.format("Comando %s (%s) processado com sucesso", dto.commandType(), dto.idCommand().toString()));
+        } catch (HttpException ex) {
+            message = new OrchestrationErrorDTO(ex.getStatusCode(), ex.getMessage());
         } catch (Exception ex) {
-            ok = false;
-            message = ex.getMessage();
-            log.debug(String.format("Comando %s (%s) finalizou com erro: %s", dto.commandType(), dto.idCommand().toString(), ex.getMessage()));
+            message = new OrchestrationErrorDTO(500, ex.getMessage());
         }
 
         rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(
@@ -77,7 +75,6 @@ public class OrchestrationConsumer {
                 dto.idOrchestration(),
                 "ms-gerente",
                 message,
-                ok,
                 payload)
         );
     }

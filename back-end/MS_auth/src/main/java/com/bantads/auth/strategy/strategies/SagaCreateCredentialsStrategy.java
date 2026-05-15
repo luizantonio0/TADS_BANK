@@ -6,8 +6,6 @@ import com.bantads.auth.service.AuthService;
 import com.bantads.auth.service.EmailService;
 import com.bantads.auth.strategy.SagaCommandStrategy;
 
-import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;

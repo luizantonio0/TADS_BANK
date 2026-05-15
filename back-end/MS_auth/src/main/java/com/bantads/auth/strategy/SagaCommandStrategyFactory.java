@@ -19,7 +19,7 @@ public class SagaCommandStrategyFactory {
             case "CreateCredentials" -> createCredentialsStrategy;
             case "Login" -> authStrategy;
             case "Logout" -> logoutStrategy;
-            default -> throw new IllegalStateException("Unexpected value: " + commandType);
+            default -> throw new IllegalArgumentException("Unexpected value: " + commandType);
         };
     }
 

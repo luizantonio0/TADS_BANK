@@ -42,7 +42,6 @@ app.use(async (req, res, next) => {
                 'Authorization': authHeader, 
             }
         });
-        console.log(authResp.status)
         if(authResp.status < 200 || authResp >= 300) {
             return res.status(authResp.status).json("Algo deu errado. Tente novamente mais tarde.");
         }
@@ -58,21 +57,23 @@ app.use(async (req, res, next) => {
     return createProxyMiddleware({
         target: targetRoute.target,
         changeOrigin: true,
-        pathRewrite: (path, req) => {
+        pathRewrite: (path) => {
             if (path === '/login' || path === '/logout') return `/auth${path}`;
             return path;
         },
-        onProxyReq: (proxyReq, req, res) => {
-            if (req.body && Object.keys(req.body).length) {
-                const bodyData = JSON.stringify(req.body);
-                proxyReq.setHeader('Content-Type', 'application/json');
-                proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-                if(claims) {
+        on: {
+            proxyReq: (proxyReq, req, res) => {
+                if (claims) {
                     proxyReq.setHeader("X-User-Id", claims.cpf);
                     proxyReq.setHeader("X-User-Profile", claims.profile);
                 }
-                proxyReq.write(bodyData);
-            }
+                if (req.body && Object.keys(req.body).length) {
+                    const bodyData = JSON.stringify(req.body);
+                    proxyReq.setHeader('Content-Type', 'application/json');
+                    proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+                    proxyReq.write(bodyData);
+                }
+            } 
         }
     })(req, res, next);
 });

@@ -19,19 +19,13 @@ public class SagaAprovarClienteStrategy implements SagaCommandStrategy {
 
     @Override
     public Object handle(OrchestrationCommandDTO cmd) throws Exception {
+        var mapper = new ObjectMapper();
+        var dto = mapper.readValue(cmd.payload(), AprovarClienteDTO.class);
 
-        try {
-            var mapper = new ObjectMapper();
-            var dto = mapper.readValue(cmd.payload(), AprovarClienteDTO.class);
+        var cli = clienteService.aprovarCliente(dto.cpf());
+        redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
 
-            var cli = clienteService.aprovarCliente(dto.cpf());
-            redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
-
-            return new AprovarClienteOutputDTO(dto.cpf(), cli.getCriacao().toString());
-        } catch (IllegalArgumentException ex) {
-            throw ex;
-        }
-
+        return new AprovarClienteOutputDTO(dto.cpf(), cli.getCriacao().toString());
     }
 
 }

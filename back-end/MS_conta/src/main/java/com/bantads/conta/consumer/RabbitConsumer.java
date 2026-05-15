@@ -1,6 +1,7 @@
 package com.bantads.conta.consumer;
 
 import com.bantads.shared.dto.*;
+import com.bantads.conta.exception.HttpException;
 import com.bantads.conta.orchestration.OrchestrationKeys;
 import com.bantads.conta.service.ContaService;
 import com.bantads.conta.strategy.SagaCommandStrategyFactory;
@@ -38,25 +39,24 @@ public class RabbitConsumer {
                     dto.idCommand(),
                     dto.idOrchestration(),
                     "ms-conta",
-                    "Nenhuma estratégia para o comando " + dto.commandType(),
-                    false,
+                    new OrchestrationErrorDTO(500, "Nenhuma estratégia para o comando " + dto.commandType()),
                     null
             ));
             return;
         }
 
         String payload = null;
-        String message = "";
-        boolean ok = true;
+        OrchestrationErrorDTO message = null;
 
         try {
             var obj = strategy.handle(dto);
             if(obj != null) {
                 payload = objectMapper.writeValueAsString(obj);
             }
+        } catch (HttpException ex) {
+            message = new OrchestrationErrorDTO(ex.getStatusCode(), ex.getMessage());
         } catch (Exception ex) {
-            ok = false;
-            message = ex.getMessage();
+            message = new OrchestrationErrorDTO(500, ex.getMessage());
         }
 
         rabbitTemplate.convertAndSend("orchestration.result", new OrchestrationCommandResultDTO(
@@ -64,7 +64,6 @@ public class RabbitConsumer {
                 dto.idOrchestration(),
                 "ms-conta",
                 message,
-                ok,
                 payload
         ));
     }
