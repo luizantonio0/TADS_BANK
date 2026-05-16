@@ -6,6 +6,7 @@ psql -v ON_ERROR_STOP=1 --username "admin" --dbname "postgres" -c "CREATE DATABA
 psql -v ON_ERROR_STOP=1 --username "admin" --dbname "postgres" -c "CREATE DATABASE ms_gerente;"
 psql -v ON_ERROR_STOP=1 --username "admin" --dbname "postgres" -c "CREATE DATABASE ms_contas;"
 
-psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_cliente" -f /docker-entrypoint-initdb.d/clientes.sql
-psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_gerente" -f /docker-entrypoint-initdb.d/gerentes.sql
-psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_contas" -f /docker-entrypoint-initdb.d/contas.sql
+echo "Iniciando migrations"
+psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_cliente" -f /docker-entrypoint-initdb.d/migrations/clientes.sql
+psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_gerente" -f /docker-entrypoint-initdb.d/migrations/gerentes.sql
+psql -v ON_ERROR_STOP=1 --username "admin" --dbname "ms_contas" -f /docker-entrypoint-initdb.d/migrations/contas.sql

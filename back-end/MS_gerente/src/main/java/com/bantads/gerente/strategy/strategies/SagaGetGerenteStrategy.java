@@ -6,15 +6,17 @@ import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.strategy.SagaCommandStrategy;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class SagaGetGerenteStrategy implements SagaCommandStrategy {
 
-    @Autowired
-    private GerenteService gerenteService;
+    private final GerenteService gerenteService;
+
+    public SagaGetGerenteStrategy(GerenteService gerenteService) {
+        this.gerenteService = gerenteService;
+    }
 
     @Override
     public Object handle(OrchestrationCommandDTO cmd) throws Exception {
@@ -22,10 +24,7 @@ public class SagaGetGerenteStrategy implements SagaCommandStrategy {
         var dto = mapper.readValue(cmd.payload(), GetGerenteInputDTO.class);
 
         var gerente = gerenteService.findByCpf(dto.cpf());
-        if (gerente.isEmpty()) {
-            throw new IllegalArgumentException("Nenhum gerente ou administrador encontrado");
-        }
 
-        return GerenteDTO.from(gerente.get());
+        return GerenteDTO.from(gerente);
     }
 }
