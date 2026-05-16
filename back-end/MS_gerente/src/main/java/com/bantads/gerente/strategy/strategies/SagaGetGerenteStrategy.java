@@ -6,7 +6,6 @@ import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.strategy.SagaCommandStrategy;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
