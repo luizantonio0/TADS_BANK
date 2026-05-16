@@ -84,8 +84,10 @@ export class Autocadastro {
       cpf: val.cpf,
       cidade: val.cidade,
       email: val.email,
-      endereco: val.ender
-
+      endereco: val.endereco,
+      nome: val.c,
+      salario: val.b,
+      estado: val.a
     }).subscribe({
       next: (response) => {
         console.log('Cadastro realizado com sucesso', response);
