@@ -113,8 +113,10 @@ public class GerenteService {
         return new GerenteAtualizadoDTO(gerente);
     }
 
-    public Optional<Gerente> findByCpf(String cpf) throws NotFoundException {
-        return gerenteRepository.findByCpf(cpf);
+    public Gerente findByCpf(String cpf) throws NotFoundException {
+        return gerenteRepository.findByCpf(cpf).orElseThrow(
+                () -> new NotFoundException("Gerente não encontrado!")
+        );
     }
 
     public Optional<Gerente> findGerenteMenosClientes() {
