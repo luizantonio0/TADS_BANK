@@ -39,7 +39,9 @@ export class Autocadastro {
       cidade: ['', [Validators.required]],
       estado: ['', [Validators.required]],
       salario: ['', [Validators.required]],
-      numero: ['', [Validators.required]]
+      numero: ['', [Validators.required]],
+      bairro: [''],
+      logradouro: ['']
     });
   }
 
@@ -70,7 +72,9 @@ export class Autocadastro {
         this.formCadastro.patchValue({
           cidade: endereco.localidade,
           estado: endereco.uf,
-          endereco: endereco.logradouro + ", " + endereco.bairro
+          endereco: endereco.logradouro + ", " + endereco.bairro,
+          bairro: endereco.bairro,
+          logradouro: endereco.logradouro
         })
       },
       error: (err) => {
@@ -84,8 +88,11 @@ export class Autocadastro {
       cpf: val.cpf,
       cidade: val.cidade,
       email: val.email,
-      endereco: val.ender
-
+      endereco: `${val.logradouro}, ${val.numero}, ${val.bairro}`,
+      estado: val.estado,
+      nome: val.nome,
+      salario: val.salario,
+      telefone: val.telefone
     }).subscribe({
       next: (response) => {
         console.log('Cadastro realizado com sucesso', response);
