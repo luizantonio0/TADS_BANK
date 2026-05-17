@@ -98,9 +98,9 @@ public class AuthService {
                 throw new NotFoundException("Usuário não encontrado");
             }            
 
-            var dto = new LogoutResponseDTO(
-                
-            );
+            var dto = (cliente != null) 
+                ? new LogoutResponseDTO(cliente.cpf(), cliente.nome(), cliente.email(), "CLIENTE")
+                : new LogoutResponseDTO(gerente.cpf(), gerente.nome(), gerente.email(), "GERENTE");
 
             completableFuture.complete(dto);
 
