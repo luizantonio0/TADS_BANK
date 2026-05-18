@@ -33,11 +33,17 @@ services:
       - "3000:3000"
     networks:
       - tadsbank
-    command: npx nodemon index.js
+    command: node index.js
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -53,12 +59,18 @@ services:
     image: redis:7.2-alpine
     container_name: tads-redis
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5 
+      start_period: 5s
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
-      - tads-network
+      - tadsbank
     command: ["redis-server", "--appendonly", "yes"]
 
   auth-ms-db:
@@ -99,7 +111,21 @@ services:
     ports:
       - "5432:5432"
 
-  auth-ms:
+  orquestrador:
+    build:
+      context: ./back-end/Orquestrador
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./back-end/Orquestrador:/app 
+    networks:
+      - tadsbank
+
+  ms-auth:
     build:
       context: ./back-end/MS_auth
       dockerfile: Dockerfile
@@ -112,14 +138,16 @@ services:
       JWT_SECRET: AYqQdMQcnW6JOCMyBS24A8GFbeRk4VTth6o8FlSDNIs
     volumes:
       - ./back-end/MS_auth:/app 
+    ports:
+      - "8055:8055"
     networks:
       - auth
       - tadsbank
 
-  auth-cliente:
+  ms-cliente:
     build:
       context: ./back-end/MS_cliente
-      dockerfile: Dockerfile
+      dockerfile: debug.Dockerfile
     depends_on:
       rabbitmq:
         condition: service_started
@@ -127,8 +155,27 @@ services:
         condition: service_healthy
     volumes:
       - ./back-end/MS_cliente:/app 
+    ports:
+      - "4729:4729"
     networks:
       - cliente
+      - tadsbank
+
+  ms-gerente:
+    build:
+      context: ./back-end/MS_gerente
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./back-end/MS_gerente:/app
+    ports:
+      - "2563:2563" 
+    networks:
+      - gerente
       - tadsbank
 
   ms-conta:
@@ -137,7 +184,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
     volumes:
@@ -151,7 +198,7 @@ services:
       - conta
       - tadsbank
     ports:
-      - "8082:8080"
+      - "4873:4873"
     
 
 

@@ -20,8 +20,8 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue msclienteCommandQueue() {
-        return new Queue(OrchestrationKeys.MS_CLIENTE + ".orchestrate", true);
+    public Queue commandQueue() {
+        return new Queue(OrchestrationKeys.MS_CLIENTE + ".command", true);
     }
 
     @Bean

@@ -1,8 +1,8 @@
 export const services = {
-    auth: "http://localhost:8055",
-    clientes: "http://localhost:4729",
-    contas: "http://localhost:4873",
-    gerentes: "http://localhost:2563"
+    auth: "http://ms-auth:8055",
+    clientes: "http://ms-cliente:4729",
+    contas: "http://ms-conta:4873",
+    gerentes: "http://ms-gerente:2563"
 };
 
 export const routeMappings = {

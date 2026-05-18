@@ -4,12 +4,8 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install --omit=dev
-
-COPY . .
+RUN npm install
 
 EXPOSE 3000
-
-USER node
 
 CMD ["node", "index.js"]

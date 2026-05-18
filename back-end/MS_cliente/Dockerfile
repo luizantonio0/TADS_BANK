@@ -26,5 +26,5 @@ COPY --from=jlink-builder /javaruntime $JAVA_HOME
 WORKDIR /usr/app/src
 COPY --from=builder /usr/app/src/build/libs/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 4729
 ENTRYPOINT ["java", "-jar", "app.jar"]

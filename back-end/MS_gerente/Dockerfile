@@ -12,6 +12,6 @@ RUN ./gradlew dependencies --no-daemon
 
 COPY src src
 
-EXPOSE 8055
+EXPOSE 2563
 
 CMD ["./gradlew", "clean", "bootRun", "--no-daemon"]
