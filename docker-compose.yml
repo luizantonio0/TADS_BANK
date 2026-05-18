@@ -73,7 +73,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./init-db/setup.js:/docker-entrypoint-initdb.d/setup.js:ro
+      - ./init-db/setup.js:/docker-entrypoint-initdb.d/setup.js:ro,Z
     networks:
       - auth
     ports:
@@ -95,7 +95,7 @@ services:
       - conta
       - gerente
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./init-db:/docker-entrypoint-initdb.d:Z
     ports:
       - "5432:5432"
 
@@ -153,6 +153,5 @@ services:
     ports:
       - "8082:8080"
     
-
 
 

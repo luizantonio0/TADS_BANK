@@ -12,7 +12,10 @@ export class AuthService {
   private http = inject(HttpClient);
 
   login(login: LoginRequestModel): Observable<LoginResponseModel> {
-    return this.http.post<LoginResponseModel>(`${this.API_URL}/login`, login);
+    return this.http.post<LoginResponseModel>(`${this.API_URL}/login`, {
+      login: login.email,
+      senha: login.senha,
+    });
   }
 
   logout() {

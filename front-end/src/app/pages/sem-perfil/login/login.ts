@@ -9,7 +9,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ClienteService } from '../../../shared/service/requests/cliente.service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +17,6 @@ import { ClienteService } from '../../../shared/service/requests/cliente.service
 })
 export class Login {
   authService = inject(AuthService);
-  clienteService = inject(ClienteService);
   formLogin: FormGroup;
 
   constructor(
@@ -34,22 +32,7 @@ export class Login {
   async submit() {
     if (this.formLogin.valid) {
       this.send_login_request(this.formLogin.value);
-      this.go_to_client_inicial(this.formLogin.value.email);
     }
-  }
-
-  go_to_client_inicial(email: string) {
-    this.clienteService.getCliente(email).subscribe({
-      next: (response) => {
-        console.log(response);
-        this.router.navigate(['/cliente'], {
-          state: { cliente: response },
-        });
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
   }
 
   send_login_request(login_model: LoginRequestModel) {
@@ -57,6 +40,16 @@ export class Login {
       next: (response) => {
         console.log(response);
         sessionStorage.setItem('access_token', response.access_token);
+        sessionStorage.setItem('usuario', JSON.stringify(response.usuario));
+        sessionStorage.setItem('tipo', response.tipo);
+
+        const rotaPorTipo: Record<string, string> = {
+          CLIENTE: '/cliente',
+          GERENTE: '/gerente',
+          ADMINISTRADOR: '/administrador',
+        };
+
+        this.router.navigate([rotaPorTipo[response.tipo] ?? '/']);
       },
       error: (error) => {
         console.log(error);
