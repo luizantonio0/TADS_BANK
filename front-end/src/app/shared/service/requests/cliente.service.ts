@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
   Cliente,
   ClienteAprovadoResponseModel
@@ -20,7 +20,13 @@ export class ClienteService {
   }
 
   getCliente(cpf: string): Observable<Cliente> {
-    return this.http.get<Cliente>(`${this.API_URL}/clientes/${cpf}`);
+    const token = sessionStorage.getItem('access_token') ?? '';
+
+    return this.http.get<Cliente>(`${this.API_URL}/clientes/${cpf}`, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      }),
+    });
   }
 
   getClientes(): Observable<Cliente[]> {

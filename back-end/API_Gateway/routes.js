@@ -30,5 +30,10 @@ export const routeMappings = {
         target: services.clientes,
         public: false,
         profiles: 'GERENTE,ADMINISTRADOR'
+    },
+    '/clientes/:cpf': {
+        target: services.clientes,
+        public: false,
+        profiles: 'GERENTE,ADMINISTRADOR,CLIENTE'
     }
 }

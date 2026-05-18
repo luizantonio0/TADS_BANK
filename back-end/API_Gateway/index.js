@@ -14,6 +14,10 @@ app.use(cors({
 }));
 
 app.use(async (req, res, next) => {
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204);
+    }
+
     let targetRoute = null;
 
     for (const pattern in routeMappings) {

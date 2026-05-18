@@ -9,6 +9,7 @@ export interface Cliente {
 
   conta?: number;
   telefone?: string;
+  cpf_gerente?: string;
   saldo?: number;
   limite?: number;
   gerente_nome?: string;
