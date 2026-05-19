@@ -25,7 +25,7 @@
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
-.card-test {
+.tads-btn-main {
   background-color: var(--tads-primary);
   color: white;
   border: none;
