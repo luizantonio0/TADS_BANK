@@ -25,7 +25,7 @@
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
-.tads-btn-main {
+.card-test {
   background-color: var(--tads-primary);
   color: white;
   border: none;
@@ -37,6 +37,49 @@
   align-items: center;
   gap: 8px;
   transition: var(--tads-transition);
+}
+
+  .dashboard-test {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--tads-shadow);
+    transition: var(--tads-transition);
+    border-left: 5px solid var(--tads-primary);
+    margin-bottom: 1rem;
+  }
+
+  .dashboard-test:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-test {
+    background-color: var(--tads-primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--tads-transition);
+  }
+
+    .btn-test:hover {
+      background-color: var(--tads-primary);
+      color: gray;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--tads-transition);
 
 
 
@@ -185,7 +228,7 @@
   .tads-card-dashboard {
     padding: 1rem;
   }
-  
+
   .tads-btn-main {
     width: 100%;
     justify-content: center;
