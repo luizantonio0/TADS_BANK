@@ -51,6 +51,10 @@ public class OrchestrationService {
         return aprovarClienteResponses.containsKey(idOrchestration);
     }
 
+    public boolean isAtualizarClienteSaga(UUID idOrchestration) {
+        return atualizarClienteResponses.containsKey(idOrchestration);
+    }
+
     private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID,T> orchMap, String... payloads) throws HttpException {
         if (dto == null)
             throw new InternalServerErrorException("Resposta nula do orquestrador");
@@ -109,8 +113,8 @@ public class OrchestrationService {
         CompletableFuture<ClienteCreateResponseDTO> completableFuture = null;
 
         try {
-            prepareResult(result, criarClienteResponses, "ms-gerente", "ms-cliente");
             completableFuture = criarClienteResponses.get(result.idOrchestration());
+            prepareResult(result, criarClienteResponses, "ms-gerente", "ms-cliente");
 
             ObjectMapper mapper = new ObjectMapper();
 
@@ -204,8 +208,8 @@ public class OrchestrationService {
         CompletableFuture<AprovarClienteResponseDTO> completableFuture = null;
 
         try {
-            prepareResult(result, aprovarClienteResponses, "ms-conta", "ms-gerente", "ms-cliente");
             completableFuture = aprovarClienteResponses.get(result.idOrchestration());
+            prepareResult(result, aprovarClienteResponses, "ms-conta", "ms-gerente", "ms-cliente");
 
             ObjectMapper mapper = new ObjectMapper();
 
@@ -229,7 +233,7 @@ public class OrchestrationService {
                 completableFuture.completeExceptionally(ex);
             }
         } finally {
-            if (result != null && criarClienteResponses.containsKey(result.idOrchestration())) {
+            if (result != null && result.idOrchestration() != null) {
                 aprovarClienteResponses.remove(result.idOrchestration());
             }
         }
@@ -273,8 +277,8 @@ public class OrchestrationService {
         CompletableFuture<Object> completableFuture = null;
 
         try {
-            prepareResult(result, atualizarClienteResponses);
             completableFuture = atualizarClienteResponses.get(result.idOrchestration());
+            prepareResult(result, atualizarClienteResponses);
 
             completableFuture.complete(null);
 
@@ -283,7 +287,7 @@ public class OrchestrationService {
                 completableFuture.completeExceptionally(ex);
             }
         } finally {
-            if (result != null && criarClienteResponses.containsKey(result.idOrchestration())) {
+            if (result != null && result.idOrchestration() != null) {
                 atualizarClienteResponses.remove(result.idOrchestration());
             }
         }

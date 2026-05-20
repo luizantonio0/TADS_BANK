@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,7 +70,10 @@ public class ClienteService {
             var revision = content.get(1).getEntity();
             clienteRepository.save(revision);
         } else {
-            clienteRepository.deleteById(uuid);
+            var whitelist = List.of("12912861012", "09506382000", "85733854057", "58872160006", "76179646090");
+            var cpf = clienteRepository.findById(uuid);
+            if(cpf.isPresent() && !whitelist.contains(cpf.get().getCpf()))
+                clienteRepository.deleteById(uuid);
         }
     }
 

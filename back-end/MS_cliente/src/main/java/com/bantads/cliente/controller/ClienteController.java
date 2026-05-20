@@ -40,7 +40,7 @@ public class ClienteController {
     public CompletableFuture<ResponseEntity<ClienteCreateResponseDTO>> save(@RequestBody ClienteRequestDTO dto) throws Exception {    
         return orchestrationService.startCriarCliente(dto)
             .thenApply(ResponseEntity::ok)
-            .orTimeout(15, TimeUnit.SECONDS);
+            .orTimeout(30, TimeUnit.SECONDS);
     }
 
     @PostMapping("/{cpf}/aprovar")

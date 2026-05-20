@@ -30,7 +30,10 @@ public class ContaService {
             var revision = content.get(1).getEntity();
             contaRepository.save(revision);
         } else {
-            contaRepository.deleteById(uuid);
+            var whitelist = List.of("1291", "0950", "8573", "5887", "7617");
+            var conta = contaRepository.findById(uuid);
+            if(conta.isPresent() && !whitelist.contains(conta.get().getConta()))
+                contaRepository.deleteById(uuid);
         }
 
     }

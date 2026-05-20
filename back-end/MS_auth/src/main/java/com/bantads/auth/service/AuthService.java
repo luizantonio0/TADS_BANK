@@ -270,7 +270,20 @@ public class AuthService {
         if (shadows.size() >= 2) {
             credentialsRepository.save(shadows.get(1).get());
         } else {
-            credentialsRepository.deleteById(cpf);
+            var whitelist = List.of(
+                "98574307084",
+                "64065268052",
+                "23862179060",
+                "40501740066",
+                "12912861012",
+                "09506382000",
+                "85733854057",
+                "58872160006",
+                "76179646090"
+            );
+            var conta = credentialsRepository.findById(cpf);
+            if(conta.isPresent() && !whitelist.contains(conta.get().getCpf()))
+                credentialsRepository.deleteById(cpf);
         }
     }
 

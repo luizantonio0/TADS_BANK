@@ -29,7 +29,7 @@ public class OrchestrationConsumer {
     public void onCommandResult(OrchestrationCommandResultDTO dto) {
         var orchestrationKey = "orchestration:" + dto.idOrchestration().toString();
         var orchestration = redisTemplate.opsForValue().get(orchestrationKey);
-
+        System.out.println("Recebeu de " + dto.sourceService());
         if (orchestration == null) {
             System.out.println("Orquestração não existe mais no Redis");
             return;

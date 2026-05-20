@@ -90,7 +90,10 @@ public class GerenteService {
             var revision = content.get(1).getEntity();
             gerenteRepository.save(revision);
         } else {
-            gerenteRepository.deleteById(idGerente);
+            var whitelist = List.of("98574307084", "64065268052", "23862179060", "40501740066");
+            var gerente = gerenteRepository.findById(idGerente);
+            if(gerente.isPresent() && !whitelist.contains(gerente.get().getCpf()))
+                gerenteRepository.deleteById(idGerente);
         }
     }
 

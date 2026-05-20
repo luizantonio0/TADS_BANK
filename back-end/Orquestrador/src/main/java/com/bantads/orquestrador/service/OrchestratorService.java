@@ -39,6 +39,7 @@ public class OrchestratorService {
 
         for(var cmd : orchestration.getCommands()) {
             String queueName = cmd.serviceName() + ".command";
+            System.out.println("Enviou para " + queueName);
             rabbitTemplate.convertAndSend(queueName, cmd);
         }
 

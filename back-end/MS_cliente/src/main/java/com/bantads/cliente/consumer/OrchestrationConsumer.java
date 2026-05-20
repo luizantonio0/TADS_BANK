@@ -35,10 +35,16 @@ public class OrchestrationConsumer {
     @RabbitListener(queues = "ms-cliente.orchestration.finished")
     public void onResult(OrchestrationRequestResultDTO dto) {
         if(orchestrationService.isCriarClienteSaga(dto.idOrchestration())) {
+            System.out.println("Recebeu response da criação de cliente");
             orchestrationService.finishCriarCliente(dto);
         }
         if(orchestrationService.isAprovarClienteSaga(dto.idOrchestration())) {
+            System.out.println("Recebeu response da aprovação de cliente");
             orchestrationService.finishAprovarCliente(dto);
+        }
+        if(orchestrationService.isAtualizarClienteSaga(dto.idOrchestration())) {
+            System.out.println("Recebeu response da atualização de cliente");
+            orchestrationService.finishAtualizarCliente(dto);
         }
     }
 
