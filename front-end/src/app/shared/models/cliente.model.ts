@@ -6,7 +6,7 @@ export interface Cliente {
   endereco: string;
   cidade: string;
   estado: string;
-
+  CEP?: string;
   conta?: number;
   telefone?: string;
   cpf_gerente?: string;

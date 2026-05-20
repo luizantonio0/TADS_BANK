@@ -34,6 +34,7 @@ public class OrchestrationConsumer {
 
     @RabbitListener(queues = "ms-cliente.orchestration.finished")
     public void onResult(OrchestrationRequestResultDTO dto) {
+        System.out.println("Recebeu " + dto.idOrchestration());
         if(orchestrationService.isCriarClienteSaga(dto.idOrchestration())) {
             System.out.println("Recebeu response da criação de cliente");
             orchestrationService.finishCriarCliente(dto);

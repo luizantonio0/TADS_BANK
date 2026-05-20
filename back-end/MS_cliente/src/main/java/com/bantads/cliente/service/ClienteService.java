@@ -1,8 +1,11 @@
 package com.bantads.cliente.service;
 
+import com.bantads.cliente.dto.ClienteResumidoDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
 import com.bantads.cliente.exception.BadRequestException;
+import com.bantads.cliente.exception.ForbiddenException;
+import com.bantads.cliente.exception.HttpException;
 import com.bantads.cliente.exception.NotFoundException;
 import com.bantads.cliente.mapper.ClienteMapper;
 import com.bantads.cliente.model.Cliente;
@@ -14,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,8 +26,28 @@ public class ClienteService {
     @Autowired private ClienteRepository clienteRepository;
     @Autowired private ClienteMapper mapper;
 
-    public List<Cliente> findAll() {
-        return clienteRepository.findAll(); 
+    public List<ClienteResumidoDTO> findClientes(String cpfLogado, String profileLogado, String filtro) throws HttpException {
+
+        var isGerente = profileLogado == "GERENTE";
+        var isAdmin = profileLogado == "ADMINISTRADOR";
+        if(!isGerente && !isAdmin) {
+            throw new ForbiddenException("O usuário não tem permissão para efetuar esta operação");
+        }
+
+        if(filtro.equals("para_aprovar")) {
+            if(!isGerente) throw new ForbiddenException("O usuário não tem permissão para efetuar esta operação");
+            return clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, false).stream().map(ClienteResumidoDTO::from).toList();
+        }
+
+        if(filtro.equalsIgnoreCase("melhores_clientes")) {
+
+        }
+
+        if(isAdmin) {
+            return clienteRepository.findAll().stream().map(ClienteResumidoDTO::from).toList();
+        }
+
+        return clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, true).stream().map(ClienteResumidoDTO::from).toList();
     }
     
     public Cliente findByCpf(String cpf) throws NotFoundException{

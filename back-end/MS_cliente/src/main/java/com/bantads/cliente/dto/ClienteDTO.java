@@ -28,6 +28,10 @@ public record ClienteDTO(
         cep = (cep != null) ? cep.replaceAll("\\D", "") : null;
         telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
     }
+
+    public ClienteDTO(String cpf, String nome, String email, BigDecimal salario, String endereco, String cidade, String estado) {
+        this(null, cpf, email, nome, null, salario, endereco, null, cidade, estado, false, null, null);
+    }
     
     public static ClienteDTO from(Cliente c) {
         if (c == null) return null;

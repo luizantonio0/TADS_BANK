@@ -20,13 +20,11 @@ export class ClienteService {
   }
 
   getCliente(cpf: string): Observable<Cliente> {
-    const token = sessionStorage.getItem('access_token') ?? '';
+    return this.http.get<Cliente>(`${this.API_URL}/clientes/${cpf}`);
+  }
 
-    return this.http.get<Cliente>(`${this.API_URL}/clientes/${cpf}`, {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${token}`,
-      }),
-    });
+  getClientesParaAprovar(): Observable<Cliente[]> {
+    return this.http.get<Cliente[]>(`${this.API_URL}/clientes?para_aprovar`);
   }
 
   getClientes(): Observable<Cliente[]> {

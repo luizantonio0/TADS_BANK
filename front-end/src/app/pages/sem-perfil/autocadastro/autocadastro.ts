@@ -48,7 +48,6 @@ export class Autocadastro {
   async submit() {
     if (this.formCadastro.valid) {
       this.autocadastrar(this.formCadastro.value);
-      this.toastr.success('Cadastro realizado com sucesso!');
     }
   }
 
@@ -65,10 +64,8 @@ export class Autocadastro {
       this.toastr.error('Digite um CEP válido!');
       return;
     }
-    debugger
     this.cepService.buscarCEP(cepAtual).subscribe({
       next: (endereco) => {
-        debugger
         this.formCadastro.patchValue({
           cidade: endereco.localidade,
           estado: endereco.uf,
@@ -92,13 +89,14 @@ export class Autocadastro {
       estado: val.estado,
       nome: val.nome,
       salario: val.salario,
-      telefone: val.telefone
+      telefone: val.telefone,
+      CEP: val.cep
     }).subscribe({
       next: (response) => {
-        console.log('Cadastro realizado com sucesso', response);
+        this.toastr.success('Um de nossos gerentes recebeu sua aplicação. Fique atento ao seu e-mail.');
       },
       error: (error) => {
-        console.error('Erro ao cadastrar cliente', error);
+        this.toastr.success(error);
       },
     });
   }

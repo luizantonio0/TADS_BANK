@@ -1,26 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DataGridComponent } from "../../../components/data-grid/data-grid";
 import { DataGridColumns, DataGridRequest, DataGridResponse } from '../../../shared/models/datagrid.model';
 import { Cliente } from '../../../shared/models/cliente.model';
 import { CurrencyPipe } from '@angular/common';
 import { CpfPipe } from '../../../shared/pipe/cpf.pipe';
+import { ClienteService } from '../../../shared/service/requests/cliente.service';
 
 @Component({
   selector: 'tab-solicitacoes',
   imports: [DataGridComponent, CurrencyPipe, CpfPipe],
   templateUrl: './tab-solicitacoes.html'
 })
-export class TabSolicitacoes {
+export class TabSolicitacoes implements OnInit {
 
-  clientes: Cliente[] = Array.from({ length: 25 }, (_, i) => ({
-    cpf: Math.random().toString().slice(2, 13).padEnd(11, '0'),
-    nome: `Cliente ${i + 1}`,
-    email: `cliente${i + 1}@email.com.br`,
-    salario: Math.floor(Math.random() * (15000 - 2000 + 1)) + 2000,
-    endereco: `Rua Exemplo, nr ${100 + i}`,
-    cidade: ["Curitiba", "São Paulo", "Porto Alegre", "Belo Horizonte"][i % 4],
-    estado: ["PR", "SP", "RS", "MG"][i % 4]
-  }));
+  clientes: Cliente[] = [];
 
   colunas: DataGridColumns[] = [
     { size: 20 , title: 'CPF' },
@@ -29,11 +22,16 @@ export class TabSolicitacoes {
     { size: 20 , title: 'Ações' } 
   ]
 
-  supplier = (req: DataGridRequest<Cliente, any>): Promise<DataGridResponse<Cliente>> => {
-    return Promise.resolve({
-      total_count: 25,
-      data: this.clientes.slice(req.page * req.page_size - req.page_size, req.page * req.page_size)
-    })
+  constructor(private clienteService: ClienteService) {}
+
+  ngOnInit(): void {
+    this.loadClientes();
+  }
+
+  loadClientes(): void {
+    this.clienteService.getClientesParaAprovar().subscribe((clientes: Cliente[]) => {
+      this.clientes = clientes;
+    });
   }
   
 }

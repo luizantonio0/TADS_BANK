@@ -59,6 +59,7 @@ public class OrchestrationConsumer {
                                     orchestration.getPayloads(),
                                     orchestration.getErrors())
                     );
+                    System.out.println("Escreveu na orchestration.finished");
                     if(orchestration.isAutoConfirm()) {
                         rabbitTemplate.convertAndSend(
                                 "orchestration.confirm",

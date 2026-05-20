@@ -1,13 +1,14 @@
 package com.bantads.cliente.controller;
 
 import com.bantads.cliente.dto.ClienteDTO;
+import com.bantads.cliente.dto.ClienteResumidoDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.http.ClienteCreateResponseDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
+import com.bantads.cliente.exception.HttpException;
 import com.bantads.cliente.exception.NotFoundException;
-import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.service.OrchestrationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,12 @@ public class ClienteController {
     @Autowired private OrchestrationService orchestrationService;
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> findAll(){
-        return new ResponseEntity<>(clienteService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<ClienteResumidoDTO>> findAll(
+        @RequestParam(name = "filtro", required = false, defaultValue = "ATIVO") String filtro,
+        @RequestHeader("X-User-Id") String cpfLogado,
+        @RequestHeader("X-User-Profile") String profileLogado
+    ) throws HttpException {
+        return new ResponseEntity<>(clienteService.findClientes(cpfLogado, profileLogado, filtro), HttpStatus.OK);
     }
 
     @GetMapping("/{cpf}")
