@@ -31,15 +31,7 @@ public class ContaService {
 
         if (content.size() >= 2) {
             var rev = content.get(1);
-            var tipo = rev.getMetadata().getRevisionType();
-
-            if (tipo != RevisionMetadata.RevisionType.DELETE) {
-                contaRepository.save(rev.getEntity());
-                return;
-            }
-
-            // se n foi nem insert nem update, a ultima versão é um delete, ou seja, o obj ainda nao existia
-            contaRepository.deleteById(rev.getEntity().getId());
+            contaRepository.save(rev.getEntity());
         } else {
             var conta = contaRepository.findById(uuid);
             if(conta.isPresent() && !whitelist.contains(conta.get().getConta()))

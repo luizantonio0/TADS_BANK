@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.javers.core.Javers;
-import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.shadow.Shadow;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -233,7 +232,7 @@ public class AuthService {
         return new TokenClaimsDTO(credentials.get().getCpf(), credentials.get().getProfile());
     }
 
-    public void createCredentials(String email, String cpf, String cryptoPw, String profile) throws BadRequestException {
+    public Credentials createCredentials(String email, String cpf, String cryptoPw, String profile) throws BadRequestException {
         if(email == null || cpf == null || cryptoPw == null || email.trim().isEmpty() || cpf.trim().isEmpty() || cryptoPw.trim().isEmpty()) {
             throw new BadRequestException("Email, CPF e Senha devem ser preenchidos.");
         }
@@ -246,25 +245,27 @@ public class AuthService {
         var creds = new Credentials(cpf, email, cryptoPw, profile);
         credentialsRepository.insert(creds);
         javers.commit("system", creds);
+        return creds;
     }
 
-    public void updateCredentials(String cpf, String email) throws BadRequestException {
+    public Credentials updateCredentials(String cpf, String email) throws BadRequestException {
         if(email == null || cpf == null || email.trim().isEmpty() || cpf.trim().isEmpty()) {
             throw new BadRequestException("Email e CPF devem ser preenchidos.");
         }
         if(credentialsRepository.existsByEmail(email)) {
             throw new BadRequestException("Email já está em uso.");
         }
-        credentialsRepository.findById(cpf).ifPresent(usuario -> {
-            usuario.setEmail(email);
-            credentialsRepository.save(usuario);
-        });
+        var cred = credentialsRepository.findById(cpf);
+        if(cred.isPresent()) {
+            cred.get().setEmail(email);
+            credentialsRepository.save(cred.get());
+        }
+        return cred.get();
     }
 
-    public void rollbackCredentials(String cpf) {
-        System.out.println("Entrou no rollback");
+    public void rollbackCredentials(String id) {
         List<Shadow<Credentials>> shadows = javers.findShadows(
-                QueryBuilder.byInstanceId(cpf, Credentials.class)
+                QueryBuilder.byInstanceId(id, Credentials.class)
                         .limit(2)
                         .build()
         );
@@ -283,21 +284,11 @@ public class AuthService {
 
         if (shadows.size() > 1) {
             var shadow = shadows.get(1);
-            SnapshotType tipo = shadow.getCommitMetadata().getId() != null 
-                ? shadow.getCdoSnapshot().getType() 
-                : null;
-
-            if (tipo == SnapshotType.INITIAL || tipo == SnapshotType.UPDATE) {
-                credentialsRepository.save(shadow.get());
-                return;
-            }
-
-            // se n foi nem insert nem update, a ultima versão é um delete, ou seja, o obj ainda nao existia
-            credentialsRepository.deleteById(shadow.get().getCpf());
+            credentialsRepository.save(shadow.get());
         } else {
-            var conta = credentialsRepository.findById(cpf);
+            var conta = credentialsRepository.findById(id);
             if(conta.isPresent() && !whitelist.contains(conta.get().getCpf())) {
-                credentialsRepository.deleteById(cpf);
+                credentialsRepository.deleteById(id);
             }
         }
     }

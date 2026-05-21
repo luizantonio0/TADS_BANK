@@ -6,7 +6,7 @@
             <p>Filtrar</p>
         </button>
     </div>
-    <data-grid [columns]="colunas" [supplier]="supplier">
+    <data-grid [columns]="colunas" [supplier]="">
         <ng-template #desktopRow let-item>
             <td>{{ item.cpf | cpf }}</td>
             <td>{{ item.nome }}</td>

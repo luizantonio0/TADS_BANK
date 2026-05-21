@@ -5,7 +5,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "credentials")
 public class Credentials {
+    
     @Id
+    private String id;
+    
     private String cpf;
     private String email;
     private String password;
@@ -21,8 +24,20 @@ public class Credentials {
         this.profile = profile;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getCpf() {
         return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
     
     public String getProfile() {
@@ -31,10 +46,6 @@ public class Credentials {
 
     public void setProfile(String profile) {
         this.profile = profile;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
     }
 
     public String getEmail() {

@@ -90,15 +90,21 @@ public class OrchestrationConsumer {
     @RabbitListener(queues = "ms-cliente.orchestration.confirm")
     public void onConfirm(OrchestrationConfirmDTO dto) {
 
-        var redisKey = dto.idOrchestration().toString() + ":touched:cliente";
-        var touchedCliente = redisTemplate.opsForValue().getAndDelete(redisKey);
-
-        if(dto.ok() || touchedCliente == null) {
+        if(dto.ok()) {
             return;
         }
 
+        var redisKeyCliente = dto.idOrchestration().toString() + ":touched:cliente";
+        var touchedCliente = redisTemplate.opsForValue().getAndDelete(redisKeyCliente);
+
+        var redisKeyLog = dto.idOrchestration().toString() + ":touched:logstatuscliente";
+        var touchedLog = redisTemplate.opsForValue().getAndDelete(redisKeyLog);
+
         try {
-            clienteService.rollbackCliente(UUID.fromString(touchedCliente));
+            if(touchedLog != null)
+                clienteService.rollbackLogStatus(UUID.fromString(touchedLog));
+            if(touchedCliente != null)
+                clienteService.rollbackCliente(UUID.fromString(touchedCliente));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

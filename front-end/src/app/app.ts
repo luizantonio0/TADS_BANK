@@ -4,10 +4,11 @@ import { Header } from './components/header/header';
 import { ToastContainerComponent } from './components/toast/toast';
 import { filter } from 'rxjs';
 import { Footer } from './components/footer/footer';
+import { SpinnerComponent } from "./components/loading/loading";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToastContainerComponent, Header, Footer],
+  imports: [RouterOutlet, ToastContainerComponent, Header, Footer, SpinnerComponent],
   templateUrl: './app.html'
 })
 export class App {

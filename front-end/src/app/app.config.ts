@@ -7,6 +7,7 @@ import localePt from '@angular/common/locales/pt';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './shared/interceptor/auth.interceptor';
+import { errorInterceptor } from './shared/interceptor/error.interceptor';
 
 registerLocaleData(localePt);
 
@@ -15,7 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding()),
     provideNgxMask(),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     { provide: LOCALE_ID, useValue: 'pt-BR' },
   ],
 };

@@ -2,6 +2,7 @@ package com.bantads.cliente.controller;
 
 import com.bantads.cliente.dto.ClienteDTO;
 import com.bantads.cliente.dto.ClienteResumidoDTO;
+import com.bantads.cliente.dto.RejeitarClienteRequestDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
@@ -51,6 +52,17 @@ public class ClienteController {
     @PostMapping("/{cpf}/aprovar")
     public CompletableFuture<ResponseEntity<AprovarClienteResponseDTO>> aprovar(@PathVariable("cpf") String cpf, @RequestHeader("X-User-Id") String cpfGerente) throws Exception {
         return orchestrationService.startAprovarCliente(cpfGerente, new AprovarClienteDTO(cpf.replaceAll("[^0-9]", "")))
+                .thenApply(ResponseEntity::ok)
+                .orTimeout(30, TimeUnit.SECONDS);
+    }
+
+    @PostMapping("/{cpf}/rejeitar")
+    public CompletableFuture<ResponseEntity<Object>> rejeitar(
+        @PathVariable("cpf") String cpf, 
+        @RequestHeader("X-User-Id") String cpfGerente,
+        @RequestBody RejeitarClienteRequestDTO dto
+    ) throws Exception {
+        return orchestrationService.startRejeitarCliente(cpfGerente, cpf, dto)
                 .thenApply(ResponseEntity::ok)
                 .orTimeout(30, TimeUnit.SECONDS);
     }

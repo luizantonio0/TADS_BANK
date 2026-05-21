@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, ContentChild, TemplateRef, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataGridColumns } from '../../shared/models/datagrid.model';
+import { LoadingService } from '../../shared/service/loading.service';
 
 @Component({
   selector: 'data-grid',
@@ -25,6 +26,8 @@ export class DataGridComponent<T extends object, V> implements OnInit, OnChanges
   data = signal<any[]>([]);
   currentPageIndex = signal(1);
 
+  constructor(private loadingService: LoadingService) {}
+
   ngOnInit() {
     if (this.rawData) {
       this.handleLocalData();
@@ -42,8 +45,10 @@ export class DataGridComponent<T extends object, V> implements OnInit, OnChanges
   async fetch(silent: boolean) {
     if (!this.supplier) return;
     try {
-      const resp = await this.supplier();
-      this.handleResp(resp);
+      await this.loadingService.withLoading(async () => {        
+        const resp = await this.supplier!();
+        this.handleResp(resp);
+      });
     } catch (err: any) {
       console.error(err.message);
     }

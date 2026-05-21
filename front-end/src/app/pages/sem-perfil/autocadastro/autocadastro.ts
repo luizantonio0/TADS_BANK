@@ -13,6 +13,7 @@ import { ClienteService } from '../../../shared/service/requests/cliente.service
 import { ToastService } from '../../../shared/service/toast/toast';
 import { cpfValidator } from '../../../shared/validators/cpf.validator';
 import { CEPService } from '../../../shared/service/cep.service';
+import { LoadingService } from '../../../shared/service/loading.service';
 @Component({
   selector: 'app-autocadastro',
   imports: [ReactiveFormsModule, FormsModule, NgxMaskDirective],
@@ -28,6 +29,8 @@ export class Autocadastro {
   constructor(
     private router: Router,
     private fb: FormBuilder,
+    private loadingService: LoadingService,
+    private toastService: ToastService
   ) {
     this.formCadastro = this.fb.group({
       cpf: ['', [Validators.required, cpfValidator()]],
@@ -60,12 +63,16 @@ export class Autocadastro {
 
   async buscarCep() {
     const cepAtual = this.formCadastro.get('cep')?.value;
-    if(!cepAtual || cepAtual.replaceAll("\\D", "").length != 8) {
+    if (!cepAtual || cepAtual.replaceAll("\\D", "").length != 8) {
       this.toastr.error('Digite um CEP válido!');
       return;
     }
-    this.cepService.buscarCEP(cepAtual).subscribe({
+    this.loadingService.withLoadingObservable(this.cepService.buscarCEP(cepAtual)).subscribe({
       next: (endereco) => {
+        if (endereco.erro) {
+          this.toastr.error('Digite um CEP válido.');
+          return;
+        }
         this.formCadastro.patchValue({
           cidade: endereco.localidade,
           estado: endereco.uf,
@@ -73,15 +80,12 @@ export class Autocadastro {
           bairro: endereco.bairro,
           logradouro: endereco.logradouro
         })
-      },
-      error: (err) => {
-        this.toastr.error('Algo deu errado!');
       }
     })
   }
 
   autocadastrar(val: any) {
-    this.clienteService.autoCadastrar({
+    this.loadingService.withLoadingObservable(this.clienteService.autoCadastrar({
       cpf: val.cpf,
       cidade: val.cidade,
       email: val.email,
@@ -91,12 +95,13 @@ export class Autocadastro {
       salario: val.salario,
       telefone: val.telefone,
       CEP: val.cep
-    }).subscribe({
+    })).subscribe({
       next: (response) => {
         this.toastr.success('Um de nossos gerentes recebeu sua aplicação. Fique atento ao seu e-mail.');
+        this.formCadastro.reset();
       },
       error: (error) => {
-        this.toastr.success(error);
+        this.toastService.error(error.error?.error || "Algo deu errado");
       },
     });
   }

@@ -13,7 +13,6 @@ import com.bantads.gerente.mapper.GerenteMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.history.Revision;
-import org.springframework.data.history.RevisionMetadata;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -78,6 +77,21 @@ public class GerenteService {
 
         gerenteRepository.save(gerenteAtualizado);
     }
+
+    @Transactional
+    public void decrementarCliente(UUID idGerente) {
+
+        Optional<Gerente> gerente = gerenteRepository.findById(idGerente);
+
+        if (gerente.isEmpty()) throw new IllegalArgumentException("Gerente não encontrado");
+
+        Gerente gerenteAtualizado = gerente.get();
+
+        gerenteAtualizado.incrementTotalClientes();
+
+        gerenteRepository.save(gerenteAtualizado);
+    }
+
     @Transactional
     public void rollbackGerente(UUID idGerente) {
         Page<Revision<Integer, Gerente>> revisions = gerenteRepository.findRevisions(
@@ -90,15 +104,8 @@ public class GerenteService {
 
         if (content.size() >= 2) {
             var rev = content.get(1);
-            var tipo = rev.getMetadata().getRevisionType();
-
-            if (tipo != RevisionMetadata.RevisionType.DELETE) {
-                gerenteRepository.save(rev.getEntity());
-                return;
-            }
-
-            // se n foi nem insert nem update, a ultima versão é um delete, ou seja, o obj ainda nao existia
-            gerenteRepository.deleteById(rev.getEntity().getId());
+            gerenteRepository.save(rev.getEntity());
+            return;
         } else {
             var cpf = gerenteRepository.findById(idGerente);
             if(cpf.isPresent() && !whitelist.contains(cpf.get().getCpf()))

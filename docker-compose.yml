@@ -18,22 +18,33 @@ services:
       dockerfile: Dockerfile
     container_name: tadsbank-frontend
     ports:
-      - "4200:4200"
+      - "4200:80"
     
   gateway:
     build:
       context: ./back-end/API_Gateway
       dockerfile: Dockerfile
-    volumes:
-      - ./back-end/API_Gateway:/usr/src/app
-      - /usr/src/app/node_modules
+    depends_on:
+      orquestrador:
+        condition: service_healthy
+      ms-auth:
+        condition: service_healthy
+      ms-cliente:
+        condition: service_healthy
+      ms-gerente:
+        condition: service_healthy
+      ms-conta:
+        condition: service_healthy
     environment:
       - NODE_ENV=development
     ports:
       - "3000:3000"
     networks:
       - tadsbank
-    command: node index.js
+    volumes:
+      - ./back-end/API_Gateway:/usr/src/app
+      - /usr/src/app/node_modules
+    command: node --watch index.js
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -74,18 +85,18 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
 
   auth-ms-db:
-    image: mongo
+    image: mongo:7.0
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--username", "admin", "--password", "password", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 5s
       timeout: 5s
       retries: 5
     volumes:
-      - ./init-db/setup.js:/docker-entrypoint-initdb.d/setup.js:ro,Z
+      - ./init-db/setup.js:/docker-entrypoint-initdb.d/setup.js:ro,z
     networks:
       - auth
     ports:
@@ -98,7 +109,7 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: ["CMD", "pg_isready", "-U", "admin"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -107,7 +118,7 @@ services:
       - conta
       - gerente
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d:Z
+      - ./init-db:/docker-entrypoint-initdb.d:z
     ports:
       - "5432:5432"
     command: >
@@ -122,8 +133,14 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec '</dev/tcp/localhost/8081'"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
     volumes:
-      - ./back-end/Orquestrador:/app 
+      - ./back-end/Orquestrador:/app
     networks:
       - tadsbank
 
@@ -133,15 +150,21 @@ services:
       dockerfile: Dockerfile
     depends_on:
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       auth-ms-db:
         condition: service_healthy
     environment:
       JWT_SECRET: AYqQdMQcnW6JOCMyBS24A8GFbeRk4VTth6o8FlSDNIs
-    volumes:
-      - ./back-end/MS_auth:/app 
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec '</dev/tcp/localhost/8055'"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
     ports:
       - "8055:8055"
+    volumes:
+      - ./back-end/MS_auth:/app
     networks:
       - auth
       - tadsbank
@@ -149,14 +172,20 @@ services:
   ms-cliente:
     build:
       context: ./back-end/MS_cliente
-      dockerfile: debug.Dockerfile
+      dockerfile: Dockerfile
     depends_on:
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec '</dev/tcp/localhost/4729'"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
     volumes:
-      - ./back-end/MS_cliente:/app 
+      - ./back-end/MS_cliente:/app
     ports:
       - "4729:4729"
     networks:
@@ -172,6 +201,12 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec '</dev/tcp/localhost/2563'"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
     volumes:
       - ./back-end/MS_gerente:/app
     ports:
@@ -189,18 +224,22 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-    volumes:
-      - ./back-end/MS_conta:/app
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ms_contas
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_RABBITMQ_HOST=rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec '</dev/tcp/localhost/4873'"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
+    volumes:
+      - ./back-end/MS_conta:/app  
     networks:
       - conta
       - tadsbank
     ports:
       - "4873:4873"
     
-
-

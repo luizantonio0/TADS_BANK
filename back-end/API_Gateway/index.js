@@ -49,12 +49,13 @@ app.use(async (req, res, next) => {
                 'Authorization': authHeader, 
             }
         });
-        if(authResp.status < 200 || authResp >= 300) {
-            return res.status(authResp.status).json("Algo deu errado. Tente novamente mais tarde.");
+        if(authResp.status < 200 || authResp.status >= 300) {
+            return res.status(authResp.status).json({ error: "Faça login para continuar." });
         }
+        
         claims = await authResp.json();
         if(claims.error) {
-            return res.status(authResp.status).json({"error": claims.error})
+            return res.status(authResp.status).json({error: claims.error})
         }
         if(targetRoute.profiles !== "*" && !targetRoute.profiles.toUpperCase().split(",").includes(claims.profile.toUpperCase())) {
             return res.status(401).json("Você não tem permissão para performar essa ação.");

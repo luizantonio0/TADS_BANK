@@ -6,6 +6,7 @@
   <app-header [isAdmin]="isAdmin" [isGerente]="isGerente" [isCliente]="isClienteInicial" [isPublic]="!isAdmin && !isGerente && !isClienteInicial"></app-header>
   <div [class.md:px-24]="!isHome" class="px-12">
     <router-outlet />
+    <app-spinner></app-spinner>
   </div>
 </div>
 <toast-container/>

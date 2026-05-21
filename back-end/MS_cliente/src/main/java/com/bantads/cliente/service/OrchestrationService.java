@@ -1,5 +1,6 @@
 package com.bantads.cliente.service;
 
+import com.bantads.cliente.dto.RejeitarClienteRequestDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
@@ -40,6 +41,7 @@ public class OrchestrationService {
 
     @Autowired private RabbitTemplate rabbitTemplate;
     private final Map<UUID, CompletableFuture<AprovarClienteResponseDTO>> aprovarClienteResponses = new ConcurrentHashMap<>();
+    private final Map<UUID, CompletableFuture<Object>> rejeitarClienteResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<ClienteCreateResponseDTO>> criarClienteResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Object>> atualizarClienteResponses = new ConcurrentHashMap<>();
 
@@ -92,8 +94,8 @@ public class OrchestrationService {
                     idOrchestration,
                     true,
                     List.of(
-                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_CLIENTE, OrchestrationKeys.CREATE_CLIENTE_COMMAND, mapper.writeValueAsString(dto)),
-                            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), OrchestrationKeys.MS_GERENTE, OrchestrationKeys.FIND_GERENTE_COMMAND, mapper.writeValueAsString(dto))
+                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente", "CreateCliente", mapper.writeValueAsString(dto)),
+                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "IncrementClientesGerente", mapper.writeValueAsString(dto))
                     )
             );
 
@@ -275,7 +277,7 @@ public class OrchestrationService {
 
     @Transactional
     public void finishAtualizarCliente(OrchestrationRequestResultDTO result) {
-        CompletableFuture<Object> completableFuture = null;
+        CompletableFuture<?> completableFuture = null;
 
         try {
             completableFuture = atualizarClienteResponses.get(result.idOrchestration());
@@ -290,6 +292,66 @@ public class OrchestrationService {
         } finally {
             if (result != null && result.idOrchestration() != null) {
                 atualizarClienteResponses.remove(result.idOrchestration());
+            }
+        }
+    }
+
+    public CompletableFuture<Object> startRejeitarCliente(String cpfGerente, String cpfCliente, RejeitarClienteRequestDTO dto) throws Exception {
+
+        var idOrchestration = UUID.randomUUID();
+        var cliente = repository.findByCpf(cpfCliente);
+        if(cliente.isEmpty()) {
+            throw new NotFoundException("Cliente não encontrado");
+        }
+
+        if(cliente.get().getCpfGerente() == null || !cliente.get().getCpfGerente().equalsIgnoreCase(cpfGerente)) {
+            throw new UnauthorizedException("Você não tem permissão para isso.");
+        }
+
+        if(cliente.get().isAprovado()) {
+            throw new BadRequestException("Cliente já está aprovado.");
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            var gerenteDTO = new GetGerenteInputDTO(cliente.get().getCpfGerente());
+
+            var request = new OrchestrationRequestDTO(
+                    idOrchestration,
+                    true,
+                    List.of(
+                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "DecrementClienteGerente", mapper.writeValueAsString(gerenteDTO)),
+                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente", "RejectCliente", mapper.writeValueAsString(dto))
+                    )
+            );
+
+            var completable = new CompletableFuture<>();
+            rejeitarClienteResponses.put(idOrchestration, completable);
+            rabbitTemplate.convertAndSend(OrchestrationKeys.ORCHESTRATE_QUEUE, request);
+
+            return completable;
+
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    @Transactional
+    public void finishRejeitarCliente(OrchestrationRequestResultDTO result) {
+        CompletableFuture<?> completableFuture = null;
+        try {
+            completableFuture = rejeitarClienteResponses.get(result.idOrchestration());
+            prepareResult(result, rejeitarClienteResponses);
+            completableFuture.complete(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            if (completableFuture != null) {
+                completableFuture.completeExceptionally(ex);
+            }
+        } finally {
+            if (result != null && result.idOrchestration() != null) {
+                aprovarClienteResponses.remove(result.idOrchestration());
             }
         }
     }

@@ -66,6 +66,10 @@ public class Gerente {
         this.totalClientes++;
     }
 
+    public void decrementTotalClientes() {
+        this.totalClientes =Math.max(0, this.totalClientes-1);
+    }
+
     public void setTipo(GerenteTipo tipo) {
         this.tipo = tipo.name();
     }

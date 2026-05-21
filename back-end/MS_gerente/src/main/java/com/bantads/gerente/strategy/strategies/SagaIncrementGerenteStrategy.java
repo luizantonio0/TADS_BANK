@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {
+public class SagaIncrementGerenteStrategy implements SagaCommandStrategy {
 
     @Autowired
     private GerenteService gerenteService;
@@ -23,6 +23,8 @@ public class SagaDefinirGerenteStrategy implements SagaCommandStrategy {
         if (gerente.isEmpty()) {
             throw new IllegalArgumentException("Nenhum gerente disponível");
         }
+
+        gerenteService.incrementarCliente(gerente.get().getId());
 
         redisTemplate.opsForValue().set(
                 cmd.idOrchestration().toString() + ":touched:gerente",

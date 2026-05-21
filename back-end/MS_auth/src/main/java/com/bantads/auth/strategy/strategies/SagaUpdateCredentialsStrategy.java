@@ -24,8 +24,8 @@ public class SagaUpdateCredentialsStrategy implements SagaCommandStrategy {
         ObjectMapper mapper = new ObjectMapper();
         CredentialsUpdateInputDTO dto = mapper.readValue(cmd.payload(), CredentialsUpdateInputDTO.class);
 
-        authService.updateCredentials(dto.cpf(), dto.email());
-        redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", dto.cpf());
+        var creds = authService.updateCredentials(dto.cpf(), dto.email());
+        redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", creds.getId());
         return null;
     }
 

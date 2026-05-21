@@ -1,24 +1,28 @@
 package com.bantads.cliente.service;
 
-import org.springframework.data.history.RevisionMetadata;
 import com.bantads.cliente.dto.ClienteResumidoDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
+import com.bantads.cliente.enums.LogStatus;
 import com.bantads.cliente.exception.BadRequestException;
 import com.bantads.cliente.exception.ForbiddenException;
 import com.bantads.cliente.exception.HttpException;
 import com.bantads.cliente.exception.NotFoundException;
 import com.bantads.cliente.mapper.ClienteMapper;
 import com.bantads.cliente.model.Cliente;
+import com.bantads.cliente.model.LogStatusCliente;
 import com.bantads.cliente.repository.ClienteRepository;
+import com.bantads.cliente.repository.LogStatusRepository;
 
-import org.hibernate.envers.RevisionType;
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +30,7 @@ import java.util.UUID;
 public class ClienteService {
 
     @Autowired private ClienteRepository clienteRepository;
+    @Autowired private LogStatusRepository logStatusRepository;
     @Autowired private ClienteMapper mapper;
 
     public List<ClienteResumidoDTO> findClientes(String cpfLogado, String profileLogado, String filtro) throws HttpException {
@@ -79,14 +84,41 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    @Transactional
     public Cliente aprovarCliente(String cpf) throws Exception {
         var cliente = clienteRepository.findByCpf(cpf);
         if(cliente.isEmpty()) {
             throw new NotFoundException("Cliente não encontrado");
         }
         cliente.get().setAprovado(true);
+        logStatusRepository.save(new LogStatusCliente(cliente.get().getId(), cpf, LogStatus.APROVADO, "", LocalDateTime.now()));
         clienteRepository.save(cliente.get());
         return cliente.get();
+    }
+
+    @Transactional
+    public Cliente rejeitarCliente(String cpf, String motivo) throws Exception {
+        var cliente = clienteRepository.findByCpf(cpf);
+        if(cliente.isEmpty()) {
+            throw new NotFoundException("Cliente não encontrado");
+        }
+        logStatusRepository.save(new LogStatusCliente(cliente.get().getId(), cpf, LogStatus.REJEITADO, motivo, LocalDateTime.now()));
+        clienteRepository.delete(cliente.get());
+        return cliente.get();
+    }
+
+    public void rollbackLogStatus(UUID uuid) throws Exception {
+        Page<Revision<Integer, LogStatusCliente>> revisions = logStatusRepository.findRevisions(uuid, PageRequest.of(0, 2));
+        List<Revision<Integer, LogStatusCliente>> content = revisions.getContent();
+
+        if (content.size() >= 2) {
+            var rev = content.get(1);
+            logStatusRepository.save(rev.getEntity());
+        } else {
+            var cpf = clienteRepository.findById(uuid);
+            if(cpf.isPresent())
+                logStatusRepository.deleteById(uuid);
+        }
     }
 
     public void rollbackCliente(UUID uuid) throws Exception {
@@ -98,15 +130,7 @@ public class ClienteService {
 
         if (content.size() >= 2) {
             var rev = content.get(1);
-            var tipo = rev.getMetadata().getRevisionType();
-
-            if (tipo != RevisionMetadata.RevisionType.DELETE) {
-                clienteRepository.save(rev.getEntity());
-                return;
-            }
-
-            // se n foi nem insert nem update, a ultima versão é um delete, ou seja, o obj ainda nao existia
-            clienteRepository.deleteById(rev.getEntity().getId());
+            clienteRepository.save(rev.getEntity());
         } else {
             var cpf = clienteRepository.findById(uuid);
             if(cpf.isPresent() && !whitelist.contains(cpf.get().getCpf()))

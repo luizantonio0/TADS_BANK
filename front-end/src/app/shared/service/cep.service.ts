@@ -9,7 +9,7 @@ import { ViacepEndereco } from '../models/cep.model';
 export class CEPService {
   private http = inject(HttpClient);
 
-  buscarCEP(cep: string): Observable<ViacepEndereco> {
+  buscarCEP(cep: string): Observable<any | ViacepEndereco> {
     return this.http.get<ViacepEndereco>(`https://viacep.com.br/ws/${cep.replaceAll("\\D", "")}/json/`);
   }
 

@@ -29,8 +29,8 @@ public class SagaCreateCredentialsStrategy implements SagaCommandStrategy {
             ObjectMapper mapper = new ObjectMapper();
             CredentialsCreateInputDTO dto = mapper.readValue(cmd.payload(), CredentialsCreateInputDTO.class);
 
-            authService.createCredentials(dto.email(), dto.cpf(), encoder.encode(dto.password()), dto.profile());
-            redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", dto.cpf());
+            var creds = authService.createCredentials(dto.email(), dto.cpf(), encoder.encode(dto.password()), dto.profile());
+            redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", creds.getId());
             
             //emailService.sendEmail(dto.email(), "Bem vindo ao BANTADS!", "Seja bem vindo ao banco mais tecnológico do mundo!\nUtilize a senha " + dto.password() + " para entrar na sua conta.");
 

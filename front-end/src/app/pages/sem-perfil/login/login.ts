@@ -9,6 +9,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastService } from '../../../shared/service/toast/toast';
+import { LoadingService } from '../../../shared/service/loading.service';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +24,8 @@ export class Login {
   constructor(
     private router: Router,
     private fb: FormBuilder,
+    private toastService: ToastService,
+    private loadingService: LoadingService
   ) {
     this.formLogin = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -36,9 +40,8 @@ export class Login {
   }
 
   send_login_request(login_model: LoginRequestModel) {
-    this.authService.login(login_model).subscribe({
+    this.loadingService.withLoadingObservable(this.authService.login(login_model)).subscribe({
       next: (response) => {
-        console.log(response);
         sessionStorage.setItem('access_token', response.access_token);
         sessionStorage.setItem('usuario', JSON.stringify(response.usuario));
         sessionStorage.setItem('tipo', response.tipo);
@@ -52,7 +55,7 @@ export class Login {
         this.router.navigate([rotaPorTipo[response.tipo] ?? '/']);
       },
       error: (error) => {
-        console.log(error);
+        this.toastService.error(error.error?.error || "Algo deu errado");
       },
     });
   }
