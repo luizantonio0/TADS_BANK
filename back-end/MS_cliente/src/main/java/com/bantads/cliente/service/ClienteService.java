@@ -1,5 +1,6 @@
 package com.bantads.cliente.service;
 
+import org.springframework.data.history.RevisionMetadata;
 import com.bantads.cliente.dto.ClienteResumidoDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
@@ -11,6 +12,7 @@ import com.bantads.cliente.mapper.ClienteMapper;
 import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.repository.ClienteRepository;
 
+import org.hibernate.envers.RevisionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,20 +29,22 @@ public class ClienteService {
     @Autowired private ClienteMapper mapper;
 
     public List<ClienteResumidoDTO> findClientes(String cpfLogado, String profileLogado, String filtro) throws HttpException {
+        System.out.println(cpfLogado + " " + profileLogado + " " + filtro);
 
-        var isGerente = profileLogado == "GERENTE";
-        var isAdmin = profileLogado == "ADMINISTRADOR";
+        var isGerente = profileLogado.equalsIgnoreCase("GERENTE");
+        var isAdmin = profileLogado.equalsIgnoreCase("ADMINISTRADOR");
+
         if(!isGerente && !isAdmin) {
-            throw new ForbiddenException("O usuário não tem permissão para efetuar esta operação");
+            throw new ForbiddenException("Você não tem permissão para efetuar esta operação");
         }
 
         if(filtro.equals("para_aprovar")) {
-            if(!isGerente) throw new ForbiddenException("O usuário não tem permissão para efetuar esta operação");
+            if(!isGerente) throw new ForbiddenException("Você não tem permissão para efetuar esta operação");
             return clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, false).stream().map(ClienteResumidoDTO::from).toList();
         }
 
         if(filtro.equalsIgnoreCase("melhores_clientes")) {
-
+            
         }
 
         if(isAdmin) {
@@ -86,13 +90,24 @@ public class ClienteService {
     }
 
     public void rollbackCliente(UUID uuid) throws Exception {
+
         Page<Revision<Integer, Cliente>> revisions = clienteRepository.findRevisions(uuid, PageRequest.of(0, 2));
         List<Revision<Integer, Cliente>> content = revisions.getContent();
+
+        var whitelist = List.of("12912861012", "09506382000", "85733854057", "58872160006", "76179646090");
+
         if (content.size() >= 2) {
-            var revision = content.get(1).getEntity();
-            clienteRepository.save(revision);
+            var rev = content.get(1);
+            var tipo = rev.getMetadata().getRevisionType();
+
+            if (tipo != RevisionMetadata.RevisionType.DELETE) {
+                clienteRepository.save(rev.getEntity());
+                return;
+            }
+
+            // se n foi nem insert nem update, a ultima versão é um delete, ou seja, o obj ainda nao existia
+            clienteRepository.deleteById(rev.getEntity().getId());
         } else {
-            var whitelist = List.of("12912861012", "09506382000", "85733854057", "58872160006", "76179646090");
             var cpf = clienteRepository.findById(uuid);
             if(cpf.isPresent() && !whitelist.contains(cpf.get().getCpf()))
                 clienteRepository.deleteById(uuid);

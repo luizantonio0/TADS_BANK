@@ -13,6 +13,7 @@ import com.bantads.gerente.mapper.GerenteMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.history.Revision;
+import org.springframework.data.history.RevisionMetadata;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -85,16 +86,25 @@ public class GerenteService {
         );
 
         List<Revision<Integer, Gerente>> content = revisions.getContent();
+        var whitelist = List.of("98574307084", "64065268052", "23862179060", "40501740066");
 
         if (content.size() >= 2) {
-            var revision = content.get(1).getEntity();
-            gerenteRepository.save(revision);
+            var rev = content.get(1);
+            var tipo = rev.getMetadata().getRevisionType();
+
+            if (tipo != RevisionMetadata.RevisionType.DELETE) {
+                gerenteRepository.save(rev.getEntity());
+                return;
+            }
+
+            // se n foi nem insert nem update, a ultima versão é um delete, ou seja, o obj ainda nao existia
+            gerenteRepository.deleteById(rev.getEntity().getId());
         } else {
-            var whitelist = List.of("98574307084", "64065268052", "23862179060", "40501740066");
-            var gerente = gerenteRepository.findById(idGerente);
-            if(gerente.isPresent() && !whitelist.contains(gerente.get().getCpf()))
+            var cpf = gerenteRepository.findById(idGerente);
+            if(cpf.isPresent() && !whitelist.contains(cpf.get().getCpf()))
                 gerenteRepository.deleteById(idGerente);
         }
+
     }
 
     @Transactional

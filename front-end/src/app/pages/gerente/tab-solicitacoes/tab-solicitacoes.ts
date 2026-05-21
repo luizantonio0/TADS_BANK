@@ -5,13 +5,15 @@ import { Cliente } from '../../../shared/models/cliente.model';
 import { CurrencyPipe } from '@angular/common';
 import { CpfPipe } from '../../../shared/pipe/cpf.pipe';
 import { ClienteService } from '../../../shared/service/requests/cliente.service';
+import { firstValueFrom } from 'rxjs';
+import { ToastService } from '../../../shared/service/toast/toast';
 
 @Component({
   selector: 'tab-solicitacoes',
   imports: [DataGridComponent, CurrencyPipe, CpfPipe],
   templateUrl: './tab-solicitacoes.html'
 })
-export class TabSolicitacoes implements OnInit {
+export class TabSolicitacoes {
 
   clientes: Cliente[] = [];
 
@@ -22,15 +24,26 @@ export class TabSolicitacoes implements OnInit {
     { size: 20 , title: 'Ações' } 
   ]
 
-  constructor(private clienteService: ClienteService) {}
+  constructor(private clienteService: ClienteService, private toastService: ToastService) {}
 
-  ngOnInit(): void {
-    this.loadClientes();
+  loadClientes(): Promise<Cliente[]> {
+    return firstValueFrom(this.clienteService.getClientesParaAprovar()).catch((httpError) => {
+      this.toastService.error(httpError.error?.error || "Algo deu errado");
+      throw httpError;
+    });
   }
 
-  loadClientes(): void {
-    this.clienteService.getClientesParaAprovar().subscribe((clientes: Cliente[]) => {
-      this.clientes = clientes;
+  aprovarCliente(cliente: Cliente): Promise<any> {
+    return firstValueFrom(this.clienteService.aprovarCliente(cliente.cpf)).catch((httpError) => {
+      this.toastService.error(httpError.error?.error || "Algo deu errado");
+      throw httpError;
+    });
+  }
+
+  rejeitarCliente(cliente: Cliente): Promise<any> {
+    return firstValueFrom(this.clienteService.rejeitarCliente(cliente.cpf)).catch((httpError) => {
+      this.toastService.error(httpError.error?.error || "Algo deu errado");
+      throw httpError;
     });
   }
   

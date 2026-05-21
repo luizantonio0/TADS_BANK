@@ -14,7 +14,6 @@ export class ClienteService {
   private API_URL = environment.apiUrl;
   private http = inject(HttpClient);
 
-  //Retorno vazio
   autoCadastrar(cliente: Cliente): Observable<any> {
     return this.http.post(`${this.API_URL}/clientes`, cliente);
   }
@@ -24,7 +23,7 @@ export class ClienteService {
   }
 
   getClientesParaAprovar(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.API_URL}/clientes?para_aprovar`);
+    return this.http.get<Cliente[]>(`${this.API_URL}/clientes?filtro=para_aprovar`);
   }
 
   getClientes(): Observable<Cliente[]> {
@@ -35,11 +34,11 @@ export class ClienteService {
     return this.http.put(`${this.API_URL}/clientes`, cliente);
   }
   aprovarCliente(cpf: string): Observable<ClienteAprovadoResponseModel>{
-    return this.http.post<ClienteAprovadoResponseModel>(`${this.API_URL}/${cpf}/aprovar`, null);
+    return this.http.post<ClienteAprovadoResponseModel>(`${this.API_URL}/clientes/${cpf}/aprovar`, null);
   }
 
   rejeitarCliente(cpf: string): Observable<any>{
-    return this.http.post(`${this.API_URL}/${cpf}/rejeitar`, null);
+    return this.http.post(`${this.API_URL}/clientes/${cpf}/rejeitar`, null);
   }
 
 

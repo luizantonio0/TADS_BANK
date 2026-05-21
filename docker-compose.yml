@@ -92,7 +92,7 @@ services:
       - "27017:27017"
 
   postgres:
-    image: postgres
+    build: .
     restart: always
     environment:
       POSTGRES_USER: admin
@@ -110,6 +110,8 @@ services:
       - ./init-db:/docker-entrypoint-initdb.d:Z
     ports:
       - "5432:5432"
+    command: >
+      sh -c "dos2unix /docker-entrypoint-initdb.d/*.sh && exec docker-entrypoint.sh postgres"
 
   orquestrador:
     build:

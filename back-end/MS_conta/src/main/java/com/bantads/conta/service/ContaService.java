@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.history.Revision;
+import org.springframework.data.history.RevisionMetadata;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,11 +27,20 @@ public class ContaService {
         Page<Revision<Integer, Conta>> revisions = contaRepository.findRevisions(uuid, PageRequest.of(0, 2));
         List<Revision<Integer, Conta>> content = revisions.getContent();
 
+        var whitelist = List.of("1291", "0950", "8573", "5887", "7617");
+
         if (content.size() >= 2) {
-            var revision = content.get(1).getEntity();
-            contaRepository.save(revision);
+            var rev = content.get(1);
+            var tipo = rev.getMetadata().getRevisionType();
+
+            if (tipo != RevisionMetadata.RevisionType.DELETE) {
+                contaRepository.save(rev.getEntity());
+                return;
+            }
+
+            // se n foi nem insert nem update, a ultima versão é um delete, ou seja, o obj ainda nao existia
+            contaRepository.deleteById(rev.getEntity().getId());
         } else {
-            var whitelist = List.of("1291", "0950", "8573", "5887", "7617");
             var conta = contaRepository.findById(uuid);
             if(conta.isPresent() && !whitelist.contains(conta.get().getConta()))
                 contaRepository.deleteById(uuid);

@@ -2,7 +2,7 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const { match } = require('path-to-regexp');
-const { services, routeMappings } = require("./routes")
+const { services, routes } = require("./routes")
 const cors = require('cors');
 const app = express();
 const PORT = 3000;
@@ -20,12 +20,15 @@ app.use(async (req, res, next) => {
 
     let targetRoute = null;
 
-    for (const pattern in routeMappings) {
-        const checker = match(pattern, { decode: decodeURIComponent });
+    for (const route of routes) {
+        if(req.method !== route.method) {
+            continue;
+        }
+        const checker = match(route.path, { decode: decodeURIComponent });
         const result = checker(req.path);
 
         if (result) {
-            targetRoute = routeMappings[pattern];
+            targetRoute = route;
             break;
         }
     }

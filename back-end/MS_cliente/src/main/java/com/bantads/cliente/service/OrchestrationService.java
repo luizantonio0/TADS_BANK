@@ -229,6 +229,7 @@ public class OrchestrationService {
             completableFuture.complete(dto);
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             if (completableFuture != null) {
                 completableFuture.completeExceptionally(ex);
             }

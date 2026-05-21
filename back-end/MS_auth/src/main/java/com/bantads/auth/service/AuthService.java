@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.javers.core.Javers;
+import org.javers.core.metamodel.object.SnapshotType;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.shadow.Shadow;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -261,16 +262,14 @@ public class AuthService {
     }
 
     public void rollbackCredentials(String cpf) {
+        System.out.println("Entrou no rollback");
         List<Shadow<Credentials>> shadows = javers.findShadows(
                 QueryBuilder.byInstanceId(cpf, Credentials.class)
                         .limit(2)
                         .build()
         );
 
-        if (shadows.size() >= 2) {
-            credentialsRepository.save(shadows.get(1).get());
-        } else {
-            var whitelist = List.of(
+        var whitelist = List.of(
                 "98574307084",
                 "64065268052",
                 "23862179060",
@@ -281,9 +280,25 @@ public class AuthService {
                 "58872160006",
                 "76179646090"
             );
+
+        if (shadows.size() > 1) {
+            var shadow = shadows.get(1);
+            SnapshotType tipo = shadow.getCommitMetadata().getId() != null 
+                ? shadow.getCdoSnapshot().getType() 
+                : null;
+
+            if (tipo == SnapshotType.INITIAL || tipo == SnapshotType.UPDATE) {
+                credentialsRepository.save(shadow.get());
+                return;
+            }
+
+            // se n foi nem insert nem update, a ultima versão é um delete, ou seja, o obj ainda nao existia
+            credentialsRepository.deleteById(shadow.get().getCpf());
+        } else {
             var conta = credentialsRepository.findById(cpf);
-            if(conta.isPresent() && !whitelist.contains(conta.get().getCpf()))
+            if(conta.isPresent() && !whitelist.contains(conta.get().getCpf())) {
                 credentialsRepository.deleteById(cpf);
+            }
         }
     }
 

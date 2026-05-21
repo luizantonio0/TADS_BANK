@@ -5,35 +5,14 @@ export const services = {
     gerentes: "http://ms-gerente:2563"
 };
 
-export const routeMappings = {
-    '/login': {
-        target: services.auth,
-        public: true,
-        profiles: '*'
-    },
-    '/logout': {
-        target: services.auth,
-        public: true,
-        profiles: '*'
-    },
-    '/gerente': {
-        target: services.gerentes,
-        public: true,
-        profiles: '*'
-    },
-    '/clientes': {
-        target: services.clientes,
-        public: true,
-        profiles: '*'
-    },
-    '/clientes/:cpf/aprovar': {
-        target: services.clientes,
-        public: false,
-        profiles: 'GERENTE,ADMINISTRADOR'
-    },
-    '/clientes/:cpf': {
-        target: services.clientes,
-        public: false,
-        profiles: 'GERENTE,ADMINISTRADOR,CLIENTE'
-    }
-}
+export const routes = [
+    { method: 'POST', path: '/login', target: services.auth, public: true, profiles: '*' },
+    { method: 'POST', path: '/logout', target: services.auth, public: false, profiles: '*' },
+
+    { method: 'POST', path: '/clientes', target: services.clientes, public: true, profiles: '*' },
+    { method: 'GET',  path: '/clientes', target: services.clientes, public: false, profiles: 'ADMINISTRADOR,GERENTE' },
+    { method: 'POST', path: '/clientes/:cpf/aprovar', target: services.clientes, public: false, profiles: 'GERENTE' },
+    { method: 'POST', path: '/clientes/:cpf', target: services.clientes, public: false, profiles: 'GERENTE,ADMINISTRADOR' },
+
+    { method: 'POST', path: '/gerente', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
+]
