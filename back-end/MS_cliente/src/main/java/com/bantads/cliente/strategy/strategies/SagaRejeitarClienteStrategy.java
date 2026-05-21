@@ -1,9 +1,6 @@
 package com.bantads.cliente.strategy.strategies;
 
-
-import com.bantads.cliente.dto.http.AprovarClienteDTO;
 import com.bantads.cliente.dto.saga.input.RejeitarClienteInputDTO;
-import com.bantads.cliente.dto.saga.output.AprovarClienteOutputDTO;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.strategy.SagaCommandStrategy;
 import com.bantads.shared.dto.OrchestrationCommandDTO;

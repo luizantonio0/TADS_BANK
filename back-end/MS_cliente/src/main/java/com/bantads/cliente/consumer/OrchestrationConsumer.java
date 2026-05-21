@@ -47,6 +47,10 @@ public class OrchestrationConsumer {
             System.out.println("Recebeu response da atualização de cliente");
             orchestrationService.finishAtualizarCliente(dto);
         }
+        if(orchestrationService.isRejeitarClienteSaga(dto.idOrchestration())) {
+            System.out.println("Recebeu response da rejeição de cliente");
+            orchestrationService.finishRejeitarCliente(dto);
+        }
     }
 
     @RabbitListener(queues = "ms-cliente.command")

@@ -57,6 +57,11 @@ public class OrchestrationService {
         return atualizarClienteResponses.containsKey(idOrchestration);
     }
 
+    public boolean isRejeitarClienteSaga(UUID idOrchestration) {
+        return rejeitarClienteResponses.containsKey(idOrchestration);
+    }
+
+
     private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID,T> orchMap, String... payloads) throws HttpException {
         if (dto == null)
             throw new InternalServerErrorException("Resposta nula do orquestrador");
