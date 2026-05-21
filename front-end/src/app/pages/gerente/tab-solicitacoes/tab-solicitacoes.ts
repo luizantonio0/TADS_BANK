@@ -28,9 +28,29 @@ export class TabSolicitacoes implements OnInit {
     this.loadClientes();
   }
 
-  loadClientes(): void {
-    this.clienteService.getClientesParaAprovar().subscribe((clientes: Cliente[]) => {
-      this.clientes = clientes;
+  supplier = async (req: DataGridRequest<Cliente, unknown>): Promise<DataGridResponse<Cliente>> => {
+    if (!this.clientes.length) {
+      await this.loadClientes();
+    }
+
+    const start = (req.page - 1) * req.page_size;
+    const end = start + req.page_size;
+
+    return {
+      total_count: this.clientes.length,
+      data: this.clientes.slice(start, end),
+    };
+  };
+
+  loadClientes(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.clienteService.getClientesParaAprovar().subscribe({
+        next: (clientes: Cliente[]) => {
+          this.clientes = clientes;
+          resolve();
+        },
+        error: reject,
+      });
     });
   }
   
