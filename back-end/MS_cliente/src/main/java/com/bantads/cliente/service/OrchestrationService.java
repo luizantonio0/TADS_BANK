@@ -11,7 +11,9 @@ import com.bantads.cliente.dto.saga.input.AtualizarClienteInputDTO;
 import com.bantads.cliente.dto.saga.input.AtualizarLimiteInputDTO;
 import com.bantads.cliente.dto.saga.input.ContaCreateInputDTO;
 import com.bantads.cliente.dto.saga.input.CredentialsCreateInputDTO;
+import com.bantads.cliente.dto.saga.input.GetClienteInputDTO;
 import com.bantads.cliente.dto.saga.input.GetGerenteInputDTO;
+import com.bantads.cliente.dto.saga.input.RejeitarClienteInputDTO;
 import com.bantads.cliente.dto.saga.output.*;
 import com.bantads.cliente.exception.BadRequestException;
 import com.bantads.cliente.exception.HttpException;
@@ -321,13 +323,14 @@ public class OrchestrationService {
             ObjectMapper mapper = new ObjectMapper();
 
             var gerenteDTO = new GetGerenteInputDTO(cliente.get().getCpfGerente());
+            var clienteDTO = new RejeitarClienteInputDTO(cpfCliente, dto.motivo());
 
             var request = new OrchestrationRequestDTO(
                     idOrchestration,
                     true,
                     List.of(
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "DecrementClienteGerente", mapper.writeValueAsString(gerenteDTO)),
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente", "RejectCliente", mapper.writeValueAsString(dto))
+                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "DecrementClientesGerente", mapper.writeValueAsString(gerenteDTO)),
+                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente", "RejectCliente", mapper.writeValueAsString(clienteDTO))
                     )
             );
 

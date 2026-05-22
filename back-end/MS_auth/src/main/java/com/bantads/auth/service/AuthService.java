@@ -83,8 +83,8 @@ public class AuthService {
         CompletableFuture<LogoutResponseDTO> completableFuture = null;
 
         try {
-            prepareResult(result, logoutRequests);
             completableFuture = logoutRequests.get(result.idOrchestration());
+            prepareResult(result, logoutRequests);
 
             ClienteDTO cliente = result.payloads().containsKey("ms-cliente")
                 ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
@@ -153,8 +153,8 @@ public class AuthService {
         CompletableFuture<LoginResponseDTO> completableFuture = null;
 
         try {
-            prepareResult(result, loginsRequests, "ms-auth");
             completableFuture = loginsRequests.get(result.idOrchestration());
+            prepareResult(result, loginsRequests, "ms-auth");
 
             ClienteDTO cliente = result.payloads().containsKey("ms-cliente")
                 ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)

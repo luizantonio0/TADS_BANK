@@ -26,7 +26,7 @@ public class LogStatusCliente {
     @Column(unique = true, nullable = false, length = 11)
     private String cpf;
 
-    @Column(length = 2)
+    @Column
     @Enumerated(EnumType.STRING)
     private LogStatus status;
 
@@ -43,6 +43,8 @@ public class LogStatusCliente {
         this.motivo = motivo;
         this.data = data;
     }
+
+    public LogStatusCliente() {}
 
     public UUID getId() {
         return id;

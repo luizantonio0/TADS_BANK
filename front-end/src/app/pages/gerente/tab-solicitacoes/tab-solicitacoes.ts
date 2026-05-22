@@ -8,16 +8,19 @@ import { ClienteService } from '../../../shared/service/requests/cliente.service
 import { first, firstValueFrom } from 'rxjs';
 import { ToastService } from '../../../shared/service/toast/toast';
 import { LoadingService } from '../../../shared/service/loading.service';
+import { ModalRejeitarCliente } from '../modal-rejeitar-cliente/modal-rejeitar-cliente';
 
 @Component({
   selector: 'tab-solicitacoes',
-  imports: [DataGridComponent, CurrencyPipe, CpfPipe],
+  imports: [DataGridComponent, CurrencyPipe, CpfPipe, ModalRejeitarCliente],
   templateUrl: './tab-solicitacoes.html'
 })
 export class TabSolicitacoes {
 
   @ViewChild('gridSolicitacoes') dataGrid!: DataGridComponent<any, any>;
   clientes: Cliente[] = [];
+
+  rejeitando: Cliente | undefined;
 
   colunas: DataGridColumns[] = [
     { size: 20, title: 'CPF' },
@@ -27,6 +30,14 @@ export class TabSolicitacoes {
   ]
 
   constructor(private clienteService: ClienteService, private toastService: ToastService, private loadingService: LoadingService) { }
+
+  onRejeitar(cliente: Cliente) {
+    this.rejeitando = cliente;
+  }
+
+  onRejeitarClosed()  {
+    this.rejeitando = undefined;
+  }
 
   loadClientes(): Promise<Cliente[]> {
     return firstValueFrom(this.clienteService.getClientesParaAprovar()).catch((httpError) => {
@@ -47,16 +58,21 @@ export class TabSolicitacoes {
       }));
   }
 
-  rejeitarCliente(cliente: Cliente): Promise<any> {
-    return this.loadingService.withLoading(() => firstValueFrom(this.clienteService.rejeitarCliente(cliente.cpf))
-      .then(_ => {
-        this.toastService.success("Cliente rejeitado com sucesso!");
-        this.dataGrid.fetch(false);
-      })
-      .catch((httpError) => {
-        this.toastService.error(httpError.error?.error || "Algo deu errado");
-        throw httpError;
-      }));
+  rejeitarCliente(motivo: string): Promise<any> {
+    if(!this.rejeitando) {
+      return Promise.resolve();
+    }
+    return this.loadingService.withLoading(() =>
+      firstValueFrom(this.clienteService.rejeitarCliente(this.rejeitando!.cpf, motivo))
+        .then((_) => {
+          this.toastService.success('Cliente rejeitado com sucesso!');
+          this.dataGrid.fetch(false);
+        })
+        .catch((httpError) => {
+          this.toastService.error(httpError.error?.error || 'Algo deu errado');
+          throw httpError;
+        }),
+    );
   }
 
 }

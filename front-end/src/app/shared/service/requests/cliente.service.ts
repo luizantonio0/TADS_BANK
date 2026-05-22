@@ -37,8 +37,8 @@ export class ClienteService {
     return this.http.post<ClienteAprovadoResponseModel>(`${this.API_URL}/clientes/${cpf}/aprovar`, null);
   }
 
-  rejeitarCliente(cpf: string): Observable<any>{
-    return this.http.post(`${this.API_URL}/clientes/${cpf}/rejeitar`, null);
+  rejeitarCliente(cpf: string, motivo: string): Observable<any>{
+    return this.http.post(`${this.API_URL}/clientes/${cpf}/rejeitar`, { motivo: motivo });
   }
 
 

@@ -10,7 +10,7 @@
                     <span class="material-symbols-outlined text-sm!">check</span>
                     Aprovar
                 </button>
-                <button class="bg-red-500! my-auto items-center flex justify-center gap-x-0.5" (click)="rejeitarCliente(item)">
+                <button class="bg-red-500! my-auto items-center flex justify-center gap-x-0.5" (click)="rejeitando = item">
                     <span class="material-symbols-outlined text-sm!">close</span>
                     Rejeitar
                 </button>
@@ -18,3 +18,5 @@
         </ng-template>
     </data-grid>
 </div>
+
+<modal-rejeitar-cliente [control]="!!rejeitando" (close)="rejeitando = undefined" (submited)="rejeitarCliente($event)" />

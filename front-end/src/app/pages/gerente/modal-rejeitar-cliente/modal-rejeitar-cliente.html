@@ -1,0 +1,6 @@
+<modal [control]="control" icon="person_cancel" title="Rejeitar cliente" submitText="Confirmar" (close)="onClose()" [submitCallback]="submit">
+  <div class="my-2 w-96">
+       <label for="nmMotivo">Motivo</label>
+       <input name="nmMotivo" placeholder="Digite o motivo para a rejeição" [(ngModel)]="motivo">
+   </div>
+</modal>

@@ -5,8 +5,7 @@ import { ToastService } from '../../../shared/service/toast/toast';
 @Component({
   selector: 'app-modal-confirmar-logout',
   imports: [Modal],
-  templateUrl: './modal-confirmar-logout.html',
-  styleUrl: './modal-confirmar-logout.css',
+  templateUrl: './modal-confirmar-logout.html'
 })
 export class ModalConfirmarLogout {
   private toastr = inject(ToastService)

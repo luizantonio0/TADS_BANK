@@ -12,6 +12,7 @@ export const routes = [
     { method: 'POST', path: '/clientes', target: services.clientes, public: true, profiles: '*' },
     { method: 'GET',  path: '/clientes', target: services.clientes, public: false, profiles: 'ADMINISTRADOR,GERENTE' },
     { method: 'POST', path: '/clientes/:cpf/aprovar', target: services.clientes, public: false, profiles: 'GERENTE' },
+    { method: 'POST', path: '/clientes/:cpf/rejeitar', target: services.clientes, public: false, profiles: 'GERENTE' },
     { method: 'POST', path: '/clientes/:cpf', target: services.clientes, public: false, profiles: 'GERENTE,ADMINISTRADOR' },
 
     { method: 'POST', path: '/gerente', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
