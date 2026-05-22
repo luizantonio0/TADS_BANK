@@ -52,3 +52,9 @@ tasks.named('test') {
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << '-parameters'
 }
+
+tasks.configureEach { task ->
+    if (task.name.contains("Aot")) {
+        task.enabled = false
+    }
+}
