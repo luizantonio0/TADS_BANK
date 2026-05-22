@@ -24,17 +24,6 @@ services:
     build:
       context: ./back-end/API_Gateway
       dockerfile: Dockerfile
-    depends_on:
-      orquestrador:
-        condition: service_healthy
-      ms-auth:
-        condition: service_healthy
-      ms-cliente:
-        condition: service_healthy
-      ms-gerente:
-        condition: service_healthy
-      ms-conta:
-        condition: service_healthy
     environment:
       - NODE_ENV=development
     ports:
