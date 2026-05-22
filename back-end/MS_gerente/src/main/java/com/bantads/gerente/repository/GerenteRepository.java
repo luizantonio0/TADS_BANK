@@ -16,7 +16,7 @@ public interface GerenteRepository extends JpaRepository<Gerente, UUID>, Revisio
     boolean existsByEmail(String email);
     void deleteByCpf(String cpf);
 
-    @Query(value = "SELECT * FROM tb_gerente WHERE tipo='GERENTE' ORDER BY CAST(total_clientes AS INTEGER) ASC LIMIT 1", nativeQuery = true)
-    Optional<Gerente> findFirstByOrderByTotalClientesAsc();
+    @Query("SELECT g FROM Gerente g WHERE g.tipo = 'GERENTE' ORDER BY g.totalClientes ASC")
+    Optional<Gerente> findTop1GerenteComMenosClientes();
 } 
         

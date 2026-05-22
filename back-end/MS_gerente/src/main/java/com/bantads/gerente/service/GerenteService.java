@@ -140,7 +140,7 @@ public class GerenteService {
     }
 
     public Optional<Gerente> findGerenteMenosClientes() {
-        return gerenteRepository.findFirstByOrderByTotalClientesAsc();
+        return gerenteRepository.findTop1GerenteComMenosClientes();
     }
 }
         
