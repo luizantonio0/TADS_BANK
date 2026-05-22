@@ -2,7 +2,6 @@ package com.bantads.conta.consumer;
 
 import com.bantads.shared.dto.*;
 import com.bantads.conta.exception.HttpException;
-import com.bantads.conta.orchestration.OrchestrationKeys;
 import com.bantads.conta.service.ContaService;
 import com.bantads.conta.strategy.SagaCommandStrategyFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -30,7 +29,7 @@ public class RabbitConsumer {
 
     }
 
-    @RabbitListener(queues = OrchestrationKeys.MS_CONTA + ".command")
+    @RabbitListener(queues = "ms-conta.command")
     public void onCommand(OrchestrationCommandDTO dto) {
         var strategy = cmdFactory.newCommand(dto.commandType());
         var objectMapper = new ObjectMapper();

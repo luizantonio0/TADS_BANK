@@ -6,13 +6,26 @@
             <p>Filtrar</p>
         </button>
     </div>
-    <data-grid [columns]="colunas" [supplier]="">
+    @if(nomeCliente != '') {
+        <div class="w-full bg-yellow-100 text-center border border-yellow-200 rounded-md text-indigo-900 mb-2 py-2">
+            Consulta realizada usando o filtro de pesquisa! <span (click)="onFiltered('')" class="text-blue-500 cursor-pointer underline">Limpar filtros</span> 
+        </div>
+    }
+    <data-grid #gridClientes [columns]="colunas" [supplier]="loadClientes.bind(this)">
         <ng-template #desktopRow let-item>
             <td>{{ item.cpf | cpf }}</td>
             <td>{{ item.nome }}</td>
-            <td>{{ item.cidade }}</td>
-            <td>{{ item.estado }}</td>
-            <td>{{ item.saldo | currency: 'BRL' }}</td>
+            <td>{{ item.cidade }}, {{item.estado}}</td>
+            <td>
+                <div
+                    [ngClass]="{
+                        'bg-green-100 border-green-400 border': item.saldo >= 0,
+                        'bg-red-100 border-red-400 border': item.saldo < 0
+                    }"
+                    class="bg-green-400 px-2 py-1 rounded-lg w-fit">
+                    {{ item.saldo | currency: 'BRL' }}
+                </div>
+            </td>
             <td>{{ item.limite | currency: 'BRL' }}</td>
             <td class="flex gap-x-2 [&>button]:text-xs! [&>button]:h-auto! ">
                 <button class="my-auto items-center flex justify-center gap-x-0.5">
@@ -24,4 +37,4 @@
     </data-grid>
 </div>
 
-<modal-filtrar-cliente [control]="filtrando" (close)="filtrando = false" />
+<modal-filtrar-cliente [control]="filtrando" (close)="filtrando = false" (filtered)="onFiltered($event)" />

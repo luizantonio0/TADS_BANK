@@ -26,8 +26,12 @@ export class ClienteService {
     return this.http.get<Cliente[]>(`${this.API_URL}/clientes?filtro=para_aprovar`);
   }
 
-  getClientes(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.API_URL}/clientes`);
+  getMelhoresClientes(): Observable<Cliente[]> {
+    return this.http.get<Cliente[]>(`${this.API_URL}/clientes?filtro=melhores_clientes`);
+  }
+
+  getClientes(nome: string): Observable<Cliente[]> {
+    return this.http.get<Cliente[]>(`${this.API_URL}/clientes?nome=${nome}`);
   }
 
   alterarCliente(cliente: Cliente | any): Observable<any> {

@@ -1,7 +1,6 @@
 package com.bantads.cliente.controller;
 
 import com.bantads.cliente.dto.ClienteDTO;
-import com.bantads.cliente.dto.ClienteResumidoDTO;
 import com.bantads.cliente.dto.RejeitarClienteRequestDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteDTO;
@@ -9,11 +8,9 @@ import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.http.ClienteCreateResponseDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
 import com.bantads.cliente.exception.HttpException;
-import com.bantads.cliente.exception.NotFoundException;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.service.OrchestrationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,17 +26,22 @@ public class ClienteController {
     @Autowired private OrchestrationService orchestrationService;
 
     @GetMapping
-    public ResponseEntity<List<ClienteResumidoDTO>> findAll(
-        @RequestParam(name = "filtro", required = false, defaultValue = "ATIVO") String filtro,
+    public CompletableFuture<ResponseEntity<List<ClienteDTO>>> findAll(
+        @RequestParam(name = "filtro", required = false, defaultValue = "") String filtro,
+        @RequestParam(name = "nome", required = false, defaultValue = "") String nome,
         @RequestHeader("X-User-Id") String cpfLogado,
         @RequestHeader("X-User-Profile") String profileLogado
     ) throws HttpException {
-        return new ResponseEntity<>(clienteService.findClientes(cpfLogado, profileLogado, filtro), HttpStatus.OK);
+        return clienteService.findClientes(cpfLogado, profileLogado, filtro, nome)
+            .thenApply(ResponseEntity::ok)
+            .orTimeout(30, TimeUnit.SECONDS);
     }
 
     @GetMapping("/{cpf}")
-    public ResponseEntity<ClienteDTO> findByCpf(@PathVariable("cpf") String cpf) throws NotFoundException {
-        return new ResponseEntity<>(ClienteDTO.from(clienteService.findByCpf(cpf)), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<ClienteDTO>> findByCpf(@PathVariable("cpf") String cpf) throws HttpException {
+        return orchestrationService.startGetCliente(cpf.replaceAll("[^0-9]", ""))
+            .thenApply(ResponseEntity::ok)
+            .orTimeout(30, TimeUnit.SECONDS);
     }
 
     @PostMapping

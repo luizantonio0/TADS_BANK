@@ -1,6 +1,6 @@
 package com.bantads.cliente.service;
 
-import com.bantads.cliente.dto.ClienteResumidoDTO;
+import com.bantads.cliente.dto.ClienteDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
 import com.bantads.cliente.enums.LogStatus;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ClienteService {
@@ -32,8 +33,9 @@ public class ClienteService {
     @Autowired private ClienteRepository clienteRepository;
     @Autowired private LogStatusRepository logStatusRepository;
     @Autowired private ClienteMapper mapper;
+    @Autowired private OrchestrationService orchestrationService;
 
-    public List<ClienteResumidoDTO> findClientes(String cpfLogado, String profileLogado, String filtro) throws HttpException {
+    public CompletableFuture<List<ClienteDTO>> findClientes(String cpfLogado, String profileLogado, String filtro, String nome) throws HttpException {
         System.out.println(cpfLogado + " " + profileLogado + " " + filtro);
 
         var isGerente = profileLogado.equalsIgnoreCase("GERENTE");
@@ -45,23 +47,28 @@ public class ClienteService {
 
         if(filtro.equals("para_aprovar")) {
             if(!isGerente) throw new ForbiddenException("Você não tem permissão para efetuar esta operação");
-            return clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, false).stream().map(ClienteResumidoDTO::from).toList();
+            return CompletableFuture.completedFuture(clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, false).stream().map(ClienteDTO::from).toList());
         }
 
         if(filtro.equalsIgnoreCase("melhores_clientes")) {
-            
+            return orchestrationService.startMelhoresClientes();
         }
 
         if(isAdmin) {
-            return clienteRepository.findAll().stream().map(ClienteResumidoDTO::from).toList();
+            return CompletableFuture.completedFuture(clienteRepository.findAll().stream().map(ClienteDTO::from).toList());
         }
 
-        return clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, true).stream().map(ClienteResumidoDTO::from).toList();
+        return orchestrationService.startConsultaClienteGerente(cpfLogado, nome);
     }
     
     public Cliente findByCpf(String cpf) throws NotFoundException{
         return clienteRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Cliente não encontrado!"));
     }
+
+    public List<Cliente> findByCpf(List<String> cpf) {
+        return clienteRepository.findByCpfIn(cpf);
+    }
+
 
     public Cliente cadastrarCliente(ClienteRequestDTO dto) throws BadRequestException {
         var cpf = dto.cpf().replaceAll("[^0-9]", "");

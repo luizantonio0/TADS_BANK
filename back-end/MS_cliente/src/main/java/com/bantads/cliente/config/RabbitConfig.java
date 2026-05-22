@@ -1,6 +1,5 @@
 package com.bantads.cliente.config;
 
-import com.bantads.cliente.orchestration.OrchestrationKeys;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -21,7 +20,7 @@ public class RabbitConfig {
 
     @Bean
     public Queue commandQueue() {
-        return new Queue(OrchestrationKeys.MS_CLIENTE + ".command", true);
+        return new Queue("ms-cliente.command", true);
     }
 
     @Bean

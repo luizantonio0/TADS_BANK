@@ -1,7 +1,9 @@
 package com.bantads.conta.strategy;
 
-import com.bantads.conta.orchestration.OrchestrationKeys;
 import com.bantads.conta.strategy.strategies.SagaCreateContaStrategy;
+import com.bantads.conta.strategy.strategies.SagaGetContaBatchStrategy;
+import com.bantads.conta.strategy.strategies.SagaGetContaStrategy;
+import com.bantads.conta.strategy.strategies.SagaGetMelhoresContasStrategy;
 import com.bantads.conta.strategy.strategies.SagaUpdateLimiteStrategy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +13,18 @@ import org.springframework.stereotype.Component;
 public class SagaCommandStrategyFactory {
 
     @Autowired private SagaCreateContaStrategy createContaStrategy;
+    @Autowired private SagaGetContaBatchStrategy getContaBatchStrategy;
+    @Autowired private SagaGetContaStrategy getContaStrategy;
     @Autowired private SagaUpdateLimiteStrategy updateLimiteStrategy;
+    @Autowired private SagaGetMelhoresContasStrategy getMelhoresContasStrategy;
 
     public SagaCommandStrategy newCommand(String commandType) {
         return switch(commandType) {
-            case OrchestrationKeys.CREATE_CONTA_COMMAND -> createContaStrategy;
-            case OrchestrationKeys.UPDATE_LIMITE_COMMAND -> updateLimiteStrategy;
+            case "CreateConta" -> createContaStrategy;
+            case "UpdateLimite" -> updateLimiteStrategy;
+            case "GetContaBatch" -> getContaBatchStrategy;
+            case "GetMelhoresContas" -> getMelhoresContasStrategy;
+            case "GetConta" -> getContaStrategy;
             default -> null;
         };
     }

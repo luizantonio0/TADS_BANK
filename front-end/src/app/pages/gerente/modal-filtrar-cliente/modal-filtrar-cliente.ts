@@ -18,7 +18,6 @@ export class ModalFiltrarCliente {
   valor = '';
 
   submit = () => {
-    this.toastr.success('Filtros aplicados com sucesso!');
     this.filtered.emit(this.valor);
     this.onClose();
   }

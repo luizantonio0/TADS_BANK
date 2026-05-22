@@ -1,25 +1,39 @@
 import { CurrencyPipe, NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CpfPipe } from '../../../shared/pipe/cpf.pipe';
+import { Cliente } from '../../../shared/models/cliente.model';
+import { ClienteService } from '../../../shared/service/requests/cliente.service';
+import { LoadingService } from '../../../shared/service/loading.service';
+import { ToastService } from '../../../shared/service/toast/toast';
 
 @Component({
   selector: 'tab-melhores-clientes',
   imports: [NgClass, CpfPipe, CurrencyPipe],
   templateUrl: './tab-melhores-clientes.html'
 })
-export class TabMelhoresClientes {
+export class TabMelhoresClientes implements OnInit {
 
-  clientes = Array.from({ length: 25 }, (_, i) => ({
-    cpf: Math.random().toString().slice(2, 13).padEnd(11, '0'),
-    nome: `Cliente ${i + 1}`,
-    email: `cliente${i + 1}@email.com.br`,
-    salario: Math.floor(Math.random() * (15000 - 2000 + 1)) + 2000,
-    saldo: Math.floor(Math.random() * (15000 - 2000 + 1)) + 2000,
-    limite: Math.floor(Math.random() * (15000 - 2000 + 1)) + 2000,
-    endereco: `Rua Exemplo, nr ${100 + i}`,
-    cidade: ["Curitiba", "São Paulo", "Porto Alegre", "Belo Horizonte"][i % 4],
-    estado: ["PR", "SP", "RS", "MG"][i % 4]
-  }));
+  clientes: Cliente[] = [];
+
+  constructor(
+    private clienteService: ClienteService, 
+    private loadingService: LoadingService, 
+    private toastService: ToastService,
+    private cdRef: ChangeDetectorRef 
+  ) {}
+
+  ngOnInit(): void {
+    this.loadingService.withLoadingObservable(this.clienteService.getMelhoresClientes()).subscribe({
+      next: (clientes) => {
+        this.clientes = clientes;
+        this.cdRef.detectChanges();
+      },
+      error: (error) => {
+        this.toastService.error(error.error?.error || "Algo deu errado");
+        this.cdRef.detectChanges();
+      },
+    });
+  }
 
 
 }

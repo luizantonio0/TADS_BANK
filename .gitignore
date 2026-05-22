@@ -63,3 +63,4 @@ front-end/baseline.json
 front-end/.husky/_
 .idea
 .env
+.vscode

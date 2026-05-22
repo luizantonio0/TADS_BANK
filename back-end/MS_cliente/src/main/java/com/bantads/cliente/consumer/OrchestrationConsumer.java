@@ -51,6 +51,18 @@ public class OrchestrationConsumer {
             System.out.println("Recebeu response da rejeição de cliente");
             orchestrationService.finishRejeitarCliente(dto);
         }
+        if(orchestrationService.isClienteGerenteResponses(dto.idOrchestration())) {
+            System.out.println("Recebeu response de cliente do gerente");
+            orchestrationService.finishConsultaClientesGerente(dto);
+        }
+        if(orchestrationService.isMelhoresClientesResponses(dto.idOrchestration())) {
+            System.out.println("Recebeu response de melhores clientes");
+            orchestrationService.finishMelhoresClientes(dto);
+        }
+        if(orchestrationService.isGetClienteResponses(dto.idOrchestration())) {
+            System.out.println("Recebeu response de get clientes");
+            orchestrationService.finishGetCliente(dto);
+        }
     }
 
     @RabbitListener(queues = "ms-cliente.command")

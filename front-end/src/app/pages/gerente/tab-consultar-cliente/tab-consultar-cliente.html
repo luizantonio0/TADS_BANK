@@ -2,16 +2,10 @@
 <div>
     <div class="flex gap-x-2 w-64">
         <input [(ngModel)]="cpf" mask="000.000.000-00" [dropSpecialCharacters]="true" name="cpf" placeholder="Digite o CPF">
-        <button class="w-8! h-8!" type="button" (click)="submit()" [disabled]="carregando">
+        <button class="w-8! h-8!" type="button" (click)="submit()">
             <span class="material-symbols-outlined">search</span>
         </button>
     </div>
-    @if(carregando) {
-        <p class="text-sm text-gray-500 mt-2">Consultando cliente...</p>
-    }
-    @if(erro) {
-        <p class="text-sm text-red-600 mt-2">{{erro}}</p>
-    }
     @if(cliente != null) {
         <div class="grid grid-cols-12 w-3/5 gap-2 mt-4">
 
@@ -36,7 +30,7 @@
                     <span class="material-symbols-outlined text-[18px]!">description</span>
                     <span class="flex font-semibold gap-x-1 text-[14px] text-md">Conta</span>
                 </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">Pendente</p>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.conta}}</p>
             </div>
 
             <div class="col-span-6">
@@ -68,7 +62,7 @@
                     <span class="material-symbols-outlined text-[18px]!">payments</span>
                     <span class="flex font-semibold gap-x-1 text-[14px] text-md">Saldo</span>
                 </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">Pendente</p>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.saldo | currency: 'BRL'}}</p>
             </div>
 
             <div class="col-span-4">
@@ -76,7 +70,7 @@
                     <span class="material-symbols-outlined text-[18px]!">finance</span>
                     <span class="flex font-semibold gap-x-1 text-[14px] text-md">Limite</span>
                 </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">Pendente</p>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.limite | currency: 'BRL'}}</p>
             </div>
 
             <div class="col-span-6">
@@ -108,7 +102,7 @@
                     <span class="material-symbols-outlined text-[18px]!">badge</span>
                     <span class="flex font-semibold gap-x-1 text-[14px] text-md">Gerente</span>
                 </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.cpf_gerente ?? 'Pendente'}}</p>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.gerente_nome ?? 'Pendente'}}</p>
             </div>
 
             <div class="col-span-6">
@@ -116,7 +110,7 @@
                     <span class="material-symbols-outlined text-[18px]!">contact_mail</span>
                     <span class="flex font-semibold gap-x-1 text-[14px] text-md">Gerente - Email</span>
                 </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">Pendente</p>
+                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.gerente_email ?? 'Pendente'}}</p>
             </div>
             
         </div>

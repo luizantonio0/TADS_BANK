@@ -7,6 +7,8 @@ import { CurrencyPipe } from '@angular/common';
 import { TelefonePipe } from '../../../shared/pipe/telefone.pipe';
 import { ClienteService } from '../../../shared/service/requests/cliente.service';
 import { finalize } from 'rxjs';
+import { LoadingService } from '../../../shared/service/loading.service';
+import { ToastService } from '../../../shared/service/toast/toast';
 
 @Component({
   selector: 'tab-consultar-cliente',
@@ -15,38 +17,30 @@ import { finalize } from 'rxjs';
 })
 export class TabConsultarCliente {
   private clienteService = inject(ClienteService);
-  private cdr = inject(ChangeDetectorRef);
+  private loadingService = inject(LoadingService);
+  private toastService = inject(ToastService);
+  private cdRef = inject(ChangeDetectorRef); 
 
   cpf = "";
   cliente: Cliente | null = null;
-  erro = "";
-  carregando = false;
 
   submit() {
-    if (this.cpf.length !== 11) {
-      this.cliente = null;
-      this.erro = "Informe um CPF válido.";
+    if (this.cpf.length < 11) {
+      this.toastService.success('Informe um CPF válido.');
       return;
     }
 
-    this.carregando = true;
-    this.erro = "";
-    this.cliente = null;
+    this.loadingService.withLoadingObservable(this.clienteService.getCliente(this.cpf)).subscribe({
+      next: (response) => {
+        this.toastService.success('Informações preenchidas com sucesso.');
+        this.cliente = response;
+        this.cdRef.detectChanges();
 
-    this.clienteService.getCliente(this.cpf)
-      .pipe(finalize(() => {
-        this.carregando = false;
-        this.cdr.detectChanges();
-      }))
-      .subscribe({
-      next: (cliente) => {
-        this.cliente = cliente;
-        this.cdr.detectChanges();
       },
-      error: () => {
-        this.erro = "Cliente não encontrado.";
-        this.cdr.detectChanges();
+      error: (error) => {
+        this.toastService.error(error.error?.error || "Algo deu errado");
       },
-    });
+    })
+    
   }
 }

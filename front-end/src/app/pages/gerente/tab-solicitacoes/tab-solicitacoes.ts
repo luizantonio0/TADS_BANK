@@ -40,10 +40,10 @@ export class TabSolicitacoes {
   }
 
   loadClientes(): Promise<Cliente[]> {
-    return firstValueFrom(this.clienteService.getClientesParaAprovar()).catch((httpError) => {
+    return this.loadingService.withLoading(() => firstValueFrom(this.clienteService.getClientesParaAprovar()).catch((httpError) => {
       this.toastService.error(httpError.error?.error || "Algo deu errado");
       throw httpError;
-    });
+    }));
   }
 
   aprovarCliente(cliente: Cliente): Promise<any> {

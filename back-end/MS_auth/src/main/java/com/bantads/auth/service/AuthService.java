@@ -9,7 +9,6 @@ import com.bantads.auth.dto.TokenClaimsDTO;
 import com.bantads.auth.dto.saga.AuthResponseDTO;
 import com.bantads.auth.dto.saga.ClienteDTO;
 import com.bantads.auth.dto.saga.GerenteDTO;
-import com.bantads.auth.dto.saga.GetProfileInputDTO;
 import com.bantads.auth.exception.BadRequestException;
 import com.bantads.auth.exception.HttpException;
 import com.bantads.auth.exception.InternalServerErrorException;
@@ -127,13 +126,12 @@ public class AuthService {
         }
 
         var orchestrationId = UUID.randomUUID();
-        var input = new GetProfileInputDTO(claims.cpf());
 
         OrchestrationCommandDTO command;
         if(claims.profile().equalsIgnoreCase("cliente")) {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", mapper.writeValueAsString(input));
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", claims.cpf());
         } else {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente", mapper.writeValueAsString(input));
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente", claims.cpf());
         }
 
         var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
@@ -202,13 +200,12 @@ public class AuthService {
         }
 
         var orchestrationId = UUID.randomUUID();
-        var input = new GetProfileInputDTO(credentials.get().getCpf());
 
         OrchestrationCommandDTO command;
         if(credentials.get().getProfile().equalsIgnoreCase("cliente")) {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", mapper.writeValueAsString(input));
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", credentials.get().getCpf());
         } else {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente", mapper.writeValueAsString(input));
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente", credentials.get().getCpf());
         }
 
         var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(

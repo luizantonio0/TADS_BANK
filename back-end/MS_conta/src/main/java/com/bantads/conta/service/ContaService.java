@@ -1,13 +1,13 @@
 package com.bantads.conta.service;
 
 import com.bantads.conta.dto.ContaCreateInputDTO;
+import com.bantads.conta.exception.NotFoundException;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.repository.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.history.Revision;
-import org.springframework.data.history.RevisionMetadata;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,6 +38,19 @@ public class ContaService {
                 contaRepository.deleteById(uuid);
         }
 
+    }
+
+    public List<Conta> findMelhoresContas() {
+        return contaRepository.findTop3ByOrderBySaldoDesc();
+    }
+
+    public Conta findByCpf(String cpf) throws NotFoundException {
+        return contaRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Conta não encontrada"));
+    }
+
+
+    public List<Conta> findByCpf(List<String> cpf) {
+        return contaRepository.findByCpfIn(cpf);
     }
 
     public Conta getConta(String numConta) {
