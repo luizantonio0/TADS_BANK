@@ -46,13 +46,13 @@ app.use(async (req, res, next) => {
         const authResp = await fetch(services.auth + "/auth/validate", {
             method: 'POST',
             headers: {
-                'Authorization': authHeader, 
+                'Authorization': authHeader,
             }
         });
         if(authResp.status < 200 || authResp.status >= 300) {
             return res.status(authResp.status).json({ error: "Faça login para continuar." });
         }
-        
+
         claims = await authResp.json();
         if(claims.error) {
             return res.status(authResp.status).json({error: claims.error})
@@ -75,13 +75,7 @@ app.use(async (req, res, next) => {
                     proxyReq.setHeader("X-User-Id", claims.cpf);
                     proxyReq.setHeader("X-User-Profile", claims.profile);
                 }
-                if (req.body && Object.keys(req.body).length) {
-                    const bodyData = JSON.stringify(req.body);
-                    proxyReq.setHeader('Content-Type', 'application/json');
-                    proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-                    proxyReq.write(bodyData);
-                }
-            } 
+            }
         }
     })(req, res, next);
 });
