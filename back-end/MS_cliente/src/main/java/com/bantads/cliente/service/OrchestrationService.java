@@ -535,7 +535,7 @@ public class OrchestrationService {
             }
         } finally {
             if (result != null && result.idOrchestration() != null) {
-                getMelhoresClientesResponses.remove(result.idOrchestration());
+                getClienteResponses.remove(result.idOrchestration());
             }
         }
     }

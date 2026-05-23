@@ -3,8 +3,10 @@ package com.bantads.auth.dto.saga;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record ClienteDTO(
     UUID id,
     String cpf,
