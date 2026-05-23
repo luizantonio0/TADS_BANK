@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgxMaskDirective } from 'ngx-mask';
 import { Cliente } from '../../../shared/models/cliente.model';
@@ -15,14 +15,22 @@ import { ToastService } from '../../../shared/service/toast/toast';
   imports: [NgxMaskDirective, FormsModule, CpfPipe, CurrencyPipe, TelefonePipe],
   templateUrl: './tab-consultar-cliente.html'
 })
-export class TabConsultarCliente {
+export class TabConsultarCliente implements OnInit {
   private clienteService = inject(ClienteService);
   private loadingService = inject(LoadingService);
   private toastService = inject(ToastService);
   private cdRef = inject(ChangeDetectorRef); 
 
+  @Input() cpfInicial: string = '';
   cpf = "";
   cliente: Cliente | null = null;
+
+  ngOnInit(): void {
+    if (this.cpfInicial) {
+      this.cpf = this.cpfInicial;
+      this.submit();
+    }
+  }
 
   submit() {
     if (this.cpf.length < 11) {

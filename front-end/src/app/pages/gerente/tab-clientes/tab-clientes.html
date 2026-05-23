@@ -8,7 +8,7 @@
     </div>
     @if(nomeCliente != '') {
         <div class="w-full bg-yellow-100 text-center border border-yellow-200 rounded-md text-indigo-900 mb-2 py-2">
-            Consulta realizada usando o filtro de pesquisa! <span (click)="onFiltered('')" class="text-blue-500 cursor-pointer underline">Limpar filtros</span> 
+            Consulta realizada usando o filtro de pesquisa! <span (click)="onFiltered('')" class="text-blue-500 cursor-pointer underline">Limpar filtros</span>
         </div>
     }
     <data-grid #gridClientes [columns]="colunas" [supplier]="loadClientes.bind(this)">
@@ -28,7 +28,7 @@
             </td>
             <td>{{ item.limite | currency: 'BRL' }}</td>
             <td class="flex gap-x-2 [&>button]:text-xs! [&>button]:h-auto! ">
-                <button class="my-auto items-center flex justify-center gap-x-0.5">
+                <button class="my-auto items-center flex justify-center gap-x-0.5" (click)="onConsultar(item)">
                     <span class="material-symbols-outlined text-sm!">search</span>
                     Consultar
                 </button>

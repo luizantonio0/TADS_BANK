@@ -209,7 +209,7 @@ public class OrchestrationService {
 
             var senha = new Random().nextInt(9000) + 1000 + "";
 
-            var contaDTO = new ContaCreateInputDTO(dto.cpf(), cliente.get().getSalario());
+            var contaDTO = new ContaCreateInputDTO(dto.cpf(), cliente.get().getCpfGerente(), cliente.get().getSalario());
             var authDTO = new CredentialsCreateInputDTO(cliente.get().getEmail(), dto.cpf(), senha, "CLIENTE");
 
             var request = new OrchestrationRequestDTO(

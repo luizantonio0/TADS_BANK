@@ -99,7 +99,7 @@ public class AuthService {
 
             var dto = (cliente != null) 
                 ? new LogoutResponseDTO(cliente.cpf(), cliente.nome(), cliente.email(), "CLIENTE")
-                : new LogoutResponseDTO(gerente.cpf(), gerente.nome(), gerente.email(), "GERENTE");
+                : new LogoutResponseDTO(gerente.cpf(), gerente.nome(), gerente.email(), gerente.tipo());
 
             completableFuture.complete(dto);
 

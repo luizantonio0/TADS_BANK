@@ -21,6 +21,6 @@ public class SagaGetGerenteStrategy implements SagaCommandStrategy {
         var cpf = cmd.payload();
         var gerente = gerenteService.findByCpf(cpf);
 
-        return GerenteDTO.from(gerente);
+        return GerenteDTO.from(gerente, false);
     }
 }

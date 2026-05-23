@@ -21,6 +21,9 @@ public class Conta {
     @Column(unique = true, nullable = false, length = 11)
     private String cpf;
 
+    @Column(unique = true, nullable = false, length = 11)
+    private String cpfGerente;
+
     @Column(unique = true, nullable = false, length = 10)
     private String conta;
 
@@ -33,12 +36,13 @@ public class Conta {
     @Column(nullable = false)
     private LocalDateTime criacao;
 
-    public Conta(LocalDateTime criacao, BigDecimal limite, BigDecimal saldo, String conta, String cpf) {
+    public Conta(LocalDateTime criacao, BigDecimal limite, BigDecimal saldo, String conta, String cpf, String cpfGerente) {
         this.criacao = criacao;
         this.limite = limite;
         this.saldo = saldo;
         this.conta = conta;
         this.cpf = cpf.replaceAll("[^0-9]", "");
+        this.cpfGerente = cpfGerente.replaceAll("[^0-9]", "");
     }
 
     public Conta() {}
@@ -90,4 +94,13 @@ public class Conta {
     public void setCriacao(LocalDateTime criacao) {
         this.criacao = criacao;
     }
+
+    public String getCpfGerente() {
+        return cpfGerente;
+    }
+
+    public void setCpfGerente(String cpfGerente) {
+        this.cpfGerente = cpfGerente;
+    }
+    
 }

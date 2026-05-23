@@ -29,6 +29,14 @@ public class GerenteController {
         this.orchestrationService = orchestrationService;
     }
 
+    @GetMapping
+    public CompletableFuture<ResponseEntity<Object>> findGerentes(
+        @PathVariable String cpf,
+        @RequestParam(name = "numero", required = false, defaultValue = "") String numero
+    ) throws Exception {
+            return new ResponseEntity<>(GerenteDTO.from(gerenteService.findByCpf(cpf)), HttpStatus.OK);
+    }
+
     @GetMapping("/{cpf}")
     public ResponseEntity<GerenteDTO> findById(@PathVariable String cpf) throws Exception {
             return new ResponseEntity<>(GerenteDTO.from(gerenteService.findByCpf(cpf)), HttpStatus.OK);

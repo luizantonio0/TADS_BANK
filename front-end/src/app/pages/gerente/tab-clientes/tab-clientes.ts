@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { DataGridColumns, DataGridRequest, DataGridResponse } from '../../../shared/models/datagrid.model';
 import { Cliente } from '../../../shared/models/cliente.model';
 import { DataGridComponent } from "../../../components/data-grid/data-grid";
@@ -20,6 +20,7 @@ export class TabClientes {
     filtrando = false;
     nomeCliente = '';
     @ViewChild('gridClientes') dataGrid!: DataGridComponent<any, any>;
+    @Output() consultar = new EventEmitter<string>();
   
     colunas: DataGridColumns[] = [
       { size: 15 , title: 'CPF' },
@@ -43,6 +44,10 @@ export class TabClientes {
       this.nomeCliente = nome;
       this.dataGrid.fetch(false);
       this.toastService.success('Filtros aplicados com sucesso!');
+    }
+    
+    onConsultar(cliente: Cliente) {
+      this.consultar.emit(cliente.cpf);
     }
     
 }

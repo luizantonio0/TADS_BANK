@@ -24,7 +24,6 @@ public class SagaCreateContaStrategy implements SagaCommandStrategy {
     @Override
     public Object handle(OrchestrationCommandDTO cmd) throws Exception {
         try {
-
             ObjectMapper mapper = new ObjectMapper();
             ContaCreateInputDTO dto = mapper.readValue(cmd.payload(), ContaCreateInputDTO.class);
 

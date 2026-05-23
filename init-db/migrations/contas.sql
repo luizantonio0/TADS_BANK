@@ -9,6 +9,7 @@ CREATE TABLE public.tb_conta (
     criacao timestamp(6) NOT NULL,
     conta varchar(10) NOT NULL,
     cpf varchar(11) NOT NULL,
+    cpfGerente varchar(11) NOT NULL,
     CONSTRAINT tb_conta_conta_key UNIQUE (conta),
     CONSTRAINT tb_conta_cpf_key UNIQUE (cpf),
     CONSTRAINT tb_conta_pkey PRIMARY KEY (id)
@@ -26,13 +27,13 @@ CREATE TABLE public.tb_movimentacao (
 ); 
 
 INSERT INTO public.tb_conta 
-(id, conta, cpf, saldo, limite, criacao)
+(id, conta, cpf, cpfGerente, saldo, limite, criacao)
 VALUES 
-(uuid_generate_v4(), '1291', '12912861012', 800.00, 5000.00, NOW()),
-(uuid_generate_v4(), '0950', '09506382000', -10000.00, 10000.00, NOW()),
-(uuid_generate_v4(), '8573', '85733854057', -1000.00, 1500.00, NOW()),
-(uuid_generate_v4(), '5887', '58872160006', 150000.00, 0.00, NOW()),
-(uuid_generate_v4(), '7617', '76179646090', 1500.00, 0.00, NOW());
+(uuid_generate_v4(), '1291', '12912861012', '98574307084', 800.00, 5000.00, NOW()),
+(uuid_generate_v4(), '0950', '09506382000', '64065268052', -10000.00, 10000.00, NOW()),
+(uuid_generate_v4(), '8573', '85733854057', '23862179060', -1000.00, 1500.00, NOW()),
+(uuid_generate_v4(), '5887', '58872160006', '98574307084', 150000.00, 0.00, NOW()),
+(uuid_generate_v4(), '7617', '76179646090', '64065268052', 1500.00, 0.00, NOW());
 
 INSERT INTO public.tb_movimentacao 
 (id, data_hora, tipo, conta_origem, conta_destino, valor)

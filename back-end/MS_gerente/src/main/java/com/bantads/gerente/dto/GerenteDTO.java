@@ -1,10 +1,12 @@
 package com.bantads.gerente.dto;
 
 import com.bantads.gerente.model.Gerente;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.UUID;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record GerenteDTO(
-        UUID id,
         String cpf,
         String nome,
         String email,
@@ -16,15 +18,14 @@ public record GerenteDTO(
         cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
     }
 
-    public static GerenteDTO from(Gerente gerente) {
+    public static GerenteDTO from(Gerente gerente, boolean includeTotalClientes) {
         if (gerente == null) return null;
         return new GerenteDTO(
-                gerente.getId(),
                 gerente.getCpf(),
                 gerente.getNome(),
                 gerente.getEmail(),
                 gerente.getTipo(),
-                gerente.getTotalClientes()
+                includeTotalClientes ? gerente.getTotalClientes() : null
         );
     }
 }

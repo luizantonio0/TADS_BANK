@@ -87,7 +87,7 @@ public class GerenteService {
 
         Gerente gerenteAtualizado = gerente.get();
 
-        gerenteAtualizado.incrementTotalClientes();
+        gerenteAtualizado.decrementTotalClientes();
 
         gerenteRepository.save(gerenteAtualizado);
     }

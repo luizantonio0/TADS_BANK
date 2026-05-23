@@ -36,13 +36,13 @@
                 <tab-solicitacoes></tab-solicitacoes>
             }
             @if(selectedTab == 2) {
-                <tab-clientes></tab-clientes>
+                <tab-clientes (consultar)="irParaConsulta($event)"></tab-clientes>
             }
             @if(selectedTab == 3) {
                 <tab-melhores-clientes></tab-melhores-clientes>
             }
             @if(selectedTab == 4) {
-                <tab-consultar-cliente></tab-consultar-cliente>
+                <tab-consultar-cliente [cpfInicial]="cpfParaConsulta"></tab-consultar-cliente>
             }
         </div>
     </div>

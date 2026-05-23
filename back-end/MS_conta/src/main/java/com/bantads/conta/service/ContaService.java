@@ -79,12 +79,13 @@ public class ContaService {
         var limite = dto.salario().divide(new BigDecimal(2), RoundingMode.UNNECESSARY);
 
         Conta conta = new Conta(
-                LocalDateTime.now(),
-                limite,
-                BigDecimal.ZERO,
-                numConta,
-                dto.cpf()
-                );
+            LocalDateTime.now(),
+            limite,
+            BigDecimal.ZERO,
+            numConta,
+            dto.cpf(),
+            dto.cpfGerente()
+        );
         contaRepository.save(conta);
         return conta;
     }

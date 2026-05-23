@@ -31,6 +31,6 @@ public class SagaCreateGerenteStrategy implements SagaCommandStrategy {
             ger.getId().toString()
         );
 
-        return GerenteDTO.from(ger);
+        return GerenteDTO.from(ger, false);
     }
 }

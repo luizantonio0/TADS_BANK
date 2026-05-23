@@ -3,8 +3,11 @@ import { ModalEditarGerente } from '../modal-editar-gerente/modal-editar-gerente
 import { ModalExcluirGerente } from '../modal-excluir-gerente/modal-excluir-gerente';
 import { ModalAdicionarGerente } from '../modal-adicionar-gerente/modal-adicionar-gerente';
 import { GerenteService } from '../../../shared/service/requests/gerente.service';
-import { GerenteResponse } from '../../../shared/models/gerente.model';
+import { Gerente, GerenteResponse } from '../../../shared/models/gerente.model';
 import { CommonModule } from '@angular/common';
+import { LoadingService } from '../../../shared/service/loading.service';
+import { firstValueFrom } from 'rxjs';
+import { ToastService } from '../../../shared/service/toast/toast';
 
 @Component({
   selector: 'tab-manter-gerentes',
@@ -13,8 +16,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './tab-manter-gerentes.css',
 })
 export class TabManterGerentes implements OnInit {
-
   gerenteService = inject(GerenteService);
+  loadService = inject(LoadingService);
+  toastService = inject(ToastService);
   cdr = inject(ChangeDetectorRef);
   gerentes: GerenteResponse[] = [];
 
@@ -26,16 +30,13 @@ export class TabManterGerentes implements OnInit {
     this.carregarGerentes();
   }
 
-  carregarGerentes() {
-    this.gerenteService.getGerentes().subscribe({
-      next: (dados) => {
-        this.gerentes = dados;
-        this.cdr.detectChanges();
-      },
-      error: (erro) => {
-        console.error('Erro ao carregar gerentes:', erro);
-      }
-    });
+  carregarGerentes(): Promise<GerenteResponse[]> {
+    return this.loadService.withLoading(() =>
+      firstValueFrom(this.gerenteService.getGerentes()).catch((httpError) => {
+        this.toastService.error(httpError.error?.error || 'Algo deu errado');
+        throw httpError;
+      }),
+    );
   }
 
   abrirModalEdicao() {

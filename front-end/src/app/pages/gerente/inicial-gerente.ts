@@ -12,4 +12,10 @@ import { TabConsultarCliente } from './tab-consultar-cliente/tab-consultar-clien
 })
 export class InicialGerente {
   selectedTab = 1;
+  cpfParaConsulta = '';
+
+  irParaConsulta(cpf: string) {
+    this.cpfParaConsulta = cpf;
+    this.selectedTab = 4;
+  }
 }
