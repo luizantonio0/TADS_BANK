@@ -1,7 +1,7 @@
-<modal-depositar-sacar [control]="modalSacarControl" [numeroConta]="currentAccount.numeroConta" tipo="withdraw" (close)="modalSacarControl = false" />
-<modal-depositar-sacar [control]="modalDepositarControl" [numeroConta]="currentAccount.numeroConta" tipo="deposit" (close)="modalDepositarControl = false"/>
-<modal-transferir [control]="modalTransferirControl" [numeroConta]="currentAccount.numeroConta" (close)="modalTransferirControl = false"/>
-<modal-alterar-perfil [control]="modalAlterarPerfilControl" (close)="modalAlterarPerfilControl = false"/>
+<modal-depositar-sacar [control]="modalSacarControl" [numeroConta]="currentAccount.numeroConta" tipo="withdraw" (close)="fecharModalOperacao()" />
+<modal-depositar-sacar [control]="modalDepositarControl" [numeroConta]="currentAccount.numeroConta" tipo="deposit" (close)="fecharModalOperacao()"/>
+<modal-transferir [control]="modalTransferirControl" [numeroConta]="currentAccount.numeroConta" (close)="fecharModalOperacao()"/>
+<modal-alterar-perfil [control]="modalAlterarPerfilControl" [cliente]="cliente" (close)="fecharModalPerfil()"/>
 
 <div class="h-main-screen flex gap-x-4">
   <div class="h-full flex-1 items-center flex flex-col justify-center py-6">
@@ -9,19 +9,26 @@
       <div style="backdrop-font: blur(4px);"
            class="w-full bg-[rgba(255,255,255,0.6)] border border-[#ccc3eb] h-full shadow-md items-center rounded-md flex flex-col justify-center">
         <h1 class="text-lg font-light ml-1 mb-2">Olá, {{ currentAccount.name.split(' ')[0]}}</h1>
-        <h1 class="text-6xl" [class.text-red-600]="currentAccount.balance < 0">
-          {{ currentAccount.balance | currency: 'BRL' }}
-        </h1>
+        @if (clienteCarregado) {
+          <h1 class="text-6xl" [class.text-red-600]="currentAccount.balance < 0">
+            {{ currentAccount.balance | currency: 'BRL' }}
+          </h1>
+        } @else {
+          <h1 class="text-4xl text-gray-400">
+            Carregando saldo
+          </h1>
+        }
+        <p class="text-sm text-gray-500 mt-2">Conta {{ currentAccount.numeroConta || '-' }}</p>
         <div class="grid grid-cols-4 gap-2 mt-2">
-          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalSacarControl = true">
+          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" [disabled]="!currentAccount.numeroConta" (click)="modalSacarControl = true">
             <span class="material-symbols-outlined">arrow_upward</span>
             Sacar
           </button>
-          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalDepositarControl = true">
+          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" [disabled]="!currentAccount.numeroConta" (click)="modalDepositarControl = true">
             <span class="material-symbols-outlined">arrow_downward</span>
             Depositar
           </button>
-          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" (click)="modalTransferirControl = true">
+          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" [disabled]="!currentAccount.numeroConta" (click)="modalTransferirControl = true">
             <span class="material-symbols-outlined">compare_arrows</span>
             Transferir
           </button>

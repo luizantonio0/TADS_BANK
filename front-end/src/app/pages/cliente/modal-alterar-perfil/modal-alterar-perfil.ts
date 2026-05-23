@@ -3,8 +3,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastService } from '../../../shared/service/toast/toast';
 import { Modal } from "../../../components/modal/modal";
 import { NgxMaskDirective } from 'ngx-mask';
-import {ClienteService} from '../../../shared/service/requests/cliente.service';
-import {Cliente} from '../../../shared/models/cliente.model';
+import { ClienteService } from '../../../shared/service/requests/cliente.service';
+import { Cliente } from '../../../shared/models/cliente.model';
 
 @Component({
   selector: 'modal-alterar-perfil',
@@ -17,7 +17,7 @@ export class ModalAlterarPerfil {
   private service = inject(ClienteService);
 
   @Input({ required: true }) control!: boolean;
-  @Input() cliente!: Cliente;
+  @Input() cliente?: Cliente;
   @Output() close = new EventEmitter();
 
   form = this.fb.group({
@@ -32,20 +32,22 @@ export class ModalAlterarPerfil {
   });
 
   submit = () => {
-    //if (this.form.valid) {
-      this.alterarPerfil(this.form.value)
-      this.toastr.success('Alterações salvas com sucesso!');
-      this.onClose();
-    //}
+    if (!this.cliente?.cpf) {
+      this.toastr.error('Nao foi possivel identificar o cliente.');
+      return;
+    }
+
+    this.alterarPerfil(this.form.value);
   };
 
   alterarPerfil(cliente: any) {
-    this.service.alterarCliente(cliente).subscribe({
-      next: (response) => {
-        console.log('Cliente alterado com sucesso', response);
+    this.service.alterarCliente(this.cliente!.cpf, cliente).subscribe({
+      next: () => {
+        this.toastr.success('Alteracoes salvas com sucesso!');
+        this.onClose();
       },
       error: (error) => {
-        console.error('Erro ao alterar cliente', error);
+        this.toastr.error(error.error?.error || 'Erro ao alterar cliente');
       },
     });
   }
