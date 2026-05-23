@@ -45,7 +45,7 @@
                 </span>
             </div>
             @for(item of group.transactions; track item.uuid) {
-            <transaction-feed-item [transaction]="item" [accountNumber]="currentAccount.account_number" />
+            <transaction-feed-item [transaction]="item" [accountNumber]="accountNumber" />
             } @empty {
             <p class="text-sm text-gray-500">Nenhuma transação nesse dia.</p>
             }
