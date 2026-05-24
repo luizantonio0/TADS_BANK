@@ -6,55 +6,69 @@
 <div class="h-main-screen flex gap-x-4">
   <div class="h-full flex-1 items-center flex flex-col justify-center py-6">
     <div class="h-full w-full mb-4">
-      <div style="backdrop-font: blur(4px);"
-           class="w-full bg-[rgba(255,255,255,0.6)] border border-[#ccc3eb] h-full shadow-md items-center rounded-md flex flex-col justify-center">
-        <h1 class="text-lg font-light ml-1 mb-2">Olá, {{ currentAccount.name.split(' ')[0]}}</h1>
+      <div style="backdrop-filter: blur(12px);"
+           class="w-full bg-white/60 border border-white/40 h-full shadow-lg items-center rounded-xl flex flex-col justify-center group/main">
+        
+        <!-- Saudação com efeito de fade-in sutil -->
+        <h1 class="text-xl font-light text-gray-500 mb-2 transition-all duration-700 group-hover/main:text-gray-700">
+          Olá, <span class="font-bold text-gray-800 tracking-tight">{{ currentAccount.name.split(' ')[0]}}</span>
+        </h1>
+
+        <!-- Saldo com Interação de Hover -->
         @if (clienteCarregado) {
-          <h1 class="text-6xl" [class.text-red-600]="currentAccount.balance < 0">
-            {{ currentAccount.balance | currency: 'BRL' }}
-          </h1>
-        } @else {
-          <h1 class="text-4xl text-gray-400">
-            Carregando saldo
-          </h1>
+          <div class="cursor-default transition-all duration-300 hover:scale-105 active:scale-95 flex flex-col items-center">
+            <h1 class="text-6xl font-bold tracking-tighter transition-colors duration-300" 
+                [class.text-red-600]="currentAccount.balance < 0" 
+                [class.text-primary]="currentAccount.balance >= 0"
+                style="text-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+              {{ currentAccount.balance | currency: 'BRL' }}
+            </h1>
+            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] opacity-0 group-hover/main:opacity-100 transition-opacity duration-500">Saldo Disponível</span>
+          </div>
         }
-        <p class="text-sm text-gray-500 mt-2">Conta {{ currentAccount.numeroConta || '-' }}</p>
-        <div class="grid grid-cols-4 gap-2 mt-2">
-          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" [disabled]="!currentAccount.numeroConta" (click)="modalSacarControl = true">
-            <span class="material-symbols-outlined">arrow_upward</span>
+
+        <!-- Badge da Conta com animação de flutuação -->
+        <div class="mt-4 px-4 py-1.5 bg-gray-100/80 border border-gray-200 rounded-full flex items-center gap-x-2 shadow-sm animate-bounce-slow">
+          <span class="material-symbols-outlined text-gray-400 text-xs">lock</span>
+          <p class="text-[10px] font-black text-gray-600 tracking-widest uppercase">Conta {{ currentAccount.numeroConta || '-' }}</p>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-3 mt-10">
+          <button class="h-12 px-6 text-sm font-medium items-center gap-x-2 flex justify-center rounded-lg bg-white border border-gray-200 shadow-sm hover:border-primary/50 hover:text-primary hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95" [disabled]="!currentAccount.numeroConta" (click)="modalSacarControl = true">
+            <span class="material-symbols-outlined text-lg">arrow_upward</span>
             Sacar
           </button>
-          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" [disabled]="!currentAccount.numeroConta" (click)="modalDepositarControl = true">
-            <span class="material-symbols-outlined">arrow_downward</span>
+          <button class="h-12 px-6 text-sm font-medium items-center gap-x-2 flex justify-center rounded-lg bg-white border border-gray-200 shadow-sm hover:border-primary/50 hover:text-primary hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95" [disabled]="!currentAccount.numeroConta" (click)="modalDepositarControl = true">
+            <span class="material-symbols-outlined text-lg">arrow_downward</span>
             Depositar
           </button>
-          <button class="h-12 text-md! items-center gap-x-1 flex justify-center" [disabled]="!currentAccount.numeroConta" (click)="modalTransferirControl = true">
-            <span class="material-symbols-outlined">compare_arrows</span>
+          <button class="h-12 px-6 text-sm font-medium items-center gap-x-2 flex justify-center rounded-lg bg-white border border-gray-200 shadow-sm hover:border-primary/50 hover:text-primary hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95" [disabled]="!currentAccount.numeroConta" (click)="modalTransferirControl = true">
+            <span class="material-symbols-outlined text-lg">compare_arrows</span>
             Transferir
           </button>
-          <button class="h-12 text-md! items-center gap-x-1 flex justify-center w-36" (click)="modalAlterarPerfilControl = true">
-            <span class="material-symbols-outlined">edit</span>
+          <button class="h-12 px-6 text-sm font-medium items-center gap-x-2 flex justify-center rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 hover:shadow-md transition-all active:scale-95 w-40" (click)="modalAlterarPerfilControl = true">
+            <span class="material-symbols-outlined text-lg">edit</span>
             Alterar perfil
           </button>
         </div>
       </div>
     </div>
     <div class="grid grid-cols-2 gap-x-4 w-full">
-      <div class="bg-white w-full rounded-md py-4 shadow-md px-8 items-center border-l-4 border-l-primary border-[#ccc3eb] border">
-        <div class="flex items-center gap-x-2">
-          <span class="material-symbols-outlined text-primary">finance</span>
-          <p class="text-lg text-primary">Seu limite</p>
+      <div class="bg-white/90 w-full rounded-xl py-5 shadow-md px-8 items-center border-l-4 border-l-primary border-white/40 border transition-all hover:shadow-lg hover:-translate-y-1">
+        <div class="flex items-center gap-x-2 mb-1">
+          <span class="material-symbols-outlined text-primary text-xl">finance</span>
+          <p class="text-sm font-bold text-primary uppercase tracking-wide">Seu limite</p>
         </div>
-        <p class="text-2xl ml-0.5">{{ currentAccount.limite | currency: 'BRL' }}</p>
-        <p class="text-xs ml-1 text-gray-400">Quanto maior seu salário, maior seu limite.</p>
+        <p class="text-2xl font-semibold text-gray-800">{{ currentAccount.limite | currency: 'BRL' }}</p>
+        <p class="text-[10px] text-gray-400 mt-1">Limite baseado no seu perfil atual.</p>
       </div>
-      <div class="bg-white w-full rounded-md py-4 shadow-md px-8 items-center border-l-4 border-l-primary border-[#ccc3eb] border">
-        <div class="flex items-center gap-x-2">
-          <span class="material-symbols-outlined text-primary">support_agent</span>
-          <p class="text-lg text-primary">Seu gerente</p>
+      <div class="bg-white/90 w-full rounded-xl py-5 shadow-md px-8 items-center border-l-4 border-l-primary border-white/40 border transition-all hover:shadow-lg hover:-translate-y-1">
+        <div class="flex items-center gap-x-2 mb-1">
+          <span class="material-symbols-outlined text-primary text-xl">support_agent</span>
+          <p class="text-sm font-bold text-primary uppercase tracking-wide">Seu gerente</p>
         </div>
-        <p class="text-2xl ml-0.5">{{ currentAccount.gerente }}</p>
-        <p class="text-xs ml-1 text-gray-400">{{ currentAccount.email }}</p>
+        <p class="text-2xl font-semibold text-gray-800">{{ currentAccount.gerente }}</p>
+        <a [href]="'mailto:' + currentAccount.email" class="text-xs text-blue-500 hover:underline mt-1 block font-medium transition-colors hover:text-primary">{{ currentAccount.email }}</a>
       </div>
     </div>
   </div>
@@ -62,3 +76,6 @@
     <extrato [accountNumber]="currentAccount.numeroConta" [accountName]="currentAccount.name" />
   </div>
 </div>
+
+
+

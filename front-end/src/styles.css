@@ -8,6 +8,13 @@
   --spacing-main-screen: calc(100vh - 64px);
   --background-image-cliente: url('/bg-cliente.png');
   --background-image-login: url('/bg-login.png');
+  
+  --animate-bounce-slow: bounce-slow 3s infinite ease-in-out;
+
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
 }
 
 body {
