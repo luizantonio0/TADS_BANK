@@ -1,6 +1,5 @@
 package com.bantads.gerente.strategy.strategies;
 
-import com.bantads.gerente.dto.saga.DefinirGerenteOutputDTO;
 import com.bantads.gerente.dto.saga.GetGerenteInputDTO;
 import com.bantads.gerente.exception.HttpException;
 import com.bantads.gerente.service.GerenteService;

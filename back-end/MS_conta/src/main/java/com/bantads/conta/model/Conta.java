@@ -21,7 +21,7 @@ public class Conta {
     @Column(unique = true, nullable = false, length = 11)
     private String cpf;
 
-    @Column(unique = true, nullable = false, length = 11)
+    @Column(name = "cpfGerente", unique = true, nullable = false, length = 11)
     private String cpfGerente;
 
     @Column(unique = true, nullable = false, length = 10)

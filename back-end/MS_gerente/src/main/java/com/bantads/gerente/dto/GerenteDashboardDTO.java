@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record GerenteCompletoDTO(
+public record GerenteDashboardDTO(
   GerenteDTO gerente, 
-  List<GerenteClienteDTO> clientes, 
+  List<GerenteClienteDashboardDTO> clientes, 
   @JsonProperty("saldo_positivo") BigDecimal saldoPositivo,
-  @JsonProperty("saldo_positivo") BigDecimal saldoNegativo
+  @JsonProperty("saldo_negativo") BigDecimal saldoNegativo
 ) {}

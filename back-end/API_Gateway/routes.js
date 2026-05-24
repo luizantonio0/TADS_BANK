@@ -16,5 +16,6 @@ export const routes = [
     { method: 'GET', path: '/clientes/:cpf', target: services.clientes, public: false, profiles: 'CLIENTE,GERENTE,ADMINISTRADOR' },
     { method: 'PUT', path: '/clientes/:cpf', target: services.clientes, public: false, profiles: 'CLIENTE' },
 
-    { method: 'POST', path: '/gerente', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
+    { method: 'POST', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
+    { method: 'GET', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' }
 ]

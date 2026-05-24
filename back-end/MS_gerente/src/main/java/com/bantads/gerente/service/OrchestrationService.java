@@ -42,7 +42,7 @@ public class OrchestrationService {
     }
 
     public boolean isGerenteDashboard(UUID id) {
-        return criarGerenteRequests.containsKey(id);
+        return gerenteDashboardRequests.containsKey(id);
     }
 
     private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID, T> orchMap, String... payloads)
@@ -135,16 +135,14 @@ public class OrchestrationService {
         var listaGerentes = repository.findAll().stream().map(c -> c.getCpf()).toList();
 
         var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-conta", "GetContasByGerenteBatch", mapper.writeValueAsString(listaGerentes)),
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetClientesByGerenteBatch", mapper.writeValueAsString(listaGerentes))
+            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-conta", "GetContasByGerentesBatch", mapper.writeValueAsString(listaGerentes)),
+            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetClientesByGerentesBatch", mapper.writeValueAsString(listaGerentes))
         ));
         
         var completable = new CompletableFuture<List<GerenteDashboardDTO>>();
         gerenteDashboardRequests.put(orchestrationId, completable);
         rabbitTemplate.convertAndSend("orchestration.orchestrate", request);
-
         return completable;
-        
     }
 
     public void finishGerenteDashboard(OrchestrationRequestResultDTO result) {
@@ -157,7 +155,7 @@ public class OrchestrationService {
             var contaOutput = mapper.readValue(result.payloads().get("ms-conta"), new TypeReference<Map<String, GetContasByGerentesBatchOutputDTO>>() {});
             var clientesOutput = mapper.readValue(result.payloads().get("ms-cliente"), new TypeReference<Map<String, List<ClienteDTO>>>() {});
 
-            var listaGerentes = repository.findAll();
+            var listaGerentes = repository.findByTipo("GERENTE");
             var response = new ArrayList<GerenteDashboardDTO>();
 
             for (var gerente : listaGerentes) {
@@ -181,8 +179,8 @@ public class OrchestrationService {
                 completableFuture.completeExceptionally(ex);
             }
         } finally {
-            if (result != null && criarGerenteRequests.containsKey(result.idOrchestration())) {
-                criarGerenteRequests.remove(result.idOrchestration());
+            if (result != null && gerenteDashboardRequests.containsKey(result.idOrchestration())) {
+                gerenteDashboardRequests.remove(result.idOrchestration());
             }
         }
     }

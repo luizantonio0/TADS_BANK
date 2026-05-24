@@ -10,6 +10,7 @@ import com.bantads.gerente.exception.NotFoundException;
 import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.service.OrchestrationService;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/gerente")
+@RequestMapping("/gerentes")
 public class GerenteController {
 
     private final GerenteService gerenteService;
@@ -30,16 +31,20 @@ public class GerenteController {
     }
 
     @GetMapping
-    public CompletableFuture<ResponseEntity<Object>> findGerentes(
-        @PathVariable String cpf,
+    public CompletableFuture<ResponseEntity<List<?>>> findGerentes(
         @RequestParam(name = "numero", required = false, defaultValue = "") String numero
     ) throws Exception {
-            return new ResponseEntity<>(GerenteDTO.from(gerenteService.findByCpf(cpf)), HttpStatus.OK);
+        if (numero.equalsIgnoreCase("dashboard")) {
+            return orchestrationService.startGerenteDashboard()
+                .thenApply(list -> ResponseEntity.<List<?>>ok(list))
+                .orTimeout(30, TimeUnit.SECONDS);
+        }
+        return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{cpf}")
     public ResponseEntity<GerenteDTO> findById(@PathVariable String cpf) throws Exception {
-            return new ResponseEntity<>(GerenteDTO.from(gerenteService.findByCpf(cpf)), HttpStatus.OK);
+            return new ResponseEntity<>(GerenteDTO.from(gerenteService.findByCpf(cpf), false), HttpStatus.OK);
     }
 
     @PostMapping

@@ -9,7 +9,7 @@ CREATE TABLE public.tb_conta (
     criacao timestamp(6) NOT NULL,
     conta varchar(10) NOT NULL,
     cpf varchar(11) NOT NULL,
-    cpfGerente varchar(11) NOT NULL,
+    cpf_gerente varchar(11) NOT NULL,
     CONSTRAINT tb_conta_conta_key UNIQUE (conta),
     CONSTRAINT tb_conta_cpf_key UNIQUE (cpf),
     CONSTRAINT tb_conta_pkey PRIMARY KEY (id)
@@ -27,7 +27,7 @@ CREATE TABLE public.tb_movimentacao (
 ); 
 
 INSERT INTO public.tb_conta 
-(id, conta, cpf, cpfGerente, saldo, limite, criacao)
+(id, conta, cpf, cpf_gerente, saldo, limite, criacao)
 VALUES 
 (uuid_generate_v4(), '1291', '12912861012', '98574307084', 800.00, 5000.00, NOW()),
 (uuid_generate_v4(), '0950', '09506382000', '64065268052', -10000.00, 10000.00, NOW()),

@@ -48,6 +48,17 @@ public class ContaService {
         return contaRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Conta não encontrada"));
     }
 
+    public List<Conta> findByGerente(String gerente) {
+        return contaRepository.findByCpfGerente(gerente);
+    }
+
+    public BigDecimal findSumSaldoNegativo(String gerente) {
+        return contaRepository.sumSaldosNegativosByCpfGerente(gerente);
+    }
+
+    public BigDecimal findSumSaldoPositivo(String gerente) {
+        return contaRepository.sumSaldosPositivosByCpfGerente(gerente);
+    }
 
     public List<Conta> findByCpf(List<String> cpf) {
         return contaRepository.findByCpfIn(cpf);

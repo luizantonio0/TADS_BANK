@@ -65,6 +65,10 @@ public class ClienteService {
         return clienteRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Cliente não encontrado!"));
     }
 
+    public List<Cliente> findByGerente(String cpf) {
+        return clienteRepository.findByGerente(cpf, "");
+    }
+
     public List<Cliente> findByCpf(List<String> cpf) {
         return clienteRepository.findByCpfIn(cpf);
     }
