@@ -39,7 +39,10 @@ public class GerenteController {
                 .thenApply(list -> ResponseEntity.<List<?>>ok(list))
                 .orTimeout(30, TimeUnit.SECONDS);
         }
-        return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
+        return CompletableFuture.completedFuture(gerenteService.findGerentes().stream()
+            .map(c -> GerenteDTO.from(c, false))
+            .toList()).thenApply(list -> ResponseEntity.<List<?>>ok(list))
+            .orTimeout(30, TimeUnit.SECONDS);
     }
 
     @GetMapping("/{cpf}")

@@ -58,11 +58,14 @@ public class GerenteService {
         return gerenteRepository.findById(id);
     }
 
-
-    @Transactional
     public void deleteByCpf(String cpf) {
         this.gerenteRepository.deleteByCpf(cpf);
     }
+
+    public List<Gerente> findGerentes() {
+        return this.gerenteRepository.findByTipo("GERENTE");
+    }
+
 
     @Transactional
     public void incrementarCliente(UUID idGerente) {
