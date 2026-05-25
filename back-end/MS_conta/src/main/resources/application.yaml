@@ -26,10 +26,16 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
   datasource:
-    url: jdbc:postgresql://postgres:5432/ms_contas
-    username: admin
-    password: password
-    driver-class-name: org.postgresql.Driver #
+    write:
+      jdbc-url: jdbc:postgresql://postgres:5432/ms_conta_write
+      username: admin
+      password: password
+      driver-class-name: org.postgresql.Driver
+    read:
+      jdbc-url: jdbc:postgresql://postgres:5432/ms_conta_read
+      username: admin
+      password: password
+      driver-class-name: org.postgresql.Driver
 logging:
   level:
     org.hibernate.SQL: DEBUG

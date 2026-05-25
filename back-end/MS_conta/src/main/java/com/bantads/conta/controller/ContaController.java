@@ -1,6 +1,7 @@
 package com.bantads.conta.controller;
 
 import com.bantads.conta.dto.*;
+import com.bantads.conta.exception.HttpException;
 import com.bantads.conta.service.ContaService;
 import com.bantads.conta.service.MovimentacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/contas")
@@ -26,6 +29,28 @@ public class ContaController {
         return new ResponseEntity<>(contaService.createConta(dto), HttpStatus.CREATED);
     }
 
+    @GetMapping
+    public ResponseEntity<List<ContaDTO>> findAll(
+        @RequestParam(name = "filtro", required = false) String filtro,
+        @RequestHeader("X-User-Id") String cpfLogado
+    ) throws Exception {
+        return new ResponseEntity<>(contaService.findAll(filtro, cpfLogado).stream().map(ContaDTO::from).toList(), HttpStatus.OK);
+    }
+
+    @GetMapping("/relation")
+    public ResponseEntity<Map<String, ContaDTO>> findByGerente(
+        @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes
+    ) throws HttpException {
+        return ResponseEntity.ok(contaService.findContasByGerentes(gerentes));
+    }
+
+    @GetMapping("/saldos")
+    public ResponseEntity<Map<String, SaldoGerenteDTO>> findSaldosByGerente(
+        @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes
+    ) throws HttpException {
+        return ResponseEntity.ok(contaService.findSaldosByGerentes(gerentes));
+    }
+
     @PostMapping("/deposito")
     public ResponseEntity<Void> depositar(@RequestBody DepositoDTO dto) {
         movimentacaoService.depositar(dto);
@@ -38,9 +63,13 @@ public class ContaController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/transferencia")
-    public ResponseEntity<Void> transferir(@RequestBody TransferenciaDTO dto) {
-        movimentacaoService.transferir(dto);
+    @PostMapping("/{conta}/transferencia")
+    public ResponseEntity<Void> transferir(
+        @RequestHeader("X-User-Id") String cpfLogado,
+        @PathVariable("conta") String conta, 
+        @RequestBody TransferenciaDTO dto
+    ) throws HttpException {
+        movimentacaoService.transferir(conta, cpfLogado, dto);
         return ResponseEntity.ok().build();
     }
 

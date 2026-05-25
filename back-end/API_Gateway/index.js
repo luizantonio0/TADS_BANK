@@ -1,9 +1,14 @@
-//require('dotenv').config();
-const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const { match } = require('path-to-regexp');
-const { services, routes } = require("./routes")
-const cors = require('cors');
+import express from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import { match } from 'path-to-regexp';
+import { services, routes } from './routes.js';
+import cors from 'cors';
+
+import { handleConsultaClientesGerente } from './compositions/gerenteClientesConsultaComposition.js';
+import { handleGerenteDashboard } from './compositions/gerenteDashboardComposition.js';
+import { handleMelhoresClientes } from './compositions/melhoresClientesComposition.js';
+import { handleClienteComposition } from './compositions/clienteComposition.js';
+
 const app = express();
 const PORT = 3000;
 
@@ -19,21 +24,22 @@ app.use(async (req, res, next) => {
     }
 
     let targetRoute = null;
+    let parsedRoute = null;
 
     for (const route of routes) {
         if(req.method !== route.method) {
             continue;
         }
-        const checker = match(route.path, { decode: decodeURIComponent });
-        const result = checker(req.path);
+        let checker = match(route.path, { decode: decodeURIComponent });
+        parsedRoute = checker(req.path);
 
-        if (result) {
+        if (parsedRoute) {
             targetRoute = route;
             break;
         }
     }
 
-    if (!targetRoute) {
+    if (!targetRoute || !parsedRoute) {
         return res.status(404).json({ error: "Rota não definida" });
     }
 
@@ -60,6 +66,23 @@ app.use(async (req, res, next) => {
         if(targetRoute.profiles !== "*" && !targetRoute.profiles.toUpperCase().split(",").includes(claims.profile.toUpperCase())) {
             return res.status(401).json("Você não tem permissão para performar essa ação.");
         }
+    }
+
+    if(targetRoute.name == "buscarGerentes" && req.query.numero == "dashboard") {
+        return await handleGerenteDashboard(res, claims);
+    }
+
+    if(targetRoute.name == "buscarClientes" && req.query.filtro == "melhores_clientes") {
+        return await handleMelhoresClientes(res, claims);
+    }
+
+    if(targetRoute.name == "buscarClientes" && !req.query.filtro) {
+        return await handleConsultaClientesGerente(res, claims);
+    }
+
+    if(targetRoute.name == "buscarCliente") {
+        let cpf = parsedRoute.params.cpf;
+        return await handleConsultaCliente(res, claims, cpf);
     }
 
     return createProxyMiddleware({

@@ -1,6 +1,5 @@
 package com.bantads.gerente.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +12,9 @@ import com.bantads.gerente.dto.saga.CredentialsUpdateInputDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bantads.gerente.dto.ClienteDTO;
-import com.bantads.gerente.dto.GerenteClienteDashboardDTO;
 import com.bantads.gerente.dto.GerenteDTO;
-import com.bantads.gerente.dto.GerenteDashboardDTO;
 import com.bantads.gerente.dto.request.CriaGerenteDTO;
 import com.bantads.gerente.dto.response.GerenteCriadoDTO;
-import com.bantads.gerente.dto.response.GetContasByGerentesBatchOutputDTO;
 import com.bantads.gerente.dto.saga.CredentialsCreateInputDTO;
 import com.bantads.gerente.exception.HttpException;
 import com.bantads.gerente.exception.InternalServerErrorException;
@@ -27,32 +22,24 @@ import com.bantads.gerente.repository.GerenteRepository;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
 import com.bantads.shared.dto.OrchestrationRequestDTO;
 import com.bantads.shared.dto.OrchestrationRequestResultDTO;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class OrchestrationService {
     
     private final GerenteRepository repository;
-    private final GerenteService service;
     private final RabbitTemplate rabbitTemplate;
 
     private Map<UUID, CompletableFuture<GerenteCriadoDTO>> criarGerenteRequests = new HashMap<>();
     private Map<UUID, CompletableFuture<GerenteAtualizadoDTO>> atualizarGerenteRequests = new HashMap<>();
-    private Map<UUID, CompletableFuture<List<GerenteDashboardDTO>>> gerenteDashboardRequests = new HashMap<>();
 
-    public OrchestrationService(GerenteRepository repository, GerenteService service, RabbitTemplate rabbitTemplate) {
+    public OrchestrationService(GerenteRepository repository, RabbitTemplate rabbitTemplate) {
         this.repository = repository;
-        this.service = service;
         this.rabbitTemplate = rabbitTemplate;
     }
 
     public boolean isCriarCliente(UUID id) {
         return criarGerenteRequests.containsKey(id);
-    }
-
-    public boolean isGerenteDashboard(UUID id) {
-        return gerenteDashboardRequests.containsKey(id);
     }
 
     private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID, T> orchMap, String... payloads)
@@ -172,63 +159,6 @@ public class OrchestrationService {
         } finally {
             if (result != null && criarGerenteRequests.containsKey(result.idOrchestration())) {
                 criarGerenteRequests.remove(result.idOrchestration());
-            }
-        }
-    }
-
-    public CompletableFuture<List<GerenteDashboardDTO>> startGerenteDashboard() throws Exception {
-        var orchestrationId = UUID.randomUUID();
-        var mapper = new ObjectMapper();
-
-        var listaGerentes = repository.findAll().stream().map(c -> c.getCpf()).toList();
-
-        var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-conta", "GetContasByGerentesBatch", mapper.writeValueAsString(listaGerentes)),
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetClientesByGerentesBatch", mapper.writeValueAsString(listaGerentes))
-        ));
-        
-        var completable = new CompletableFuture<List<GerenteDashboardDTO>>();
-        gerenteDashboardRequests.put(orchestrationId, completable);
-        rabbitTemplate.convertAndSend("orchestration.orchestrate", request);
-        return completable;
-    }
-
-    public void finishGerenteDashboard(OrchestrationRequestResultDTO result) {
-        CompletableFuture<List<GerenteDashboardDTO>> completableFuture = null;
-        try {
-            completableFuture = gerenteDashboardRequests.get(result.idOrchestration());
-            prepareResult(result, gerenteDashboardRequests, "ms-conta", "ms-cliente");
-            
-            ObjectMapper mapper = new ObjectMapper();
-            var contaOutput = mapper.readValue(result.payloads().get("ms-conta"), new TypeReference<Map<String, GetContasByGerentesBatchOutputDTO>>() {});
-            var clientesOutput = mapper.readValue(result.payloads().get("ms-cliente"), new TypeReference<Map<String, List<ClienteDTO>>>() {});
-
-            var listaGerentes = repository.findByTipo("GERENTE");
-            var response = new ArrayList<GerenteDashboardDTO>();
-
-            for (var gerente : listaGerentes) {
-                var gerenteDTO = GerenteDTO.from(gerente, false);
-                var contaDTO = contaOutput.get(gerente.getCpf());
-                var clientesDTO = clientesOutput.get(gerente.getCpf());
-
-                var clientes = new ArrayList<GerenteClienteDashboardDTO>();
-
-                for (var cliente : clientesDTO) {
-                    var contaCliente = contaDTO.contas().get(cliente.cpf());
-                    clientes.add(new GerenteClienteDashboardDTO(cliente.cpf(), contaCliente.conta(), contaCliente.saldo(), contaCliente.limite(), gerente.getCpf(), cliente.criacao()));
-                }
-
-                response.add(new GerenteDashboardDTO(gerenteDTO, clientes, contaDTO.saldoPositivo(), contaDTO.saldoNegativo()));
-            }
-
-            completableFuture.complete(response);
-        } catch (Exception ex) {
-            if (completableFuture != null) {
-                completableFuture.completeExceptionally(ex);
-            }
-        } finally {
-            if (result != null && gerenteDashboardRequests.containsKey(result.idOrchestration())) {
-                gerenteDashboardRequests.remove(result.idOrchestration());
             }
         }
     }

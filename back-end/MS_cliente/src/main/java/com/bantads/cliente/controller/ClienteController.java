@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +36,18 @@ public class ClienteController {
         return clienteService.findClientes(cpfLogado, profileLogado, filtro, nome)
             .thenApply(ResponseEntity::ok)
             .orTimeout(30, TimeUnit.SECONDS);
+    }
+
+    @GetMapping("/relation")
+    public ResponseEntity<Map<String, List<ClienteDTO>>> findAll(
+        @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes
+    ) throws HttpException {
+        return ResponseEntity.ok(clienteService.findClientesByGerentes(gerentes));
+    }
+
+    @GetMapping("/gerente/{cpf}")
+    public ResponseEntity<List<ClienteDTO>> findByGerente(@PathVariable("cpf") String cpf) throws HttpException {
+        return ResponseEntity.ok(clienteService.findClientesByGerente(cpf).stream().map(c -> ClienteDTO.from(c)).toList());
     }
 
     @GetMapping("/{cpf}")

@@ -5,7 +5,7 @@
 @theme {
   --color-primary: #562be3;
   --font-sans: "Google Sans", ui-sans-serif, system-ui, sans-serif;
-  --spacing-main-screen: calc(100vh - 64px);
+  --spacing-main-screen: calc(100vh - 80px);
   --background-image-cliente: url('/bg-cliente.png');
   --background-image-login: url('/bg-login.png');
   

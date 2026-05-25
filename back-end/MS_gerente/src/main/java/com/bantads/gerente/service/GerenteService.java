@@ -8,7 +8,6 @@ import com.bantads.gerente.model.Gerente;
 import com.bantads.gerente.repository.GerenteRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
 import com.bantads.gerente.mapper.GerenteMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

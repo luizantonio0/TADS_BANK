@@ -38,9 +38,6 @@ public class OrchestrationConsumer {
         if(orchestrationService.isCriarCliente(dto.idOrchestration())) {
             orchestrationService.finishCriarGerente(dto);
         }
-        if(orchestrationService.isGerenteDashboard(dto.idOrchestration())) {
-            orchestrationService.finishGerenteDashboard(dto);
-        }
     }
 
     @RabbitListener(queues = "ms-gerente.command")

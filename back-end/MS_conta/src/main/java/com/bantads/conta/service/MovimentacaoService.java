@@ -1,6 +1,12 @@
 package com.bantads.conta.service;
 
+import com.bantads.conta.datasource.DataSourceContextHolder;
+import com.bantads.conta.datasource.DataSourceType;
 import com.bantads.conta.dto.*;
+import com.bantads.conta.exception.BadRequestException;
+import com.bantads.conta.exception.ForbiddenException;
+import com.bantads.conta.exception.HttpException;
+import com.bantads.conta.model.Conta;
 import com.bantads.conta.model.Movimentacao;
 import com.bantads.conta.model.TipoMovimentacao;
 import com.bantads.conta.repository.ContaRepository;
@@ -46,8 +52,8 @@ public class MovimentacaoService {
                 .build();
 
         movimentacaoRepository.save(movimentacao);
-        
-        publicarEventoCQRS(dto.numeroConta(), conta.getSaldo(), TipoMovimentacao.DEPOSITO, valor, null);
+        sincronizarMovimentacao(movimentacao);
+        sincronizarConta(conta);
     }
 
     @Transactional
@@ -62,7 +68,6 @@ public class MovimentacaoService {
         }
 
         conta.setSaldo(conta.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
-        contaRepository.save(conta);
 
         var movimentacao = Movimentacao.builder()
                 .dataHora(LocalDateTime.now())
@@ -71,22 +76,33 @@ public class MovimentacaoService {
                 .contaOrigem(dto.numeroConta())
                 .build();
 
-        movimentacaoRepository.save(movimentacao);
+        sincronizarMovimentacao(movimentacao);
+        sincronizarConta(conta);
 
-        publicarEventoCQRS(dto.numeroConta(), conta.getSaldo(), TipoMovimentacao.SAQUE, valor, null);
+        movimentacaoRepository.save(movimentacao);
+        contaRepository.save(conta);
     }
 
     @Transactional
-    public void transferir(TransferenciaDTO dto) {
+    public void transferir(String conta, String cpfLogado, TransferenciaDTO dto) throws HttpException {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
-        var origem = contaRepository.findByConta(dto.numeroContaOrigem())
-                .orElseThrow(() -> new IllegalArgumentException("Conta de origem não encontrada"));
-        var destino = contaRepository.findByConta(dto.numeroContaDestino())
-                .orElseThrow(() -> new IllegalArgumentException("Conta de destino não encontrada"));
+        var origem = contaRepository.findByConta(conta)
+                .orElseThrow(() -> new BadRequestException("Conta de origem não encontrada"));
+
+        if(!origem.getCpf().equals(cpfLogado)) {
+            throw new ForbiddenException("Você não tem permissão para realizar essa operação");
+        }
+            
+        var destino = contaRepository.findByConta(dto.destino())
+                .orElseThrow(() -> new BadRequestException("Conta de destino não encontrada"));
+
+        if(destino.getCpf().equals(origem.getCpf())) {
+            throw new ForbiddenException("Não é permitido transferir para a própria conta");
+        }
 
         BigDecimal saldoDisponivel = origem.getSaldo().add(origem.getLimite());
         if (saldoDisponivel.compareTo(valor) < 0) {
-            throw new IllegalStateException("Saldo insuficiente na conta de origem");
+            throw new BadRequestException("Saldo insuficiente na conta de origem");
         }
 
         origem.setSaldo(origem.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
@@ -99,29 +115,26 @@ public class MovimentacaoService {
                 .dataHora(LocalDateTime.now())
                 .tipo(TipoMovimentacao.TRANSFERENCIA)
                 .valor(valor)
-                .contaOrigem(dto.numeroContaOrigem())
-                .contaDestino(dto.numeroContaDestino())
+                .contaOrigem(conta)
+                .contaDestino(dto.destino())
                 .build();
 
         movimentacaoRepository.save(movimentacao);
 
-        publicarEventoCQRS(dto.numeroContaOrigem(), origem.getSaldo(), TipoMovimentacao.TRANSFERENCIA, valor, dto.numeroContaDestino());
-        publicarEventoCQRS(dto.numeroContaDestino(), destino.getSaldo(), TipoMovimentacao.TRANSFERENCIA, valor, dto.numeroContaOrigem());
+        sincronizarConta(origem);
+        sincronizarConta(destino);
+        sincronizarMovimentacao(movimentacao);
     }
 
-    private void publicarEventoCQRS(String numConta, BigDecimal novoSaldo, TipoMovimentacao tipo, BigDecimal valor, String outraConta) {
-        var evento = new CQRSEventDTO(
-            numConta,
-            novoSaldo,
-            tipo,
-            valor,
-            LocalDateTime.now(),
-            (tipo == TipoMovimentacao.TRANSFERENCIA ? numConta : null),
-            outraConta
-        );
-        rabbitTemplate.convertAndSend("ms-conta.movimentacao.event", evento);
+    protected void sincronizarMovimentacao(Movimentacao movimentacao) {
+        rabbitTemplate.convertAndSend("ms-conta.cqrs.movimentacao", movimentacao);
     }
 
+    protected void sincronizarConta(Conta conta) {
+        rabbitTemplate.convertAndSend("ms-conta.cqrs.conta", conta);
+    }
+
+    @Transactional(readOnly = true)
     public ExtratoResponseDTO getExtrato(String numConta, LocalDate inicio, LocalDate fim) {
         LocalDateTime dataInicio = inicio.atStartOfDay();
         LocalDateTime dataFim = fim.atTime(LocalTime.MAX);
@@ -176,5 +189,10 @@ public class MovimentacaoService {
         }
 
         return new ExtratoResponseDTO(dtos, saldosDiarios);
+    }
+
+    public void sync(Movimentacao conta) {
+        DataSourceContextHolder.setContext(DataSourceType.READER);
+        movimentacaoRepository.save(conta);
     }
 }

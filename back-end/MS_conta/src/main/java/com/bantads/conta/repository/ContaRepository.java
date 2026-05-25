@@ -22,6 +22,7 @@ public interface ContaRepository extends JpaRepository<Conta, UUID>, RevisionRep
     Optional<Conta> findByCpf(String cpf);
     List<Conta> findByCpfIn(List<String> cpf);
     List<Conta> findByCpfGerente(String cpfGerente);
+    List<Conta> findByCpfGerenteIn(List<String> cpfGerente);
     List<Conta> findTop3ByOrderBySaldoDesc();
 
     @Query("SELECT COALESCE(SUM(c.saldo), 0) FROM Conta c WHERE c.cpfGerente = :cpfGerente AND c.saldo < 0")

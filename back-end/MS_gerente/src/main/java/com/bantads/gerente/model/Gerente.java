@@ -118,10 +118,6 @@ public class Gerente {
         this.email = email;
     }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
     public void setTotalClientes(Integer totalClientes) {
         this.totalClientes = totalClientes;
     }

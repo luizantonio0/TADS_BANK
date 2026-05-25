@@ -21,7 +21,6 @@ import com.bantads.cliente.exception.HttpException;
 import com.bantads.cliente.exception.InternalServerErrorException;
 import com.bantads.cliente.exception.NotFoundException;
 import com.bantads.cliente.exception.UnauthorizedException;
-import com.bantads.cliente.model.Cliente;
 import com.bantads.cliente.repository.ClienteRepository;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
 import com.bantads.shared.dto.OrchestrationRequestDTO;
@@ -32,14 +31,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Service
 public class OrchestrationService {
@@ -51,8 +47,6 @@ public class OrchestrationService {
     private RabbitTemplate rabbitTemplate;
     private final Map<UUID, CompletableFuture<AprovarClienteResponseDTO>> aprovarClienteResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<ClienteCreateResponseDTO>> criarClienteResponses = new ConcurrentHashMap<>();
-    private final Map<UUID, CompletableFuture<List<ClienteDTO>>> getClienteGerenteResponses = new ConcurrentHashMap<>();
-    private final Map<UUID, CompletableFuture<List<ClienteDTO>>> getMelhoresClientesResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<ClienteDTO>> getClienteResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Object>> rejeitarClienteResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Object>> atualizarClienteResponses = new ConcurrentHashMap<>();
@@ -71,14 +65,6 @@ public class OrchestrationService {
 
     public boolean isRejeitarClienteSaga(UUID idOrchestration) {
         return rejeitarClienteResponses.containsKey(idOrchestration);
-    }
-
-    public boolean isClienteGerenteResponses(UUID idOrchestration) {
-        return getClienteGerenteResponses.containsKey(idOrchestration);
-    }
-
-    public boolean isMelhoresClientesResponses(UUID idOrchestration) {
-        return getMelhoresClientesResponses.containsKey(idOrchestration);
     }
 
     public boolean isGetClienteResponses(UUID idOrchestration) {
@@ -388,158 +374,6 @@ public class OrchestrationService {
         }
     }
 
-    public CompletableFuture<List<ClienteDTO>> startConsultaClienteGerente(String cpfGerente, String nome) {
-        var idOrchestration = UUID.randomUUID();
-        var clientes = repository.findByGerente(cpfGerente, nome);
-
-        if (clientes.isEmpty())
-            return CompletableFuture.completedFuture(List.of());
-
-        var completable = new CompletableFuture<List<ClienteDTO>>();
-        ObjectMapper mapper = new ObjectMapper();
-        var cpfs = clientes.stream().map(Cliente::getCpf).toList();
-
-        var request = new OrchestrationRequestDTO(
-                idOrchestration,
-                true,
-                List.of(
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-conta",
-                                "GetContaBatch", mapper.writeValueAsString(cpfs)),
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente",
-                                "GetClienteBatch", mapper.writeValueAsString(cpfs))));
-
-        getClienteGerenteResponses.put(idOrchestration, completable);
-        rabbitTemplate.convertAndSend("orchestration.orchestrate", request);
-        return completable;
-    }
-
-    @Transactional
-    public void finishConsultaClientesGerente(OrchestrationRequestResultDTO result) {
-
-        CompletableFuture<List<ClienteDTO>> completableFuture = null;
-
-        try {
-            completableFuture = getClienteGerenteResponses.get(result.idOrchestration());
-            prepareResult(result, getClienteGerenteResponses, "ms-conta", "ms-cliente");
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            var mapCliente = mapper.readValue(result.payloads().get("ms-cliente"),
-                    new TypeReference<Map<String, ClienteDTO>>() {
-                    });
-            var mapConta = mapper.readValue(result.payloads().get("ms-conta"),
-                    new TypeReference<Map<String, ContaDTO>>() {
-                    });
-
-            var clientes = new ArrayList<ClienteDTO>();
-
-            for (var entry : mapCliente.entrySet()) {
-                var cliente = entry.getValue();
-                var conta = mapConta.get(entry.getKey());
-                clientes.add(new ClienteDTO(
-                        cliente.cpf(),
-                        cliente.nome(),
-                        cliente.telefone(),
-                        cliente.email(),
-                        cliente.salario(),
-                        conta == null ? new BigDecimal(0) : conta.saldo(),
-                        conta == null ? new BigDecimal(0) : conta.limite(),
-                        cliente.endereco(),
-                        cliente.cidade(),
-                        cliente.estado(),
-                        true,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null));
-
-            }
-            clientes.sort(Comparator.comparing(ClienteDTO::nome));
-            completableFuture.complete(clientes);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            if (completableFuture != null) {
-                completableFuture.completeExceptionally(ex);
-            }
-        } finally {
-            if (result != null && result.idOrchestration() != null) {
-                getClienteGerenteResponses.remove(result.idOrchestration());
-            }
-        }
-    }
-
-    public CompletableFuture<List<ClienteDTO>> startMelhoresClientes() {
-        var idOrchestration = UUID.randomUUID();
-        var completable = new CompletableFuture<List<ClienteDTO>>();
-        var request = new OrchestrationRequestDTO(
-                idOrchestration,
-                true,
-                List.of(
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-conta",
-                                "GetMelhoresContas", null)));
-
-        getMelhoresClientesResponses.put(idOrchestration, completable);
-        rabbitTemplate.convertAndSend("orchestration.orchestrate", request);
-        return completable;
-    }
-
-    @Transactional
-    public void finishMelhoresClientes(OrchestrationRequestResultDTO result) {
-
-        CompletableFuture<List<ClienteDTO>> completableFuture = null;
-
-        try {
-            completableFuture = getMelhoresClientesResponses.get(result.idOrchestration());
-            prepareResult(result, getMelhoresClientesResponses, "ms-conta");
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            var contasArray = mapper.readValue(result.payloads().get("ms-conta"),
-                    new TypeReference<List<ContaDTO>>() {
-                    });
-
-            var clientes = repository.findByCpfIn(contasArray.stream().map(ContaDTO::cpf).toList())
-                    .stream().collect(Collectors.toMap(c -> c.getCpf(), c->c));
-
-            var clienteList = new ArrayList<ClienteDTO>();
-
-            for (var conta : contasArray) {
-                var cliente = clientes.get(conta.cpf());
-                clienteList.add(
-                    new ClienteDTO(
-                        cliente.getCpf(),
-                        cliente.getNome(),
-                        cliente.getTelefone(),
-                        cliente.getEmail(),
-                        cliente.getSalario(),
-                        conta == null ? new BigDecimal(0) : conta.saldo(),
-                        conta == null ? new BigDecimal(0) : conta.limite(),
-                        cliente.getEndereco(),
-                        cliente.getCidade(),
-                        cliente.getEstado() != null ? cliente.getEstado().name() : null,
-                        true,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null)
-                    );
-
-            }
-            completableFuture.complete(clienteList);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            if (completableFuture != null) {
-                completableFuture.completeExceptionally(ex);
-            }
-        } finally {
-            if (result != null && result.idOrchestration() != null) {
-                getClienteResponses.remove(result.idOrchestration());
-            }
-        }
-    }
-
     public CompletableFuture<ClienteDTO> startGetCliente(String cpf) throws HttpException {
         var idOrchestration = UUID.randomUUID();
         var completable = new CompletableFuture<ClienteDTO>();
@@ -609,7 +443,7 @@ public class OrchestrationService {
             }
         } finally {
             if (result != null && result.idOrchestration() != null) {
-                getMelhoresClientesResponses.remove(result.idOrchestration());
+                getClienteResponses.remove(result.idOrchestration());
             }
         }
     }

@@ -5,8 +5,7 @@
             <thead>
                 <tr>
                     @for (col of columns; track col.title; let first = $first; let last = $last) {
-                    <th [style.width.%]="col.size" class="text-left font-normal text-xs py-2 px-2 bg-[#f2ebff] border-t border-b border-primary"
-                        [ngClass]="first ? 'rounded-l-md border-l' : last ? 'rounded-r-md border-r' : ''">
+                    <th [style.width.%]="col.size" class="text-left text-xs font-bold uppercase py-2 px-2 bg-gray-200 text-gray-600">
                         {{ col.title }}
                     </th>
                     }

@@ -6,7 +6,7 @@ export interface Gerente {
   senha?: string;
 }
 
-export interface GerenteResponse {
+export interface GerenteDashboardResponse {
   gerente: Gerente;
   clientes?: any[];
   saldo_positivo?: number;

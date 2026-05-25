@@ -29,18 +29,8 @@ public class GerenteController {
     }
 
     @GetMapping
-    public CompletableFuture<ResponseEntity<List<?>>> findGerentes(
-        @RequestParam(name = "numero", required = false, defaultValue = "") String numero
-    ) throws Exception {
-        if (numero.equalsIgnoreCase("dashboard")) {
-            return orchestrationService.startGerenteDashboard()
-                .thenApply(list -> ResponseEntity.<List<?>>ok(list))
-                .orTimeout(30, TimeUnit.SECONDS);
-        }
-        return CompletableFuture.completedFuture(gerenteService.findGerentes().stream()
-            .map(c -> GerenteDTO.from(c, false))
-            .toList()).thenApply(list -> ResponseEntity.<List<?>>ok(list))
-            .orTimeout(30, TimeUnit.SECONDS);
+    public ResponseEntity<List<GerenteDTO>> findGerentes() throws Exception {
+        return ResponseEntity.ok(gerenteService.findGerentes().stream().map(c -> GerenteDTO.from(c, false)).toList());
     }
 
     @GetMapping("/{cpf}")

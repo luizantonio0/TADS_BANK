@@ -6,16 +6,18 @@ export const services = {
 };
 
 export const routes = [
-    { method: 'POST', path: '/login', target: services.auth, public: true, profiles: '*' },
-    { method: 'POST', path: '/logout', target: services.auth, public: false, profiles: '*' },
+    { name: "login", method: 'POST', path: '/login', target: services.auth, public: true, profiles: '*' },
+    { name: "logout", method: 'POST', path: '/logout', target: services.auth, public: false, profiles: '*' },
 
-    { method: 'POST', path: '/clientes', target: services.clientes, public: true, profiles: '*' },
-    { method: 'GET',  path: '/clientes', target: services.clientes, public: false, profiles: 'ADMINISTRADOR,GERENTE' },
-    { method: 'POST', path: '/clientes/:cpf/aprovar', target: services.clientes, public: false, profiles: 'GERENTE' },
-    { method: 'POST', path: '/clientes/:cpf/rejeitar', target: services.clientes, public: false, profiles: 'GERENTE' },
-    { method: 'GET', path: '/clientes/:cpf', target: services.clientes, public: false, profiles: 'CLIENTE,GERENTE,ADMINISTRADOR' },
-    { method: 'PUT', path: '/clientes/:cpf', target: services.clientes, public: false, profiles: 'CLIENTE' },
+    { name: "autocadastro", method: 'POST', path: '/clientes', target: services.clientes, public: true, profiles: '*' },
+    { name: "buscarClientes", method: 'GET',  path: '/clientes', target: services.clientes, public: false, profiles: 'ADMINISTRADOR,GERENTE' },
+    { name: "aprovarCliente", method: 'POST', path: '/clientes/:cpf/aprovar', target: services.clientes, public: false, profiles: 'GERENTE' },
+    { name: "rejeitarCliente", method: 'POST', path: '/clientes/:cpf/rejeitar', target: services.clientes, public: false, profiles: 'GERENTE' },
+    { name: "buscarCliente", method: 'GET', path: '/clientes/:cpf', target: services.clientes, public: false, profiles: '*' },
+    { name: "atualizarCliente", method: 'PUT', path: '/clientes/:cpf', target: services.clientes, public: false, profiles: 'CLIENTE' },
 
-    { method: 'POST', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
-    { method: 'GET', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' }
+    { name: "criarGerente", method: 'POST', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
+    { name: "buscarGerentes", method: 'GET', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' }, 
+
+    { name: "buscarContas", method: 'GET', path: '/contas', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR,GERENTE' }
 ]

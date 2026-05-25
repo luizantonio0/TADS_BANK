@@ -13,12 +13,12 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    @for (item of gerentes; track item.gerente.cpf) {
+    @for (item of gerentes; track item.cpf) {
       <div class="border p-4 rounded-lg flex justify-between items-start hover:shadow-sm">
         <div>
-          <p class="font-bold text-lg">{{ item.gerente.nome }}</p>
-          <p class="text-gray-600 text-sm">CPF: {{ item.gerente.cpf }}</p>
-          <p class="text-gray-600 text-sm">E-mail: {{ item.gerente.email }}</p>
+          <p class="font-bold text-lg">{{ item.nome }}</p>
+          <p class="text-gray-600 text-sm">CPF: {{ item.cpf }}</p>
+          <p class="text-gray-600 text-sm">E-mail: {{ item.email }}</p>
         </div>
         <div class="flex gap-2">
           <button (click)="exibirModalEditar = true" class="text-primary hover:bg-primary/10 p-1 rounded" title="Editar">

@@ -17,9 +17,20 @@ public class RabbitConfig {
     public MessageConverter messageConverter() {
         return new JacksonJsonMessageConverter();
     }
+    
     @Bean
     public Queue msContaCommandQueue() {
         return new Queue("ms-conta.command", true);
+    }
+
+    @Bean
+    public Queue cqrsMovimentacao() {
+        return new Queue("ms-conta.cqrs.movimentacao", true);
+    }
+
+    @Bean
+    public Queue cqrsConta() {
+        return new Queue("ms-conta.cqrs.conta", true);
     }
 
     @Bean

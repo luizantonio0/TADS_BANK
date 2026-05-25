@@ -3,26 +3,57 @@
     <span class="material-symbols-outlined">dashboard</span>
     Dashboard de Gerentes
   </h2>
-
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm text-left">
-      <thead class="text-xs uppercase bg-gray-100 text-gray-600">
-        <tr>
-          <th class="px-4 py-3">Gerente</th>
-          <th class="px-4 py-3 text-center">Qtd. Clientes</th>
-          <th class="px-4 py-3 text-right">Saldos Positivos (+)</th>
-          <th class="px-4 py-3 text-right">Saldos Negativos (-)</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr class="border-t hover:bg-gray-50 transition-colors">
-          <td class="px-4 py-3 font-medium">Geniéve</td>
-          <td class="px-4 py-3 text-center">2</td>
-          <td class="px-4 py-3 text-right text-blue-600">R$ 150.800,00</td>
-          <td class="px-4 py-3 text-right text-red-600">R$ 0,00</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="my-8 w-full grid grid-cols-4 text-white text-xl gap-x-2">
+    <div class="w-full p-4 rounded-md space-y-2 bg-indigo shadow-md shadow-gray-300">
+      <p class="text-3xl font-extrabold">{{ gerentes.length }}</p>
+      <div class="flex gap-x-1 items-center">
+        <span class="material-symbols-outlined">business_center</span>
+        <p class="text-lg">Gerentes cadastrados</p>
+      </div>
+    </div>
+    <div class="w-full p-4 space-y-2 rounded-md bg-indigo shadow-md shadow-gray-300">
+      <p class="text-3xl font-extrabold">{{ gerentes.reduce((acc, curr) => acc + (curr.clientes??[]).length, 0) }}</p>
+      <div class="flex gap-x-1 items-center">
+        <span class="material-symbols-outlined">person</span>
+        <p class="text-lg">Clientes cadastrados</p>
+      </div>
+    </div>
+    <div class="w-full p-4 space-y-2 rounded-md bg-green-500 shadow-md shadow-gray-300">
+      <p class="text-3xl font-extrabold">+{{ gerentes.reduce((acc, curr) => acc + curr.saldo_positivo!, 0) | currency: 'BRL'}}</p>
+      <div class="flex gap-x-1 items-center">
+        <span class="material-symbols-outlined">trending_up</span>
+        <p class="text-lg">Saldo positivo total</p>
+      </div>
+    </div>
+    <div class="w-full p-4 space-y-2 rounded-md bg-red-500 shadow-md shadow-gray-300">
+      <p class="text-3xl font-extrabold">{{ gerentes.reduce((acc, curr) => acc + curr.saldo_negativo!, 0) | currency: 'BRL'}}</p>
+      <div class="flex gap-x-1 items-center">
+        <span class="material-symbols-outlined">trending_down</span>
+        <p class="text-lg">Saldo negativo total</p>
+      </div>
+    </div>
   </div>
+  <data-grid [columns]="columns" [supplier]="carregarGerentes.bind(this)">
+    <ng-template #desktopRow let-item>
+      <td>{{ item.gerente.nome }}</td>
+      <td>{{ item.gerente.cpf | cpf }}</td>
+      <td>{{ item.clientes.length }}</td>
+      <td>
+        <div [ngClass]="{
+                        'bg-green-100 border-green-400': item.saldo_positivo > 0,
+                        'bg-red-100 border-red-400': item.saldo_positivo <= 0
+                    }" class="px-2 py-1 rounded-lg w-fit border">
+          {{ item.saldo_positivo | currency: 'BRL'}}
+        </div>
+      </td>
+      <td>
+        <div [ngClass]="{
+                        'bg-green-100 border-green-400': item.saldo_negativo >= 0,
+                        'bg-red-100 border-red-400': item.saldo_negativo < 0
+                    }" class="px-2 py-1 rounded-lg w-fit border">
+          {{ item.saldo_negativo | currency: 'BRL'}}
+        </div>
+      </td>
+    </ng-template>
+  </data-grid>
 </div>

@@ -10,8 +10,7 @@ import { ToastService } from '../../shared/service/toast/toast';
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, RouterModule, ModalConfirmarLogout],
-  templateUrl: './header.html',
-  styleUrls: ['./header.css'],
+  templateUrl: './header.html'
 })
 export class Header {
   @Input() isAdmin: boolean = false;

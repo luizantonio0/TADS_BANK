@@ -23,7 +23,9 @@ import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -33,7 +35,6 @@ public class ClienteService {
     @Autowired private ClienteRepository clienteRepository;
     @Autowired private LogStatusRepository logStatusRepository;
     @Autowired private ClienteMapper mapper;
-    @Autowired private OrchestrationService orchestrationService;
 
     public CompletableFuture<List<ClienteDTO>> findClientes(String cpfLogado, String profileLogado, String filtro, String nome) throws HttpException {
         System.out.println(cpfLogado + " " + profileLogado + " " + filtro);
@@ -50,15 +51,11 @@ public class ClienteService {
             return CompletableFuture.completedFuture(clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, false).stream().map(ClienteDTO::from).toList());
         }
 
-        if(filtro.equalsIgnoreCase("melhores_clientes")) {
-            return orchestrationService.startMelhoresClientes();
-        }
-
         if(isAdmin) {
             return CompletableFuture.completedFuture(clienteRepository.findAll().stream().map(ClienteDTO::from).toList());
         }
 
-        return orchestrationService.startConsultaClienteGerente(cpfLogado, nome);
+        return null;
     }
     
     public Cliente findByCpf(String cpf) throws NotFoundException{
@@ -69,10 +66,21 @@ public class ClienteService {
         return clienteRepository.findByGerente(cpf, "");
     }
 
+    public Map<String, List<ClienteDTO>> findClientesByGerentes(String cpfs) {
+        var cpfsList = cpfs.split(",");
+        var maps = new HashMap<String, List<ClienteDTO>>();
+        for(var cpf : cpfsList)
+            maps.put(cpf, clienteRepository.findByGerente(cpf, "").stream().map(ClienteDTO::from).toList());
+        return maps;
+    }
+
+    public List<Cliente> findClientesByGerente(String cpf) {
+        return clienteRepository.findByGerente(cpf, "");
+    }
+
     public List<Cliente> findByCpf(List<String> cpf) {
         return clienteRepository.findByCpfIn(cpf);
     }
-
 
     public Cliente cadastrarCliente(ClienteRequestDTO dto) throws BadRequestException {
         var cpf = dto.cpf().replaceAll("[^0-9]", "");

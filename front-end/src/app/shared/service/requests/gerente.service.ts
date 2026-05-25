@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment';
 import { Observable } from 'rxjs';
-import { Gerente, GerenteResponse } from '../../models/gerente.model';
+import { Gerente, GerenteDashboardResponse } from '../../models/gerente.model';
 
 @Injectable({
   providedIn: 'root',
@@ -11,12 +11,16 @@ export class GerenteService {
   private API_URL = environment.apiUrl;
   private http = inject(HttpClient);
 
-  getGerentes(): Observable<GerenteResponse[]> {
-    return this.http.get<GerenteResponse[]>(`${this.API_URL}/gerentes`);
+  getGerentes(): Observable<Gerente[]> {
+    return this.http.get<Gerente[]>(`${this.API_URL}/gerentes`);
   }
 
-  getGerente(cpf: string): Observable<GerenteResponse> {
-    return this.http.get<GerenteResponse>(`${this.API_URL}/gerentes/${cpf}`);
+  getGerentesDashboard(): Observable<GerenteDashboardResponse[]> {
+    return this.http.get<GerenteDashboardResponse[]>(`${this.API_URL}/gerentes?numero=dashboard`);
+  }
+
+  getGerente(cpf: string): Observable<Gerente> {
+    return this.http.get<Gerente>(`${this.API_URL}/gerentes/${cpf}`);
   }
 
   cadastrarGerente(gerente: Gerente): Observable<Gerente> {
