@@ -118,7 +118,7 @@ public class GerenteService {
     }
 
     @Transactional
-    public GerenteAtualizadoDTO updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) throws NotFoundException, BadRequestException {
+    public Gerente updateByCpf(String cpf, AtualizaGerenteDTO atualizaGerenteDTO) throws NotFoundException, BadRequestException {
 
         String email = validatorService.emailValidator(atualizaGerenteDTO.email()).
                 orElseThrow(
@@ -133,7 +133,7 @@ public class GerenteService {
 
         gerenteRepository.save(gerente);
 
-        return new GerenteAtualizadoDTO(gerente);
+        return gerente;
     }
 
     public Gerente findByCpf(String cpf) throws NotFoundException {

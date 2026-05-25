@@ -1,10 +1,6 @@
 package com.bantads.gerente.strategy;
 
-import com.bantads.gerente.strategy.strategies.SagaCreateGerenteStrategy;
-import com.bantads.gerente.strategy.strategies.SagaDecrementGerenteStrategy;
-import com.bantads.gerente.strategy.strategies.SagaIncrementGerenteStrategy;
-import com.bantads.gerente.strategy.strategies.SagaGetGerenteStrategy;
-
+import com.bantads.gerente.strategy.strategies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +11,7 @@ public class SagaCommandStrategyFactory {
     @Autowired private SagaDecrementGerenteStrategy decrementClienteStrategy;
     @Autowired private SagaGetGerenteStrategy getGerenteStrategy;
     @Autowired private SagaCreateGerenteStrategy createGerenteStrategy;
+    @Autowired private SagaUpdateGerenteStrategy updateGerenteStrategy;
 
     public SagaCommandStrategy newCommand(String commandType) {
         return switch(commandType) {
@@ -22,6 +19,7 @@ public class SagaCommandStrategyFactory {
             case "DecrementClientesGerente" -> decrementClienteStrategy;
             case "GetGerente" -> getGerenteStrategy;
             case "CreateGerente" -> createGerenteStrategy;
+            case "AtualizarGerente" -> updateGerenteStrategy;
             default -> throw new IllegalStateException("Unexpected value: " + commandType);
         };
     }

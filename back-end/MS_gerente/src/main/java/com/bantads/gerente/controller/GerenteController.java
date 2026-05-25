@@ -5,8 +5,6 @@ import com.bantads.gerente.dto.GerenteDTO;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
 import com.bantads.gerente.dto.response.GerenteCriadoDTO;
-import com.bantads.gerente.exception.BadRequestException;
-import com.bantads.gerente.exception.NotFoundException;
 import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.service.OrchestrationService;
 
@@ -58,8 +56,24 @@ public class GerenteController {
     }
 
     @PutMapping("/{cpf}")
-    public ResponseEntity<GerenteAtualizadoDTO> update(@PathVariable String cpf , @RequestBody AtualizaGerenteDTO atualizaGerenteDTO) throws NotFoundException, BadRequestException{
-        return new ResponseEntity<>(gerenteService.updateByCpf(cpf, atualizaGerenteDTO), HttpStatus.OK);
+    public ResponseEntity<GerenteAtualizadoDTO> update(@PathVariable String cpf , @RequestBody AtualizaGerenteDTO atualizaGerenteDTO) throws Exception {
+        var dto = new AtualizaGerenteDTO(
+                atualizaGerenteDTO.nome(),
+                atualizaGerenteDTO.email(),
+                atualizaGerenteDTO.senha(),
+                atualizaGerenteDTO.telefone(),
+                atualizaGerenteDTO.tipo(),
+                null
+        );
+
+        if (atualizaGerenteDTO.senha() == null) {
+            var gerente = gerenteService.updateByCpf(cpf, dto);
+            return new ResponseEntity<>(new GerenteAtualizadoDTO(gerente), HttpStatus.OK);
+
+        }
+
+        return new ResponseEntity<>(orchestrationService.startAtualizarGerente(cpf, dto).get(), HttpStatus.OK);
+
     }
     
     @DeleteMapping("/{cpf}")

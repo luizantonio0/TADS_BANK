@@ -7,8 +7,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
+import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bantads.gerente.dto.ClienteDTO;
@@ -31,11 +32,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class OrchestrationService {
     
-    @Autowired private GerenteRepository repository;
-    @Autowired private RabbitTemplate rabbitTemplate;
+    private final GerenteRepository repository;
+    private final GerenteService service;
+    private final RabbitTemplate rabbitTemplate;
 
     private Map<UUID, CompletableFuture<GerenteCriadoDTO>> criarGerenteRequests = new HashMap<>();
+    private Map<UUID, CompletableFuture<GerenteAtualizadoDTO>> atualizarGerenteRequests = new HashMap<>();
     private Map<UUID, CompletableFuture<List<GerenteDashboardDTO>>> gerenteDashboardRequests = new HashMap<>();
+
+    public OrchestrationService(GerenteRepository repository, GerenteService service, RabbitTemplate rabbitTemplate) {
+        this.repository = repository;
+        this.service = service;
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
     public boolean isCriarCliente(UUID id) {
         return criarGerenteRequests.containsKey(id);
@@ -67,7 +76,45 @@ public class OrchestrationService {
         }
     }
 
-    
+    public CompletableFuture<GerenteAtualizadoDTO> startAtualizarGerente(String _cpf, AtualizaGerenteDTO _dto) throws Exception{
+        var cpf = _cpf.replaceAll("[^0-9]", "");
+
+        if(!repository.existsByCpf(cpf)) {
+            throw new IllegalArgumentException("Gerente não encontrado!");
+        }
+
+        if(_dto.email() != null && repository.existsByEmail(_dto.email())) {
+            throw new IllegalArgumentException("Gerente com email já cadastrado!");
+        }
+
+        var dto = new AtualizaGerenteDTO(
+                _dto.nome(),
+                _dto.email(),
+                _dto.senha(),
+                _dto.telefone(),
+                _dto.tipo(),
+                cpf
+        );
+
+        var orchestrationId = UUID.randomUUID();
+        var mapper = new ObjectMapper();
+
+        var authDTO = new CredentialsCreateInputDTO(dto.email(), cpf, dto.senha(), dto.tipo().getNome());
+
+        var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
+                new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "UpdateCredentials", mapper.writeValueAsString(authDTO)),
+                new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "AtualizarGerente", mapper.writeValueAsString(dto))
+        ));
+
+        var completable = new CompletableFuture<GerenteAtualizadoDTO>();
+        atualizarGerenteRequests.put(orchestrationId, completable);
+        rabbitTemplate.convertAndSend("orchestration.orchestrate", request);
+
+        return completable;
+    }
+
+
+
     public CompletableFuture<GerenteCriadoDTO> startCriarGerente(CriaGerenteDTO dto) throws Exception {
 
         var cpf = dto.cpf().replaceAll("[^0-9]", "");

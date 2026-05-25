@@ -7,24 +7,29 @@ import com.bantads.auth.service.AuthService;
 import com.bantads.auth.strategy.SagaCommandStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class SagaUpdateCredentialsStrategy implements SagaCommandStrategy {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final PasswordEncoder encoder;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    public SagaUpdateCredentialsStrategy(AuthService authService, RedisTemplate<String, String> redisTemplate, PasswordEncoder encoder) {
+        this.authService = authService;
+        this.redisTemplate = redisTemplate;
+        this.encoder = encoder;
+    }
 
     @Override
     public Object handle(OrchestrationCommandDTO cmd) throws BadRequestException {
         ObjectMapper mapper = new ObjectMapper();
         CredentialsUpdateInputDTO dto = mapper.readValue(cmd.payload(), CredentialsUpdateInputDTO.class);
 
-        var creds = authService.updateCredentials(dto.cpf(), dto.email());
+        var creds = authService.updateCredentials(dto.cpf(), dto.email(), encoder.encode(dto.password()));
         redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", creds.getId());
         return null;
     }
