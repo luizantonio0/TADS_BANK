@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
+import com.bantads.gerente.dto.saga.CredentialsUpdateInputDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -99,7 +100,7 @@ public class OrchestrationService {
         var orchestrationId = UUID.randomUUID();
         var mapper = new ObjectMapper();
 
-        var authDTO = new CredentialsCreateInputDTO(dto.email(), cpf, dto.senha(), dto.tipo().getNome());
+        var authDTO = new CredentialsUpdateInputDTO(cpf, dto.email(), dto.senha());
 
         var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
                 new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "UpdateCredentials", mapper.writeValueAsString(authDTO)),
