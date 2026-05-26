@@ -43,8 +43,6 @@ app.use(async (req, res, next) => {
         return res.status(404).json({ error: "Rota não definida" });
     }
 
-    console.log(targetRoute.name)
-
     let claims;
     if (!targetRoute.public) {
         const authHeader = req.headers['authorization'];

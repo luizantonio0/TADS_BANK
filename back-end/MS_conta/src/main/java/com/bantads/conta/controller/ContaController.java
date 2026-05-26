@@ -31,53 +31,48 @@ public class ContaController {
 
     @GetMapping
     public ResponseEntity<List<ContaDTO>> findAll(
-        @RequestParam(name = "filtro", required = false) String filtro,
-        @RequestHeader("X-User-Id") String cpfLogado
-    ) throws Exception {
-        return new ResponseEntity<>(contaService.findAll(filtro, cpfLogado).stream().map(ContaDTO::from).toList(), HttpStatus.OK);
-    }
-
-    @GetMapping("/cliente/{cpf}")
-    public ResponseEntity<ContaDTO> findByCliente(@PathVariable("cpf") String cpf) throws HttpException {
-        return ResponseEntity.ok(ContaDTO.from(contaService.findByCpf(cpf)));
+            @RequestParam(name = "filtro", required = false) String filtro,
+            @RequestHeader("X-User-Id") String cpfLogado) throws Exception {
+        return new ResponseEntity<>(contaService.findAll(filtro, cpfLogado).stream().map(ContaDTO::from).toList(),
+                HttpStatus.OK);
     }
 
     @GetMapping("/relation")
     public ResponseEntity<Map<String, ContaDTO>> findByGerente(
-        @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes
-    ) throws HttpException {
+            @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes)
+            throws HttpException {
         return ResponseEntity.ok(contaService.findContasByGerentes(gerentes));
     }
 
     @GetMapping("/saldos")
     public ResponseEntity<Map<String, SaldoGerenteDTO>> findSaldosByGerente(
-        @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes
-    ) throws HttpException {
+            @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes)
+            throws HttpException {
         return ResponseEntity.ok(contaService.findSaldosByGerentes(gerentes));
     }
 
     @PostMapping("/{conta}/depositar")
     public ResponseEntity<Void> depositar(
-        @RequestHeader("X-User-Id") String cpfLogado,
-        @PathVariable("conta") String conta,
-        @RequestBody DepositoDTO dto
-    ) throws HttpException {
+            @RequestHeader("X-User-Id") String cpfLogado,
+            @PathVariable("conta") String conta,
+            @RequestBody DepositoDTO dto) throws HttpException {
         movimentacaoService.depositar(conta, cpfLogado, dto);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/saque")
-    public ResponseEntity<Void> sacar(@RequestBody SaqueDTO dto) {
-        movimentacaoService.sacar(dto);
+    @PostMapping("/{conta}/sacar")
+    public ResponseEntity<Void> sacar(
+            @PathVariable("conta") String conta,
+            @RequestBody SaqueDTO dto) {
+        movimentacaoService.sacar(conta, dto);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{conta}/transferir")
+    @PostMapping("/{conta}/transferencia")
     public ResponseEntity<Void> transferir(
-        @RequestHeader("X-User-Id") String cpfLogado,
-        @PathVariable("conta") String conta, 
-        @RequestBody TransferenciaDTO dto
-    ) throws HttpException {
+            @RequestHeader("X-User-Id") String cpfLogado,
+            @PathVariable("conta") String conta,
+            @RequestBody TransferenciaDTO dto) throws HttpException {
         movimentacaoService.transferir(conta, cpfLogado, dto);
         return ResponseEntity.ok().build();
     }
@@ -85,6 +80,11 @@ public class ContaController {
     @GetMapping("/{numConta}")
     public ResponseEntity<Object> getSaldo(@PathVariable String numConta) {
         return ResponseEntity.ok(contaService.getConta(numConta));
+    }
+
+    @GetMapping("/cpf/{cpf}")
+    public ResponseEntity<ContaDTO> getContaByCpf(@PathVariable String cpf) throws HttpException {
+        return ResponseEntity.ok(ContaDTO.from(contaService.findByCpf(cpf)));
     }
 
     @GetMapping("/{numConta}/extrato")

@@ -9,7 +9,6 @@ import com.bantads.conta.exception.HttpException;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.model.Movimentacao;
 import com.bantads.conta.model.TipoMovimentacao;
-import com.bantads.conta.repository.ContaReadRepository;
 import com.bantads.conta.repository.ContaRepository;
 import com.bantads.conta.repository.MovimentacaoRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,15 +26,20 @@ import java.util.*;
 @Service
 public class MovimentacaoService {
 
-    @Autowired private ContaRepository contaRepository;
-    @Autowired private MovimentacaoRepository movimentacaoRepository;
-    @Autowired private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private ContaRepository contaRepository;
+
+    @Autowired
+    private MovimentacaoRepository movimentacaoRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Transactional
     public void depositar(String conta, String cpfLogado, DepositoDTO dto) throws HttpException {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
         var contaDestino = contaRepository.findByConta(conta)
-            .orElseThrow(() -> new BadRequestException("Conta de depósito não encontrada"));
+                .orElseThrow(() -> new BadRequestException("Conta de depósito não encontrada"));
 
         if (!contaDestino.getCpf().equals(cpfLogado)) {
             throw new ForbiddenException("Você não tem permissão para realizar essa operação");
@@ -57,30 +61,30 @@ public class MovimentacaoService {
     }
 
     @Transactional
-    public void sacar(SaqueDTO dto) {
+    public void sacar(String conta, SaqueDTO dto) {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
-        var conta = contaRepository.findByConta(dto.numeroConta())
+        var contaDestino = contaRepository.findByConta(conta)
                 .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
 
-        BigDecimal saldoDisponivel = conta.getSaldo().add(conta.getLimite());
+        BigDecimal saldoDisponivel = contaDestino.getSaldo().add(contaDestino.getLimite());
         if (saldoDisponivel.compareTo(valor) < 0) {
             throw new IllegalStateException("Saldo insuficiente (considerando limite)");
         }
 
-        conta.setSaldo(conta.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
+        contaDestino.setSaldo(contaDestino.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
 
         var movimentacao = Movimentacao.builder()
                 .dataHora(LocalDateTime.now())
                 .tipo(TipoMovimentacao.SAQUE)
                 .valor(valor)
-                .contaOrigem(dto.numeroConta())
+                .contaOrigem(conta)
                 .build();
 
         sincronizarMovimentacao(movimentacao);
-        sincronizarConta(conta);
+        sincronizarConta(contaDestino);
 
         movimentacaoRepository.save(movimentacao);
-        contaRepository.save(conta);
+        contaRepository.save(contaDestino);
     }
 
     @Transactional
@@ -89,14 +93,14 @@ public class MovimentacaoService {
         var origem = contaRepository.findByConta(conta)
                 .orElseThrow(() -> new BadRequestException("Conta de origem não encontrada"));
 
-        if(!origem.getCpf().equals(cpfLogado)) {
+        if (!origem.getCpf().equals(cpfLogado)) {
             throw new ForbiddenException("Você não tem permissão para realizar essa operação");
         }
-            
+
         var destino = contaRepository.findByConta(dto.destino())
                 .orElseThrow(() -> new BadRequestException("Conta de destino não encontrada"));
 
-        if(destino.getCpf().equals(origem.getCpf())) {
+        if (destino.getCpf().equals(origem.getCpf())) {
             throw new ForbiddenException("Não é permitido transferir para a própria conta");
         }
 
@@ -164,26 +168,27 @@ public class MovimentacaoService {
         int indexMov = 0;
 
         while (!dataCorrente.isAfter(fim)) {
-            while (indexMov < periodo.size() && periodo.get(indexMov).getDataHora().toLocalDate().equals(dataCorrente)) {
+            while (indexMov < periodo.size()
+                    && periodo.get(indexMov).getDataHora().toLocalDate().equals(dataCorrente)) {
                 Movimentacao m = periodo.get(indexMov);
                 String cor = "azul";
                 BigDecimal valor = m.getValor();
 
-                if (m.getTipo() == TipoMovimentacao.SAQUE || (m.getTipo() == TipoMovimentacao.TRANSFERENCIA && numConta.equals(m.getContaOrigem()))) {
+                if (m.getTipo() == TipoMovimentacao.SAQUE
+                        || (m.getTipo() == TipoMovimentacao.TRANSFERENCIA && numConta.equals(m.getContaOrigem()))) {
                     cor = "vermelho";
                 }
 
                 dtos.add(new MovimentacaoDTO(
-                    m.getDataHora(),
-                    m.getTipo().name(),
-                    m.getContaOrigem(),
-                    m.getContaDestino(),
-                    valor,
-                    cor
-                ));
+                        m.getDataHora(),
+                        m.getTipo().name(),
+                        m.getContaOrigem(),
+                        m.getContaDestino(),
+                        valor,
+                        cor));
                 indexMov++;
             }
-            
+
             saldosDiarios.put(dataCorrente.toString(), saldoAtual.setScale(2, RoundingMode.HALF_UP));
             dataCorrente = dataCorrente.plusDays(1);
         }

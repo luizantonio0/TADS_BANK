@@ -63,7 +63,7 @@ public class ContaService {
         return contaRepository.findTop3ByOrderBySaldoDesc();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Conta findByCpf(String cpf) throws NotFoundException {
         return contaRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Conta não encontrada"));
     }
@@ -88,7 +88,7 @@ public class ContaService {
         return contaRepository.findByCpfIn(cpf);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Conta getConta(String numConta) {
         return contaRepository.findByConta(numConta)
                 .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
