@@ -24,5 +24,4 @@ export async function handleConsultaClientesGerente(res, claims) {
     }
 
     return res.status(200).json(clientes);
-
 }

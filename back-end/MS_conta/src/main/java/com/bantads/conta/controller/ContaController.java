@@ -37,6 +37,11 @@ public class ContaController {
         return new ResponseEntity<>(contaService.findAll(filtro, cpfLogado).stream().map(ContaDTO::from).toList(), HttpStatus.OK);
     }
 
+    @GetMapping("/cliente/{cpf}")
+    public ResponseEntity<ContaDTO> findByCliente(@PathVariable("cpf") String cpf) throws HttpException {
+        return ResponseEntity.ok(ContaDTO.from(contaService.findByCpf(cpf)));
+    }
+
     @GetMapping("/relation")
     public ResponseEntity<Map<String, ContaDTO>> findByGerente(
         @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes

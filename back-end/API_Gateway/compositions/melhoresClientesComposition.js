@@ -15,7 +15,6 @@ export async function handleMelhoresClientes(res, claims) {
     const contas = await contasResp.json();
 
     let response = []
-    console.log(contas)
 
     for (var conta of contas) {
         const clienteResp = await fetch(services.clientes + `/clientes/${conta.cpf}`, config)
@@ -24,7 +23,6 @@ export async function handleMelhoresClientes(res, claims) {
         
         cliente.saldo = conta.saldo;
         cliente.limite = conta.limite;
-        console.log(conta)
 
         response.push(cliente)
     }

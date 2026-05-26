@@ -1,13 +1,11 @@
 package com.bantads.cliente.service;
 
-import com.bantads.cliente.dto.ClienteDTO;
 import com.bantads.cliente.dto.RejeitarClienteRequestDTO;
 import com.bantads.cliente.dto.http.AlterarDadosClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteDTO;
 import com.bantads.cliente.dto.http.AprovarClienteResponseDTO;
 import com.bantads.cliente.dto.http.ClienteCreateResponseDTO;
 import com.bantads.cliente.dto.http.ClienteRequestDTO;
-import com.bantads.cliente.dto.saga.ContaDTO;
 import com.bantads.cliente.dto.saga.GerenteDTO;
 import com.bantads.cliente.dto.saga.input.AtualizarClienteInputDTO;
 import com.bantads.cliente.dto.saga.input.AtualizarLimiteInputDTO;
@@ -47,7 +45,6 @@ public class OrchestrationService {
     private RabbitTemplate rabbitTemplate;
     private final Map<UUID, CompletableFuture<AprovarClienteResponseDTO>> aprovarClienteResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<ClienteCreateResponseDTO>> criarClienteResponses = new ConcurrentHashMap<>();
-    private final Map<UUID, CompletableFuture<ClienteDTO>> getClienteResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Object>> rejeitarClienteResponses = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Object>> atualizarClienteResponses = new ConcurrentHashMap<>();
 
@@ -65,10 +62,6 @@ public class OrchestrationService {
 
     public boolean isRejeitarClienteSaga(UUID idOrchestration) {
         return rejeitarClienteResponses.containsKey(idOrchestration);
-    }
-
-    public boolean isGetClienteResponses(UUID idOrchestration) {
-        return getClienteResponses.containsKey(idOrchestration);
     }
 
     private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID, T> orchMap, String... payloads)
@@ -370,80 +363,6 @@ public class OrchestrationService {
         } finally {
             if (result != null && result.idOrchestration() != null) {
                 aprovarClienteResponses.remove(result.idOrchestration());
-            }
-        }
-    }
-
-    public CompletableFuture<ClienteDTO> startGetCliente(String cpf) throws HttpException {
-        var idOrchestration = UUID.randomUUID();
-        var completable = new CompletableFuture<ClienteDTO>();
-
-        var cliente = repository.findByCpf(cpf);
-        if (cliente.isEmpty()) {
-            throw new NotFoundException("Cliente não encontrado");
-        }
-
-        if(!cliente.get().isAprovado()) {
-            throw new HttpException(409, "Cliente ainda não foi aprovado");
-        }
-
-        var request = new OrchestrationRequestDTO(
-                idOrchestration,
-                true,
-                List.of(
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-conta", "GetConta", cpf),
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente", "GetCliente", cpf),
-                        new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "GetGerente", cliente.get().getCpfGerente())
-                )
-            );
-
-        getClienteResponses.put(idOrchestration, completable);
-        rabbitTemplate.convertAndSend("orchestration.orchestrate", request);
-        return completable;
-    }
-
-    @Transactional
-    public void finishGetCliente(OrchestrationRequestResultDTO result) {
-
-        CompletableFuture<ClienteDTO> completableFuture = null;
-
-        try {
-            completableFuture = getClienteResponses.get(result.idOrchestration());
-            prepareResult(result, getClienteResponses, "ms-conta", "ms-cliente", "ms-gerente");
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            var conta = mapper.readValue(result.payloads().get("ms-conta"), ContaDTO.class);
-            var gerente = mapper.readValue(result.payloads().get("ms-gerente"), GerenteDTO.class);
-            var cliente = mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class);
-
-            completableFuture.complete(new ClienteDTO(
-                cliente.cpf(),
-                cliente.nome(),
-                cliente.telefone(),
-                cliente.email(),
-                cliente.salario(),
-                conta.saldo(),
-                conta.limite(),
-                cliente.endereco(),
-                cliente.cidade(),
-                cliente.estado(),
-                cliente.aprovado(),
-                cliente.cpfGerente(),
-                gerente.nome(),
-                gerente.email(),
-                conta.conta(),
-                cliente.criacao()
-            ));
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            if (completableFuture != null) {
-                completableFuture.completeExceptionally(ex);
-            }
-        } finally {
-            if (result != null && result.idOrchestration() != null) {
-                getClienteResponses.remove(result.idOrchestration());
             }
         }
     }

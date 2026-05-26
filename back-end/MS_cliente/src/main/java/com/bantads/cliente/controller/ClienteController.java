@@ -50,23 +50,6 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.findClientesByGerente(cpf).stream().map(c -> ClienteDTO.from(c)).toList());
     }
 
-    @GetMapping("/{cpf}")
-    public CompletableFuture<ResponseEntity<ClienteDTO>> findByCpf(
-        @PathVariable("cpf") String cpf,
-        @RequestHeader("X-User-Id") String cpfLogado,
-        @RequestHeader("X-User-Profile") String profileLogado
-    ) throws HttpException {
-        var cpfNormalizado = cpf.replaceAll("[^0-9]", "");
-
-        if (profileLogado.equalsIgnoreCase("CLIENTE") && !cpfNormalizado.equals(cpfLogado)) {
-            throw new com.bantads.cliente.exception.ForbiddenException("Voce nao tem permissao para consultar este cliente.");
-        }
-
-        return orchestrationService.startGetCliente(cpfNormalizado)
-            .thenApply(ResponseEntity::ok)
-            .orTimeout(30, TimeUnit.SECONDS);
-    }
-
     @PostMapping
     public CompletableFuture<ResponseEntity<ClienteCreateResponseDTO>> save(@RequestBody ClienteRequestDTO dto) throws Exception {    
         return orchestrationService.startCriarCliente(dto)

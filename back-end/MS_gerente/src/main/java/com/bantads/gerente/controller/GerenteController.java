@@ -34,7 +34,7 @@ public class GerenteController {
     }
 
     @GetMapping("/{cpf}")
-    public ResponseEntity<GerenteDTO> findById(@PathVariable String cpf) throws Exception {
+    public ResponseEntity<GerenteDTO> findById(@PathVariable("cpf") String cpf) throws Exception {
             return new ResponseEntity<>(GerenteDTO.from(gerenteService.findByCpf(cpf), false), HttpStatus.OK);
     }
 

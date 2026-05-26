@@ -7,7 +7,7 @@ import cors from 'cors';
 import { handleConsultaClientesGerente } from './compositions/gerenteClientesConsultaComposition.js';
 import { handleGerenteDashboard } from './compositions/gerenteDashboardComposition.js';
 import { handleMelhoresClientes } from './compositions/melhoresClientesComposition.js';
-import { handleClienteComposition } from './compositions/clienteComposition.js';
+import { handleConsultaCliente } from './compositions/clienteComposition.js';
 
 const app = express();
 const PORT = 3000;
@@ -42,6 +42,8 @@ app.use(async (req, res, next) => {
     if (!targetRoute || !parsedRoute) {
         return res.status(404).json({ error: "Rota não definida" });
     }
+
+    console.log(targetRoute.name)
 
     let claims;
     if (!targetRoute.public) {
