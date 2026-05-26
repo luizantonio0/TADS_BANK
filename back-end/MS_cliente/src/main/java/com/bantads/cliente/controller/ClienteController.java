@@ -50,6 +50,11 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.findClientesByGerente(cpf).stream().map(c -> ClienteDTO.from(c)).toList());
     }
 
+    @GetMapping("/{cpf}")
+    public ResponseEntity<ClienteDTO> findByCpf(@PathVariable("cpf") String cpf) throws HttpException {
+        return ResponseEntity.ok(ClienteDTO.from(clienteService.findByCpf(cpf.replaceAll("[^0-9]", ""))));
+    }
+
     @PostMapping
     public CompletableFuture<ResponseEntity<ClienteCreateResponseDTO>> save(@RequestBody ClienteRequestDTO dto) throws Exception {    
         return orchestrationService.startCriarCliente(dto)

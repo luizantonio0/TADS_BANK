@@ -13,15 +13,24 @@ export async function handleConsultaCliente(res, claims, cpf) {
     if(claims.profile == "CLIENTE" && cpf != claims.cpf) return res.status(403).json({ error: "Você não tem permissão para isso." });
 
     const clienteResp = await fetch(services.clientes + `/clientes/${cpf}`, config)
-    if (!clienteResp.ok) return res.status(clienteResp.status).json(clienteResp.body);
+    if (!clienteResp.ok) {
+        const error = await clienteResp.json().catch(() => ({ error: "Erro ao buscar cliente" }));
+        return res.status(clienteResp.status).json(error);
+    }
     const cliente = await clienteResp.json();
  
     const contaResp = await fetch(services.contas + `/contas/cliente/${cpf}`, config)
-    if (!contaResp.ok) return res.status(contaResp.status).json(contaResp.body);
+    if (!contaResp.ok) {
+        const error = await contaResp.json().catch(() => ({ error: "Erro ao buscar conta" }));
+        return res.status(contaResp.status).json(error);
+    }
     const conta = (await contaResp.json());
 
     const gerenteResp = await fetch(services.gerentes + `/gerentes/${cliente.gerente}`, config)
-    if (!gerenteResp.ok) return res.status(gerenteResp.status).json(gerenteResp.body);
+    if (!gerenteResp.ok) {
+        const error = await gerenteResp.json().catch(() => ({ error: "Erro ao buscar gerente" }));
+        return res.status(gerenteResp.status).json(error);
+    }
     const gerente = (await gerenteResp.json());
 
     cliente.saldo = conta.saldo;
