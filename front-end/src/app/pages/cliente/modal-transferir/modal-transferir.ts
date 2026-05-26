@@ -31,12 +31,12 @@ export class ModalTransferir {
 
       this.contaService.transferir(this.numeroConta, contaDestino, valor).subscribe({
         next: (res) => {
-          this.toastr.success(`Transferência de R$ ${valor} para a conta ${contaDestino} realizada com sucesso!`);
+          this.toastr.success(`Transferência realizada com sucesso!`);
           this.form.reset();
           this.onClose();
         },
         error: (err) => {
-          this.toastr.error("Erro ao realizar transferencia");
+          this.toastr.error(err.error?.error || 'Algo deu errado');
           console.log(err);
         }
       })

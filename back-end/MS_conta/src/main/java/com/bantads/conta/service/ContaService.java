@@ -8,6 +8,7 @@ import com.bantads.conta.dto.SaldoGerenteDTO;
 import com.bantads.conta.exception.NotFoundException;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.model.Movimentacao;
+import com.bantads.conta.repository.ContaReadRepository;
 import com.bantads.conta.repository.ContaRepository;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -33,6 +34,8 @@ public class ContaService {
 
     @Autowired
     private ContaRepository contaRepository;
+    @Autowired
+    private ContaReadRepository readRepository;
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -150,7 +153,7 @@ public class ContaService {
 
     public void sync(Conta conta) {
         DataSourceContextHolder.setContext(DataSourceType.READER);
-        contaRepository.save(conta);
+        readRepository.save(conta);
     }
 
     protected void sincronizarMovimentacao(Movimentacao movimentacao) {

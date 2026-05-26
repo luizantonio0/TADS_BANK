@@ -68,7 +68,7 @@ public class ContaController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{conta}/transferencia")
+    @PostMapping("/{conta}/transferir")
     public ResponseEntity<Void> transferir(
         @RequestHeader("X-User-Id") String cpfLogado,
         @PathVariable("conta") String conta, 

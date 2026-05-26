@@ -9,6 +9,7 @@ import com.bantads.conta.exception.HttpException;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.model.Movimentacao;
 import com.bantads.conta.model.TipoMovimentacao;
+import com.bantads.conta.repository.ContaReadRepository;
 import com.bantads.conta.repository.ContaRepository;
 import com.bantads.conta.repository.MovimentacaoRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -26,14 +27,9 @@ import java.util.*;
 @Service
 public class MovimentacaoService {
 
-    @Autowired
-    private ContaRepository contaRepository;
-
-    @Autowired
-    private MovimentacaoRepository movimentacaoRepository;
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    @Autowired private ContaRepository contaRepository;
+    @Autowired private MovimentacaoRepository movimentacaoRepository;
+    @Autowired private RabbitTemplate rabbitTemplate;
 
     @Transactional
     public void depositar(DepositoDTO dto) {
