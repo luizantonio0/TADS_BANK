@@ -23,4 +23,4 @@ export const routes = [
     { name: "transferirSaldo", method: 'POST', path: '/contas/:conta/transferir', target: services.contas, public: false, profiles: 'CLIENTE' },
     { name: "depositarSaldo", method: 'POST', path: '/contas/:conta/depositar', target: services.contas, public: false, profiles: 'CLIENTE' },
     { name: "sacarSaldo", method: 'POST', path: '/contas/:conta/sacar', target: services.contas, public: false, profiles: 'CLIENTE' }
-]
+];

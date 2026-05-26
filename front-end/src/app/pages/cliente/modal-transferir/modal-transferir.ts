@@ -24,10 +24,28 @@ export class ModalTransferir {
     amount: ['', [Validators.required]],
   });
 
+  private parseValorMonetario(valor: unknown): number {
+    if (typeof valor === 'number') {
+      return valor;
+    }
+
+    if (typeof valor === 'string') {
+      const normalizado = valor.replace(/\./g, '').replace(',', '.').trim();
+      return Number(normalizado);
+    }
+
+    return Number.NaN;
+  }
+
   submit = () => {
     if (this.form.valid) {
       const contaDestino = this.form.value.account!;
-      const valor = Number(this.form.value.amount);
+      const valor = this.parseValorMonetario(this.form.value.amount);
+
+      if (!Number.isFinite(valor) || valor <= 0) {
+        this.toastr.error('Informe um valor válido para a transferência');
+        return;
+      }
 
       this.contaService.transferir(this.numeroConta, contaDestino, valor).subscribe({
         next: (res) => {

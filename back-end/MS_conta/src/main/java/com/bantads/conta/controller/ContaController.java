@@ -56,9 +56,13 @@ public class ContaController {
         return ResponseEntity.ok(contaService.findSaldosByGerentes(gerentes));
     }
 
-    @PostMapping("/deposito")
-    public ResponseEntity<Void> depositar(@RequestBody DepositoDTO dto) {
-        movimentacaoService.depositar(dto);
+    @PostMapping("/{conta}/depositar")
+    public ResponseEntity<Void> depositar(
+        @RequestHeader("X-User-Id") String cpfLogado,
+        @PathVariable("conta") String conta,
+        @RequestBody DepositoDTO dto
+    ) throws HttpException {
+        movimentacaoService.depositar(conta, cpfLogado, dto);
         return ResponseEntity.ok().build();
     }
 

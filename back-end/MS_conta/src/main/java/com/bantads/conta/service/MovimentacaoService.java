@@ -32,24 +32,28 @@ public class MovimentacaoService {
     @Autowired private RabbitTemplate rabbitTemplate;
 
     @Transactional
-    public void depositar(DepositoDTO dto) {
+    public void depositar(String conta, String cpfLogado, DepositoDTO dto) throws HttpException {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
-        var conta = contaRepository.findByConta(dto.numeroConta())
-                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
+        var contaDestino = contaRepository.findByConta(conta)
+            .orElseThrow(() -> new BadRequestException("Conta de depósito não encontrada"));
 
-        conta.setSaldo(conta.getSaldo().add(valor).setScale(2, RoundingMode.HALF_UP));
-        contaRepository.save(conta);
+        if (!contaDestino.getCpf().equals(cpfLogado)) {
+            throw new ForbiddenException("Você não tem permissão para realizar essa operação");
+        }
+
+        contaDestino.setSaldo(contaDestino.getSaldo().add(valor).setScale(2, RoundingMode.HALF_UP));
+        contaRepository.save(contaDestino);
 
         var movimentacao = Movimentacao.builder()
                 .dataHora(LocalDateTime.now())
                 .tipo(TipoMovimentacao.DEPOSITO)
                 .valor(valor)
-                .contaOrigem(dto.numeroConta())
+                .contaOrigem(conta)
                 .build();
 
         movimentacaoRepository.save(movimentacao);
         sincronizarMovimentacao(movimentacao);
-        sincronizarConta(conta);
+        sincronizarConta(contaDestino);
     }
 
     @Transactional
