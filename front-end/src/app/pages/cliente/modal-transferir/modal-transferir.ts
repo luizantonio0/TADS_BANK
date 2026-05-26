@@ -8,12 +8,12 @@ import { ContaService } from '../../../shared/service/requests/conta.service';
 @Component({
   selector: 'modal-transferir',
   imports: [Modal, ReactiveFormsModule, NgxMaskDirective],
-  templateUrl: './modal-transferir.html'
+  templateUrl: './modal-transferir.html',
 })
 export class ModalTransferir {
   private fb = inject(FormBuilder);
   private toastr = inject(ToastService);
-  private contaService = inject(ContaService)
+  private contaService = inject(ContaService);
 
   @Input({ required: true }) control!: boolean;
   @Input({ required: true }) numeroConta!: string;
@@ -24,24 +24,44 @@ export class ModalTransferir {
     amount: ['', [Validators.required]],
   });
 
+  private parseValorMonetario(valor: unknown): number {
+    if (typeof valor === 'number') {
+      return valor;
+    }
+
+    if (typeof valor === 'string') {
+      const normalizado = valor.replace(/\./g, '').replace(',', '.').trim();
+      return Number(normalizado);
+    }
+
+    return Number.NaN;
+  }
+
   submit = () => {
     if (this.form.valid) {
       const contaDestino = this.form.value.account!;
-      const valor = Number(this.form.value.amount);
+      const valor = this.parseValorMonetario(this.form.value.amount);
+
+      if (!Number.isFinite(valor) || valor <= 0) {
+        this.toastr.error('Informe um valor válido para a transferência');
+        return;
+      }
 
       this.contaService.transferir(this.numeroConta, contaDestino, valor).subscribe({
         next: (res) => {
-          this.toastr.success(`Transferência realizada com sucesso!`);
+          this.toastr.success(
+            `Transferência de R$ ${valor} para a conta ${contaDestino} realizada com sucesso!`,
+          );
           this.form.reset();
           this.onClose();
         },
         error: (err) => {
-          this.toastr.error(err.error?.error || 'Algo deu errado');
+          this.toastr.error('Erro ao realizar transferencia');
           console.log(err);
-        }
-      })
+        },
+      });
     }
-  }
+  };
 
   onClose() {
     this.close.emit();

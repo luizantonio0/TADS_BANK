@@ -35,51 +35,55 @@ public class MovimentacaoService {
     @Autowired private RabbitTemplate rabbitTemplate;
 
     @Transactional
-    public void depositar(DepositoDTO dto) {
+    public void depositar(String conta, String cpfLogado, DepositoDTO dto) throws HttpException {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
-        var conta = contaRepository.findByConta(dto.numeroConta())
-                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
+        var contaDestino = contaRepository.findByConta(conta)
+                .orElseThrow(() -> new BadRequestException("Conta de depósito não encontrada"));
 
-        conta.setSaldo(conta.getSaldo().add(valor).setScale(2, RoundingMode.HALF_UP));
-        contaRepository.save(conta);
+        if (!contaDestino.getCpf().equals(cpfLogado)) {
+            throw new ForbiddenException("Você não tem permissão para realizar essa operação");
+        }
+
+        contaDestino.setSaldo(contaDestino.getSaldo().add(valor).setScale(2, RoundingMode.HALF_UP));
+        contaRepository.save(contaDestino);
 
         var movimentacao = Movimentacao.builder()
                 .dataHora(LocalDateTime.now())
                 .tipo(TipoMovimentacao.DEPOSITO)
                 .valor(valor)
-                .contaOrigem(dto.numeroConta())
+                .contaOrigem(conta)
                 .build();
 
         movimentacaoRepository.save(movimentacao);
         sincronizarMovimentacao(movimentacao);
-        sincronizarConta(conta);
+        sincronizarConta(contaDestino);
     }
 
     @Transactional
-    public void sacar(SaqueDTO dto) {
+    public void sacar(String conta, SaqueDTO dto) {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
-        var conta = contaRepository.findByConta(dto.numeroConta())
+        var contaDestino = contaRepository.findByConta(conta)
                 .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
 
-        BigDecimal saldoDisponivel = conta.getSaldo().add(conta.getLimite());
+        BigDecimal saldoDisponivel = contaDestino.getSaldo().add(contaDestino.getLimite());
         if (saldoDisponivel.compareTo(valor) < 0) {
             throw new IllegalStateException("Saldo insuficiente (considerando limite)");
         }
 
-        conta.setSaldo(conta.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
+        contaDestino.setSaldo(contaDestino.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
 
         var movimentacao = Movimentacao.builder()
                 .dataHora(LocalDateTime.now())
                 .tipo(TipoMovimentacao.SAQUE)
                 .valor(valor)
-                .contaOrigem(dto.numeroConta())
+                .contaOrigem(conta)
                 .build();
 
         movimentacaoRepository.save(movimentacao);
-        contaRepository.save(conta);
+        contaRepository.save(contaDestino);
 
         sincronizarMovimentacao(movimentacao);
-        sincronizarConta(conta);
+        sincronizarConta(contaDestino);
     }
 
     @Transactional
@@ -88,14 +92,14 @@ public class MovimentacaoService {
         var origem = contaRepository.findByConta(conta)
                 .orElseThrow(() -> new BadRequestException("Conta de origem não encontrada"));
 
-        if(!origem.getCpf().equals(cpfLogado)) {
+        if (!origem.getCpf().equals(cpfLogado)) {
             throw new ForbiddenException("Você não tem permissão para realizar essa operação");
         }
-            
+
         var destino = contaRepository.findByConta(dto.destino())
                 .orElseThrow(() -> new BadRequestException("Conta de destino não encontrada"));
 
-        if(destino.getCpf().equals(origem.getCpf())) {
+        if (destino.getCpf().equals(origem.getCpf())) {
             throw new ForbiddenException("Não é permitido transferir para a própria conta");
         }
 
