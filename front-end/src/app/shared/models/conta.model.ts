@@ -5,17 +5,20 @@ export interface ContaResponse {
 }
 
 export interface Movimentacao {
-    data: string,
+    data_hora: string,
     tipo: string,
-    origem: string,
-    destino: string,
+    conta_origem: string,
+    conta_destino: string | null,
     valor: number;
+    nome_origem?: string,
+    nome_destino: string;
 }
 
 export interface ExtratoResponse {
     conta: string,
     saldo: number,
-    movimentacoes: Movimentacao[];
+    movimentacoes: Movimentacao[],
+    saldos_consolidados: Record<string, number>
 }
 
 export interface OperacaoContaResponse {

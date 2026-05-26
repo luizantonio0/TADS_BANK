@@ -15,7 +15,6 @@ import java.util.UUID;
 public class Conta {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(unique = true, nullable = false, length = 11)
@@ -46,6 +45,13 @@ public class Conta {
     }
 
     public Conta() {}
+
+    @PrePersist
+    public void prePersist() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+    }
 
     public UUID getId() {
         return id;
@@ -102,5 +108,5 @@ public class Conta {
     public void setCpfGerente(String cpfGerente) {
         this.cpfGerente = cpfGerente;
     }
-    
+
 }

@@ -1,7 +1,7 @@
 import { services } from "../routes.js";
 
 export async function handleConsultaCliente(res, claims, cpf) {
-    console.log(cpf)
+
     let config = {
         method: 'GET',
         headers: {

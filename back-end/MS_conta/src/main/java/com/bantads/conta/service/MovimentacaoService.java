@@ -3,15 +3,17 @@ package com.bantads.conta.service;
 import com.bantads.conta.datasource.DataSourceContextHolder;
 import com.bantads.conta.datasource.DataSourceType;
 import com.bantads.conta.dto.*;
+import com.bantads.conta.dto.cqrs.CQRSSyncEntity;
 import com.bantads.conta.exception.BadRequestException;
 import com.bantads.conta.exception.ForbiddenException;
 import com.bantads.conta.exception.HttpException;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.model.Movimentacao;
 import com.bantads.conta.model.TipoMovimentacao;
-import com.bantads.conta.repository.ContaReadRepository;
-import com.bantads.conta.repository.ContaRepository;
-import com.bantads.conta.repository.MovimentacaoRepository;
+import com.bantads.conta.repository.read.MovimentacaoReadRepository;
+import com.bantads.conta.repository.write.ContaRepository;
+import com.bantads.conta.repository.write.MovimentacaoRepository;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class MovimentacaoService {
 
     @Autowired private ContaRepository contaRepository;
     @Autowired private MovimentacaoRepository movimentacaoRepository;
+    @Autowired private MovimentacaoReadRepository readRepository;
     @Autowired private RabbitTemplate rabbitTemplate;
 
     @Transactional
@@ -72,11 +75,11 @@ public class MovimentacaoService {
                 .contaOrigem(dto.numeroConta())
                 .build();
 
-        sincronizarMovimentacao(movimentacao);
-        sincronizarConta(conta);
-
         movimentacaoRepository.save(movimentacao);
         contaRepository.save(conta);
+
+        sincronizarMovimentacao(movimentacao);
+        sincronizarConta(conta);
     }
 
     @Transactional
@@ -123,17 +126,38 @@ public class MovimentacaoService {
     }
 
     protected void sincronizarMovimentacao(Movimentacao movimentacao) {
-        rabbitTemplate.convertAndSend("ms-conta.cqrs.movimentacao", movimentacao);
+        var dto = CQRSSyncEntity.MovimentacaoDTO.from(movimentacao);
+        rabbitTemplate.convertAndSend("ms-conta.cqrs.movimentacao", dto);
     }
 
     protected void sincronizarConta(Conta conta) {
-        rabbitTemplate.convertAndSend("ms-conta.cqrs.conta", conta);
+        var dto = CQRSSyncEntity.ContaDTO.from(conta);
+        rabbitTemplate.convertAndSend("ms-conta.cqrs.conta", dto);
     }
 
     @Transactional(readOnly = true)
-    public ExtratoResponseDTO getExtrato(String numConta, LocalDate inicio, LocalDate fim) {
-        LocalDateTime dataInicio = inicio.atStartOfDay();
-        LocalDateTime dataFim = fim.atTime(LocalTime.MAX);
+    public ExtratoResponseDTO getExtrato(String numConta, LocalDate inicio, LocalDate fim) throws BadRequestException {
+
+        var primeiraMovimentacaoOpt = movimentacaoRepository.findFirstByContaOrigemOrContaDestinoOrderByDataHoraAsc(numConta, numConta);
+        var ultimaMovimentacaoOpt = movimentacaoRepository.findFirstByContaOrigemOrContaDestinoOrderByDataHoraDesc(numConta, numConta);
+
+        Optional<Conta> contaOpt = contaRepository.findByConta(numConta);
+        if(contaOpt.isEmpty()) {
+            throw new BadRequestException("Conta não encontrada");
+        }
+
+        if (primeiraMovimentacaoOpt.isEmpty()) {
+            return new ExtratoResponseDTO(numConta, BigDecimal.ZERO, List.of(), Map.of());
+        }
+
+        var primeiraMovimentacao = primeiraMovimentacaoOpt.get();
+        var ultimaMovimentacao = ultimaMovimentacaoOpt.get();
+        var conta = contaOpt.get();
+
+        LocalDateTime dataInicio = inicio.isBefore(primeiraMovimentacao.getDataHora().toLocalDate()) 
+            ? primeiraMovimentacao.getDataHora().toLocalDate().atStartOfDay() : inicio.atStartOfDay();
+        LocalDateTime dataFim = fim.isAfter(ultimaMovimentacao.getDataHora().toLocalDate()) 
+            ? ultimaMovimentacao.getDataHora().toLocalDate().atTime(LocalTime.MAX) : fim.atTime(LocalTime.MAX);
 
         List<Movimentacao> anteriores = movimentacaoRepository.findByContaBefore(numConta, dataInicio);
         BigDecimal saldoAtual = BigDecimal.ZERO;
@@ -156,17 +180,24 @@ public class MovimentacaoService {
         List<MovimentacaoDTO> dtos = new ArrayList<>();
         Map<String, BigDecimal> saldosDiarios = new LinkedHashMap<>();
 
-        LocalDate dataCorrente = inicio;
+        LocalDate dataCorrente = dataInicio.toLocalDate();
         int indexMov = 0;
 
-        while (!dataCorrente.isAfter(fim)) {
+        while (!dataCorrente.isAfter(dataFim.toLocalDate())) {
             while (indexMov < periodo.size() && periodo.get(indexMov).getDataHora().toLocalDate().equals(dataCorrente)) {
                 Movimentacao m = periodo.get(indexMov);
-                String cor = "azul";
                 BigDecimal valor = m.getValor();
 
-                if (m.getTipo() == TipoMovimentacao.SAQUE || (m.getTipo() == TipoMovimentacao.TRANSFERENCIA && numConta.equals(m.getContaOrigem()))) {
-                    cor = "vermelho";
+                if (m.getTipo() == TipoMovimentacao.SAQUE) {
+                    saldoAtual = saldoAtual.subtract(valor);
+                } else if (m.getTipo() == TipoMovimentacao.DEPOSITO) {
+                    saldoAtual = saldoAtual.add(valor);
+                } else if (m.getTipo() == TipoMovimentacao.TRANSFERENCIA) {
+                    if (numConta.equals(m.getContaOrigem())) {
+                        saldoAtual = saldoAtual.subtract(valor);
+                    } else {
+                        saldoAtual = saldoAtual.add(valor);
+                    }
                 }
 
                 dtos.add(new MovimentacaoDTO(
@@ -174,21 +205,26 @@ public class MovimentacaoService {
                     m.getTipo().name(),
                     m.getContaOrigem(),
                     m.getContaDestino(),
-                    valor,
-                    cor
+                    valor
                 ));
                 indexMov++;
             }
-            
             saldosDiarios.put(dataCorrente.toString(), saldoAtual.setScale(2, RoundingMode.HALF_UP));
             dataCorrente = dataCorrente.plusDays(1);
         }
 
-        return new ExtratoResponseDTO(dtos, saldosDiarios);
+        return new ExtratoResponseDTO(conta.getConta(), conta.getSaldo(), dtos, saldosDiarios);
     }
 
-    public void sync(Movimentacao conta) {
+    public void sync(CQRSSyncEntity.MovimentacaoDTO m) {
         DataSourceContextHolder.setContext(DataSourceType.READER);
-        movimentacaoRepository.save(conta);
+        Movimentacao c = new Movimentacao();
+        c.setContaDestino(m.contaDestino());
+        c.setContaOrigem(m.contaOrigem());
+        c.setDataHora(m.dataHora());
+        c.setId(m.id());
+        c.setTipo(TipoMovimentacao.valueOf(m.tipo()));
+        c.setValor(m.valor());
+        readRepository.save(c);
     }
 }

@@ -70,9 +70,8 @@
     </div>
   </div>
   <div class="py-6 w-150">
-    <extrato [accountNumber]="currentAccount.numeroConta" [accountName]="currentAccount.name" />
+    @if (currentAccount.numeroConta) {
+      <extrato [accountNumber]="currentAccount.numeroConta" [accountName]="currentAccount.name" />
+    }
   </div>
 </div>
-
-
-

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { Transaction } from '../../../shared/models/transaction.model';
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { Movimentacao } from '../../../shared/models/conta.model';
 
 @Component({
   selector: 'transaction-feed-item',
@@ -9,5 +9,5 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 })
 export class TransactionFeedItem {
   @Input() accountNumber!: string;
-  @Input({ required: true }) transaction!: Transaction;
+  @Input({ required: true }) transaction!: Movimentacao;
 }

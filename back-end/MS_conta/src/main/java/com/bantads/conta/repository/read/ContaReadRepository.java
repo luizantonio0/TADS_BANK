@@ -1,4 +1,4 @@
-package com.bantads.conta.repository;
+package com.bantads.conta.repository.read;
 
 import java.util.UUID;
 

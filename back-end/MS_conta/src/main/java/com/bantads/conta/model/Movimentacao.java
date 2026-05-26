@@ -19,7 +19,6 @@ import java.util.UUID;
 public class Movimentacao {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
@@ -37,5 +36,12 @@ public class Movimentacao {
 
     @Column(length = 10)
     private String contaDestino;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+    }
 
 }

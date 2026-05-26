@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment';
 import { Observable } from 'rxjs';
-import { ContaResponse, OperacaoContaResponse } from '../../models/conta.model';
+import { ContaResponse, ExtratoResponse, OperacaoContaResponse } from '../../models/conta.model';
 
 
 @Injectable({
@@ -31,6 +31,10 @@ export class ContaService {
       `${this.API_URL}/contas/${origem}/transferir`,
       {destino, valor}
     );
+  }
+
+  extrato(numeroConta: string, de: string, ate: string): Observable<ExtratoResponse> {
+    return this.http.get<ExtratoResponse>(`${this.API_URL}/contas/${numeroConta}/extrato?include=all${de ? `&inicio=${de}` : ''}${ate ? `&fim=${ate}` : ''}`);
   }
 
 }

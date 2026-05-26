@@ -22,7 +22,7 @@ body {
 }
 
 label {
-  @apply block mb-0.5 text-gray-500 leading-tight font-sans text-xs;
+  @apply block mb-0.5 text-gray-500 leading-tight font-sans text-sm font-semibold;
 }
 
 input {

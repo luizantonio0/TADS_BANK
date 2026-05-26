@@ -32,9 +32,10 @@ public class ContaController {
     @GetMapping
     public ResponseEntity<List<ContaDTO>> findAll(
         @RequestParam(name = "filtro", required = false) String filtro,
+        @RequestParam(name = "contas", required = false) String contas,
         @RequestHeader("X-User-Id") String cpfLogado
     ) throws Exception {
-        return new ResponseEntity<>(contaService.findAll(filtro, cpfLogado).stream().map(ContaDTO::from).toList(), HttpStatus.OK);
+        return new ResponseEntity<>(contaService.findAll(filtro, cpfLogado, contas).stream().map(ContaDTO::from).toList(), HttpStatus.OK);
     }
 
     @GetMapping("/cliente/{cpf}")
@@ -86,8 +87,8 @@ public class ContaController {
     @GetMapping("/{numConta}/extrato")
     public ResponseEntity<ExtratoResponseDTO> getExtrato(
             @PathVariable String numConta,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+            @RequestParam(name = "inicio", required = false, defaultValue = "1971-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(name = "fim", required = false, defaultValue = "2100-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) throws HttpException{
         return ResponseEntity.ok(movimentacaoService.getExtrato(numConta, inicio, fim));
     }
 

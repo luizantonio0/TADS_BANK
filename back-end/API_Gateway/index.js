@@ -8,6 +8,7 @@ import { handleConsultaClientesGerente } from './compositions/gerenteClientesCon
 import { handleGerenteDashboard } from './compositions/gerenteDashboardComposition.js';
 import { handleMelhoresClientes } from './compositions/melhoresClientesComposition.js';
 import { handleConsultaCliente } from './compositions/clienteComposition.js';
+import { handleExtratoFull } from './compositions/extratoComposition.js';
 
 const app = express();
 const PORT = 3000;
@@ -82,9 +83,14 @@ app.use(async (req, res, next) => {
         return await handleConsultaClientesGerente(res, claims);
     }
 
-    if(targetRoute.name == "buscarCliente") {
+    if(targetRoute.name == "buscarCliente" && !req.query.include) {
         let cpf = parsedRoute.params.cpf;
         return await handleConsultaCliente(res, claims, cpf);
+    }
+
+    if(targetRoute.name == "extrato" && req.query.include == "all") {
+        let conta = parsedRoute.params.conta;
+        return await handleExtratoFull(res, claims, conta);
     }
 
     return createProxyMiddleware({

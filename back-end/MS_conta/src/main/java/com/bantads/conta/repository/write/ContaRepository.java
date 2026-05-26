@@ -1,4 +1,4 @@
-package com.bantads.conta.repository;
+package com.bantads.conta.repository.write;
 
 import com.bantads.conta.model.Conta;
 
@@ -21,6 +21,7 @@ public interface ContaRepository extends JpaRepository<Conta, UUID>, RevisionRep
     Optional<Conta> findByConta(String conta);
     Optional<Conta> findByCpf(String cpf);
     List<Conta> findByCpfIn(List<String> cpf);
+    List<Conta> findByContaIn(List<String> contas);
     List<Conta> findByCpfGerente(String cpfGerente);
     List<Conta> findByCpfGerenteIn(List<String> cpfGerente);
     List<Conta> findTop3ByOrderBySaldoDesc();

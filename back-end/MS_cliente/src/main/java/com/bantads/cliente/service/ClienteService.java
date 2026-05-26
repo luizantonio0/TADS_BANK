@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class ClienteService {
@@ -36,7 +36,7 @@ public class ClienteService {
     @Autowired private LogStatusRepository logStatusRepository;
     @Autowired private ClienteMapper mapper;
 
-    public CompletableFuture<List<ClienteDTO>> findClientes(String cpfLogado, String profileLogado, String filtro, String nome) throws HttpException {
+    public List<Cliente> findClientes(String cpfLogado, String profileLogado, String filtro, String nome) throws HttpException {
         System.out.println(cpfLogado + " " + profileLogado + " " + filtro);
 
         var isGerente = profileLogado.equalsIgnoreCase("GERENTE");
@@ -48,15 +48,19 @@ public class ClienteService {
 
         if(filtro.equals("para_aprovar")) {
             if(!isGerente) throw new ForbiddenException("Você não tem permissão para efetuar esta operação");
-            return CompletableFuture.completedFuture(clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, false).stream().map(ClienteDTO::from).toList());
+            return clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, false);
         }
 
         if(isAdmin) {
-            return CompletableFuture.completedFuture(clienteRepository.findAll().stream().map(ClienteDTO::from).toList());
+            return clienteRepository.findAll();
         }
 
         return null;
     }
+
+    public Map<String, String> findNomesByCpf(List<String> cpfs) {
+        return clienteRepository.findByCpfIn(cpfs).stream().collect(Collectors.toMap(c->c.getCpf(), c->c.getNome()));
+    } 
     
     public Cliente findByCpf(String cpf) throws NotFoundException{
         return clienteRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Cliente não encontrado!"));

@@ -1,20 +1,7 @@
-export interface Transaction {
-    uuid: string
-    origin?: {
-        account_number: string
-        account_name: string
-    },
-    destination?: {
-        account_number: string
-        account_name: string
-    }
-    type: 'withdraw' | 'deposit' | 'transfer'
-    amount: number
-    date: string
-}
+import { Movimentacao } from "./conta.model"
 
-export interface TransactionGroup {
-    day: string
-    balance: number
-    transactions: Transaction[]
+export interface GrupoMovimentacao {
+    dia: string
+    saldo: number
+    movimentacoes: Movimentacao[]
 }

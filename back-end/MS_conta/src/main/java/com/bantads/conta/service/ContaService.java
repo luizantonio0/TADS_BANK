@@ -5,11 +5,12 @@ import com.bantads.conta.datasource.DataSourceType;
 import com.bantads.conta.dto.ContaCreateInputDTO;
 import com.bantads.conta.dto.ContaDTO;
 import com.bantads.conta.dto.SaldoGerenteDTO;
+import com.bantads.conta.dto.cqrs.CQRSSyncEntity;
 import com.bantads.conta.exception.NotFoundException;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.model.Movimentacao;
-import com.bantads.conta.repository.ContaReadRepository;
-import com.bantads.conta.repository.ContaRepository;
+import com.bantads.conta.repository.read.ContaReadRepository;
+import com.bantads.conta.repository.write.ContaRepository;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,16 +91,29 @@ public class ContaService {
     }
 
     @Transactional(readOnly = true)
+    public List<Conta> findByContaNum(List<String> contas) {
+        return contaRepository.findByCpfIn(contas);
+    }
+
+
+    @Transactional(readOnly = true)
     public Conta getConta(String numConta) {
         return contaRepository.findByConta(numConta)
                 .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
     }
 
-    public List<Conta> findAll(String filtro, String cpfGerente) {
+    @Transactional(readOnly = true)
+    public List<Conta> findAll(String filtro, String cpfGerente, String contas) {
         if(filtro.equalsIgnoreCase("melhores_clientes")) {
             return findMelhoresContas();
         }
-        return contaRepository.findByCpfGerente(cpfGerente);
+        if(filtro.equalsIgnoreCase("contas")) {
+            return contaRepository.findByContaIn(Arrays.asList(contas.split(",")));
+        }
+        if(cpfGerente != null && !cpfGerente.isBlank()) {
+            return contaRepository.findByCpfGerente(cpfGerente);
+        }
+        return null;
     }
 
     public Conta atualizarLimite(String cpf, BigDecimal salario) {
@@ -109,6 +124,8 @@ public class ContaService {
         var conta = optConta.get();
         conta.setLimite(salario.divide(new BigDecimal(2), RoundingMode.UNNECESSARY));
         contaRepository.save(conta);
+
+        sincronizarConta(conta);
         return conta;
     }
 
@@ -128,6 +145,7 @@ public class ContaService {
                 dto.cpfGerente());
         contaRepository.save(conta);
 
+        sincronizarConta(conta);
         return conta;
     }
 
@@ -151,17 +169,27 @@ public class ContaService {
         return maps;
     }
 
-    public void sync(Conta conta) {
+    public void sync(CQRSSyncEntity.ContaDTO m) {
         DataSourceContextHolder.setContext(DataSourceType.READER);
-        readRepository.save(conta);
+        Conta c = new Conta();
+        c.setConta(m.conta());
+        c.setCpf(m.cpf());
+        c.setCpfGerente(m.cpfGerente());
+        c.setCriacao(LocalDateTime.parse(m.criacao()));
+        c.setLimite(m.limite());
+        c.setSaldo(m.saldo());
+        c.setId(m.id());
+        readRepository.save(c);
     }
 
     protected void sincronizarMovimentacao(Movimentacao movimentacao) {
-        rabbitTemplate.convertAndSend("ms-conta.cqrs.movimentacao", movimentacao);
+        var dto = CQRSSyncEntity.MovimentacaoDTO.from(movimentacao);
+        rabbitTemplate.convertAndSend("ms-conta.cqrs.movimentacao", dto);
     }
 
     protected void sincronizarConta(Conta conta) {
-        rabbitTemplate.convertAndSend("ms-conta.cqrs.conta", conta);
+        var dto = CQRSSyncEntity.ContaDTO.from(conta);
+        rabbitTemplate.convertAndSend("ms-conta.cqrs.conta", dto);
     }
 
     protected void sincronizarDeleteConta(UUID conta) {

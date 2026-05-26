@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -27,15 +28,13 @@ public class ClienteController {
     @Autowired private OrchestrationService orchestrationService;
 
     @GetMapping
-    public CompletableFuture<ResponseEntity<List<ClienteDTO>>> findAll(
+    public ResponseEntity<List<ClienteDTO>> findAll(
         @RequestParam(name = "filtro", required = false, defaultValue = "") String filtro,
         @RequestParam(name = "nome", required = false, defaultValue = "") String nome,
         @RequestHeader("X-User-Id") String cpfLogado,
         @RequestHeader("X-User-Profile") String profileLogado
     ) throws HttpException {
-        return clienteService.findClientes(cpfLogado, profileLogado, filtro, nome)
-            .thenApply(ResponseEntity::ok)
-            .orTimeout(30, TimeUnit.SECONDS);
+        return ResponseEntity.ok(clienteService.findClientes(cpfLogado, profileLogado, filtro, nome).stream().map(ClienteDTO::from).toList());
     }
 
     @GetMapping("/relation")
@@ -53,6 +52,13 @@ public class ClienteController {
     @GetMapping("/{cpf}")
     public ResponseEntity<ClienteDTO> findByCpf(@PathVariable("cpf") String cpf) throws HttpException {
         return ResponseEntity.ok(ClienteDTO.from(clienteService.findByCpf(cpf.replaceAll("[^0-9]", ""))));
+    }
+
+    @GetMapping("/nomes")
+    public ResponseEntity<Map<String, String>> findNomesByCpf(
+        @RequestParam(name = "filtro", required = false, defaultValue = "") String filtro
+    ) throws HttpException {
+        return ResponseEntity.ok(clienteService.findNomesByCpf(Arrays.asList(filtro.split(","))));
     }
 
     @PostMapping
