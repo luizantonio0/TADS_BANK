@@ -25,5 +25,6 @@ export const routes = [
     { name: "sacarSaldo", method: 'POST', path: '/contas/:conta/sacar', target: services.contas, public: false, profiles: 'CLIENTE' },
     { name: "extrato", method: 'GET', path: '/contas/:conta/extrato', target: services.contas, public: false, profiles: 'CLIENTE' },
     { name: "depositar", method: 'POST', path: '/contas/:conta/depositar', target: services.contas, public: false, profiles: 'CLIENTE' },
-    { name: "sacar", method: 'POST', path: '/contas/:conta/sacar', target: services.contas, public: false, profiles: 'CLIENTE' }
+    { name: "sacar", method: 'POST', path: '/contas/:conta/sacar', target: services.contas, public: false, profiles: 'CLIENTE' },
+    { name: "extrato", method: 'GET', path: '/contas/:conta/extrato', target: services.contas, public: false, profiles: 'CLIENTE' }
 ]
