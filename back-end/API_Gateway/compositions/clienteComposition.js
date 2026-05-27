@@ -17,8 +17,18 @@ export async function handleConsultaCliente(res, claims, cpf) {
     const cliente = await clienteResp.json();
 
     const contaResp = await fetch(services.contas + `/contas/cpf/${claims.cpf}`, config)
-    if (!contaResp.ok) return res.status(contaResp.status).json(contaResp.body);
+    if (!contaResp.ok) {
+        const error = await contaResp.json().catch(() => ({ error: "Erro ao buscar conta" }));
+        return res.status(contaResp.status).json(error);
+    }
     const conta = await contaResp.json();
+
+    const gerenteResp = await fetch(services.gerentes + `/gerentes/${cliente.gerente}`, config)
+    if (gerenteResp.ok) {
+        const gerente = await gerenteResp.json();
+        cliente.gerente_nome = gerente.nome;
+        cliente.gerente_email = gerente.email;
+    }
 
     cliente.conta = conta.conta;
     cliente.saldo = conta.saldo;
