@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import com.bantads.conta.datasource.DataSourceType;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -100,6 +101,15 @@ public class ContaController {
             @RequestParam(name = "inicio", required = false, defaultValue = "1971-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam(name = "fim", required = false, defaultValue = "2100-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) throws HttpException{
         return ResponseEntity.ok(movimentacaoService.getExtrato(numConta, inicio, fim));
+    }
+
+    @GetMapping("/reboot")
+    public ResponseEntity<?> reboot() {
+        contaService.reboot(DataSourceType.READER);
+        contaService.reboot(DataSourceType.WRITER);
+        movimentacaoService.reboot(DataSourceType.READER);
+        movimentacaoService.reboot(DataSourceType.WRITER);
+        return ResponseEntity.ok("Banco de dados criado conforme especificação");
     }
 
 }

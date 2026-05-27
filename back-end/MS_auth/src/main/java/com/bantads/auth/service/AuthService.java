@@ -29,6 +29,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,13 +43,19 @@ public class AuthService {
     private Map<UUID, CompletableFuture<LoginResponseDTO>> loginsRequests = new HashMap<>();
     private Map<UUID, CompletableFuture<LogoutResponseDTO>> logoutRequests = new HashMap<>();
 
-    @Autowired private RabbitTemplate rabbitTemplate;
-    @Autowired private CredentialsRepository credentialsRepository;
-    @Autowired private PasswordEncoder encoder;
-    @Autowired private Javers javers;
-    @Autowired private ObjectMapper mapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private CredentialsRepository credentialsRepository;
+    @Autowired
+    private PasswordEncoder encoder;
+    @Autowired
+    private Javers javers;
+    @Autowired
+    private ObjectMapper mapper;
 
-    @Autowired private JwtService jwtService;
+    @Autowired
+    private JwtService jwtService;
 
     public boolean isLoginRequest(UUID id) {
         return loginsRequests.containsKey(id);
@@ -58,18 +65,20 @@ public class AuthService {
         return logoutRequests.containsKey(id);
     }
 
-    private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID,T> orchMap, String... payloads) throws HttpException {
+    private <T> void prepareResult(OrchestrationRequestResultDTO dto, Map<UUID, T> orchMap, String... payloads)
+            throws HttpException {
         if (dto == null)
             throw new InternalServerErrorException("Resposta nula do orquestrador");
-        
-        if(!orchMap.containsKey(dto.idOrchestration()))
-            throw new InternalServerErrorException("CompletableFuture para idOrchestration " + dto.idOrchestration() + " não encontrado.");
-        
-        for(var p : payloads)
-            if(!dto.payloads().containsKey(p))
+
+        if (!orchMap.containsKey(dto.idOrchestration()))
+            throw new InternalServerErrorException(
+                    "CompletableFuture para idOrchestration " + dto.idOrchestration() + " não encontrado.");
+
+        for (var p : payloads)
+            if (!dto.payloads().containsKey(p))
                 throw new InternalServerErrorException("Payload " + p + " não encontrado");
 
-        if(dto.failed()) {
+        if (dto.failed()) {
             var err = dto.errors().values().iterator().next();
             if (err == null) {
                 throw new HttpException(500, "Algo deu errado. Tente novamente mais tarde.");
@@ -86,20 +95,20 @@ public class AuthService {
             prepareResult(result, logoutRequests);
 
             ClienteDTO cliente = result.payloads().containsKey("ms-cliente")
-                ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
-                : null;
+                    ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
+                    : null;
 
             GerenteDTO gerente = result.payloads().containsKey("ms-gerente")
-                ? mapper.readValue(result.payloads().get("ms-gerente"), GerenteDTO.class)
-                : null;
+                    ? mapper.readValue(result.payloads().get("ms-gerente"), GerenteDTO.class)
+                    : null;
 
-            if(cliente == null && gerente == null) {
+            if (cliente == null && gerente == null) {
                 throw new NotFoundException("Usuário não encontrado");
-            }            
+            }
 
-            var dto = (cliente != null) 
-                ? new LogoutResponseDTO(cliente.cpf(), cliente.nome(), cliente.email(), "CLIENTE")
-                : new LogoutResponseDTO(gerente.cpf(), gerente.nome(), gerente.email(), gerente.tipo());
+            var dto = (cliente != null)
+                    ? new LogoutResponseDTO(cliente.cpf(), cliente.nome(), cliente.email(), "CLIENTE")
+                    : new LogoutResponseDTO(gerente.cpf(), gerente.nome(), gerente.email(), gerente.tipo());
 
             completableFuture.complete(dto);
 
@@ -114,31 +123,33 @@ public class AuthService {
         }
     }
 
-    public CompletableFuture<LogoutResponseDTO> startLogout(String token) throws UnauthorizedException, JsonProcessingException {
-        if(token == null || token.isEmpty()) {
+    public CompletableFuture<LogoutResponseDTO> startLogout(String token)
+            throws UnauthorizedException, JsonProcessingException {
+        if (token == null || token.isEmpty()) {
             throw new UnauthorizedException("Usuário não está logado");
         }
-    
+
         token = token.replace("Bearer ", "");
         var claims = jwtService.parseToken(token);
-        if(claims == null) {
+        if (claims == null) {
             throw new UnauthorizedException("Usuário não está logado");
         }
 
         var orchestrationId = UUID.randomUUID();
 
         OrchestrationCommandDTO command;
-        if(claims.profile().equalsIgnoreCase("cliente")) {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", claims.cpf());
+        if (claims.profile().equalsIgnoreCase("cliente")) {
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente",
+                    claims.cpf());
         } else {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente", claims.cpf());
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente",
+                    claims.cpf());
         }
 
         var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
-            command,
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "Logout", token)
-        ));
-    
+                command,
+                new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "Logout", token)));
+
         var completable = new CompletableFuture<LogoutResponseDTO>();
         logoutRequests.put(orchestrationId, completable);
         rabbitTemplate.convertAndSend(OrchestrationKeys.ORCHESTRATE_QUEUE, request);
@@ -155,29 +166,27 @@ public class AuthService {
             prepareResult(result, loginsRequests, "ms-auth");
 
             ClienteDTO cliente = result.payloads().containsKey("ms-cliente")
-                ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
-                : null;
+                    ? mapper.readValue(result.payloads().get("ms-cliente"), ClienteDTO.class)
+                    : null;
 
             GerenteDTO gerente = result.payloads().containsKey("ms-gerente")
-                ? mapper.readValue(result.payloads().get("ms-gerente"), GerenteDTO.class)
-                : null;
+                    ? mapper.readValue(result.payloads().get("ms-gerente"), GerenteDTO.class)
+                    : null;
 
             AuthResponseDTO auth = mapper.readValue(result.payloads().get("ms-auth"), AuthResponseDTO.class);
 
-            if(cliente == null && gerente == null) {
+            if (cliente == null && gerente == null) {
                 throw new NotFoundException("Nenhum usuário encontrado!");
             }
 
             var dto = new LoginResponseDTO(
-                auth.accessToken(),
-                auth.tokenType(),
-                auth.profile(),
-                new LoginUsuarioResponseDTO(
-                    cliente != null ? cliente.nome() : gerente.nome(),
-                    cliente != null ? cliente.cpf() : gerente.cpf(),
-                    cliente != null ? cliente.email() : gerente.email()
-                )
-            );
+                    auth.accessToken(),
+                    auth.tokenType(),
+                    auth.profile(),
+                    new LoginUsuarioResponseDTO(
+                            cliente != null ? cliente.nome() : gerente.nome(),
+                            cliente != null ? cliente.cpf() : gerente.cpf(),
+                            cliente != null ? cliente.email() : gerente.email()));
 
             completableFuture.complete(dto);
 
@@ -192,27 +201,31 @@ public class AuthService {
         }
     }
 
-    public CompletableFuture<LoginResponseDTO> startLogin(String login, String senha) throws UnauthorizedException, JsonProcessingException {
+    public CompletableFuture<LoginResponseDTO> startLogin(String login, String senha)
+            throws UnauthorizedException, JsonProcessingException {
 
         var credentials = credentialsRepository.findByEmail(login);
-        if(credentials.isEmpty() || credentials.filter(value -> encoder.matches(senha, value.getPassword())).isEmpty()) {
+        if (credentials.isEmpty()
+                || credentials.filter(value -> encoder.matches(senha, value.getPassword())).isEmpty()) {
             throw new UnauthorizedException("Credenciais inválidas");
         }
 
         var orchestrationId = UUID.randomUUID();
 
         OrchestrationCommandDTO command;
-        if(credentials.get().getProfile().equalsIgnoreCase("cliente")) {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente", credentials.get().getCpf());
+        if (credentials.get().getProfile().equalsIgnoreCase("cliente")) {
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-cliente", "GetCliente",
+                    credentials.get().getCpf());
         } else {
-            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente", credentials.get().getCpf());
+            command = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "GetGerente",
+                    credentials.get().getCpf());
         }
 
         var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
-            command,
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "Login", mapper.writeValueAsString(new LoginDTO(login, senha)))
-        ));
-        
+                command,
+                new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "Login",
+                        mapper.writeValueAsString(new LoginDTO(login, senha)))));
+
         var completable = new CompletableFuture<LoginResponseDTO>();
         loginsRequests.put(orchestrationId, completable);
         rabbitTemplate.convertAndSend(OrchestrationKeys.ORCHESTRATE_QUEUE, request);
@@ -223,20 +236,23 @@ public class AuthService {
 
     public TokenClaimsDTO auth(String login, String senha) {
         var credentials = credentialsRepository.findByEmail(login);
-        if (credentials.isEmpty() || credentials.filter(value -> encoder.matches(senha, value.getPassword())).isEmpty()) {
+        if (credentials.isEmpty()
+                || credentials.filter(value -> encoder.matches(senha, value.getPassword())).isEmpty()) {
             return null;
         }
         return new TokenClaimsDTO(credentials.get().getCpf(), credentials.get().getProfile());
     }
 
-    public Credentials createCredentials(String email, String cpf, String cryptoPw, String profile) throws BadRequestException {
-        if(email == null || cpf == null || cryptoPw == null || email.trim().isEmpty() || cpf.trim().isEmpty() || cryptoPw.trim().isEmpty()) {
+    public Credentials createCredentials(String email, String cpf, String cryptoPw, String profile)
+            throws BadRequestException {
+        if (email == null || cpf == null || cryptoPw == null || email.trim().isEmpty() || cpf.trim().isEmpty()
+                || cryptoPw.trim().isEmpty()) {
             throw new BadRequestException("Email, CPF e Senha devem ser preenchidos.");
         }
-        if(credentialsRepository.existsById(cpf)) {
+        if (credentialsRepository.existsById(cpf)) {
             throw new BadRequestException("Credenciais já foram definidas para esse usuário.");
         }
-        if(credentialsRepository.existsByEmail(email)) {
+        if (credentialsRepository.existsByEmail(email)) {
             throw new BadRequestException("Email já está em uso.");
         }
         var creds = new Credentials(cpf, email, cryptoPw, profile);
@@ -246,15 +262,15 @@ public class AuthService {
     }
 
     public Credentials updateCredentials(String cpf, String email, String cryptoPw) throws BadRequestException {
-        if(email == null || cpf == null || email.trim().isEmpty() || cpf.trim().isEmpty()) {
+        if (email == null || cpf == null || email.trim().isEmpty() || cpf.trim().isEmpty()) {
             throw new BadRequestException("Email e CPF devem ser preenchidos.");
         }
-        if(credentialsRepository.existsByEmail(email)) {
+        if (credentialsRepository.existsByEmail(email)) {
             throw new BadRequestException("Email já está em uso.");
         }
         var cred = credentialsRepository.findById(cpf);
 
-        if(cred.isPresent()) {
+        if (cred.isPresent()) {
             cred.get().setEmail(email);
             cred.get().setPassword(cryptoPw);
             credentialsRepository.save(cred.get());
@@ -266,8 +282,7 @@ public class AuthService {
         List<Shadow<Credentials>> shadows = javers.findShadows(
                 QueryBuilder.byInstanceId(id, Credentials.class)
                         .limit(2)
-                        .build()
-        );
+                        .build());
 
         var whitelist = List.of(
                 "98574307084",
@@ -278,18 +293,36 @@ public class AuthService {
                 "09506382000",
                 "85733854057",
                 "58872160006",
-                "76179646090"
-            );
+                "76179646090");
 
         if (shadows.size() > 1) {
             var shadow = shadows.get(1);
             credentialsRepository.save(shadow.get());
         } else {
             var conta = credentialsRepository.findById(id);
-            if(conta.isPresent() && !whitelist.contains(conta.get().getCpf())) {
+            if (conta.isPresent() && !whitelist.contains(conta.get().getCpf())) {
                 credentialsRepository.deleteById(id);
             }
         }
+    }
+
+    @Transactional
+    public void reboot() {
+        String senhaHash = "$2a$12$ErTAzddLw07oe9DtGL1QcO6RGMYjfNF2pCcZpbcCs2gdlqsT5S1l6";
+
+        List<Credentials> listaCredenciais = List.of(
+                new Credentials("98574307084", "ger1@bantads.com.br", senhaHash, "GERENTE"),
+                new Credentials("64065268052", "ger2@bantads.com.br", senhaHash, "GERENTE"),
+                new Credentials("23862179060", "ger3@bantads.com.br", senhaHash, "GERENTE"),
+                new Credentials("40501740066", "adm1@bantads.com.br", senhaHash, "ADMINISTRADOR"),
+                new Credentials("12912861012", "cli1@bantads.com.br", senhaHash, "CLIENTE"),
+                new Credentials("09506382000", "cli2@bantads.com.br", senhaHash, "CLIENTE"),
+                new Credentials("85733854057", "cli3@bantads.com.br", senhaHash, "CLIENTE"),
+                new Credentials("58872160006", "cli4@bantads.com.br", senhaHash, "CLIENTE"),
+                new Credentials("76179646090", "cli5@bantads.com.br", senhaHash, "CLIENTE"));
+
+        credentialsRepository.deleteAll();
+        credentialsRepository.saveAll(listaCredenciais);
     }
 
 }

@@ -6,6 +6,8 @@ export const services = {
 };
 
 export const routes = [
+    { name: "reboot", method: 'GET', path: '/reboot', target: services.auth, public: true, profiles: '*' },
+
     { name: "login", method: 'POST', path: '/login', target: services.auth, public: true, profiles: '*' },
     { name: "logout", method: 'POST', path: '/logout', target: services.auth, public: false, profiles: '*' },
 

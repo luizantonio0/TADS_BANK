@@ -15,7 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_log_cliente")
+@Table(name = "tb_log_cliente", schema = "public")
 @Audited
 public class LogStatusCliente {
 

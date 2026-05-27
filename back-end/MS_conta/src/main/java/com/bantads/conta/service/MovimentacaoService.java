@@ -29,10 +29,14 @@ import java.util.*;
 @Service
 public class MovimentacaoService {
 
-    @Autowired private ContaRepository contaRepository;
-    @Autowired private MovimentacaoRepository movimentacaoRepository;
-    @Autowired private MovimentacaoReadRepository readRepository;
-    @Autowired private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private ContaRepository contaRepository;
+    @Autowired
+    private MovimentacaoRepository movimentacaoRepository;
+    @Autowired
+    private MovimentacaoReadRepository readRepository;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Transactional
     public void depositar(String conta, String cpfLogado, DepositoDTO dto) throws HttpException {
@@ -142,11 +146,13 @@ public class MovimentacaoService {
     @Transactional(readOnly = true)
     public ExtratoResponseDTO getExtrato(String numConta, LocalDate inicio, LocalDate fim) throws BadRequestException {
 
-        var primeiraMovimentacaoOpt = movimentacaoRepository.findFirstByContaOrigemOrContaDestinoOrderByDataHoraAsc(numConta, numConta);
-        var ultimaMovimentacaoOpt = movimentacaoRepository.findFirstByContaOrigemOrContaDestinoOrderByDataHoraDesc(numConta, numConta);
+        var primeiraMovimentacaoOpt = movimentacaoRepository
+                .findFirstByContaOrigemOrContaDestinoOrderByDataHoraAsc(numConta, numConta);
+        var ultimaMovimentacaoOpt = movimentacaoRepository
+                .findFirstByContaOrigemOrContaDestinoOrderByDataHoraDesc(numConta, numConta);
 
         Optional<Conta> contaOpt = contaRepository.findByConta(numConta);
-        if(contaOpt.isEmpty()) {
+        if (contaOpt.isEmpty()) {
             throw new BadRequestException("Conta não encontrada");
         }
 
@@ -158,10 +164,14 @@ public class MovimentacaoService {
         var ultimaMovimentacao = ultimaMovimentacaoOpt.get();
         var conta = contaOpt.get();
 
-        LocalDateTime dataInicio = inicio == null ? LocalDateTime.MIN : inicio.isBefore(primeiraMovimentacao.getDataHora().toLocalDate()) 
-            ? primeiraMovimentacao.getDataHora().toLocalDate().atStartOfDay() : inicio.atStartOfDay();
-        LocalDateTime dataFim = fim == null ? LocalDateTime.MAX : fim.isAfter(ultimaMovimentacao.getDataHora().toLocalDate()) 
-            ? ultimaMovimentacao.getDataHora().toLocalDate().atTime(LocalTime.MAX) : fim.atTime(LocalTime.MAX);
+        LocalDateTime dataInicio = inicio == null ? LocalDateTime.MIN
+                : inicio.isBefore(primeiraMovimentacao.getDataHora().toLocalDate())
+                        ? primeiraMovimentacao.getDataHora().toLocalDate().atStartOfDay()
+                        : inicio.atStartOfDay();
+        LocalDateTime dataFim = fim == null ? LocalDateTime.MAX
+                : fim.isAfter(ultimaMovimentacao.getDataHora().toLocalDate())
+                        ? ultimaMovimentacao.getDataHora().toLocalDate().atTime(LocalTime.MAX)
+                        : fim.atTime(LocalTime.MAX);
 
         List<Movimentacao> anteriores = movimentacaoRepository.findByContaBefore(numConta, dataInicio);
         BigDecimal saldoAtual = BigDecimal.ZERO;
@@ -188,7 +198,8 @@ public class MovimentacaoService {
         int indexMov = 0;
 
         while (!dataCorrente.isAfter(dataFim.toLocalDate())) {
-            while (indexMov < periodo.size() && periodo.get(indexMov).getDataHora().toLocalDate().equals(dataCorrente)) {
+            while (indexMov < periodo.size()
+                    && periodo.get(indexMov).getDataHora().toLocalDate().equals(dataCorrente)) {
                 Movimentacao m = periodo.get(indexMov);
                 BigDecimal valor = m.getValor();
 
@@ -205,12 +216,11 @@ public class MovimentacaoService {
                 }
 
                 dtos.add(new MovimentacaoDTO(
-                    m.getDataHora(),
-                    m.getTipo().name(),
-                    m.getContaOrigem(),
-                    m.getContaDestino(),
-                    valor
-                ));
+                        m.getDataHora(),
+                        m.getTipo().name(),
+                        m.getContaOrigem(),
+                        m.getContaDestino(),
+                        valor));
                 indexMov++;
             }
             saldosDiarios.put(dataCorrente.toString(), saldoAtual.setScale(2, RoundingMode.HALF_UP));
@@ -230,5 +240,149 @@ public class MovimentacaoService {
         c.setTipo(TipoMovimentacao.valueOf(m.tipo()));
         c.setValor(m.valor());
         readRepository.save(c);
+    }
+
+    @Transactional
+    public void reboot(DataSourceType context) {
+        DataSourceContextHolder.setContext(context);
+        var repository = context == DataSourceType.WRITER ? movimentacaoRepository : readRepository;
+        repository.deleteAll();
+        repository.flush();
+        Movimentacao m1 = Movimentacao.builder()
+                .id(UUID.fromString("d67612cc-ea11-4667-82b2-b1b48cd6e017"))
+                .dataHora(LocalDateTime.of(2020, 1, 1, 10, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("1291")
+                .contaDestino(null)
+                .valor(new BigDecimal("1000.00"))
+                .build();
+
+        Movimentacao m2 = Movimentacao.builder()
+                .id(UUID.fromString("767eb3c8-15d0-42da-bc05-9ed9c4e9ab50"))
+                .dataHora(LocalDateTime.of(2020, 1, 1, 11, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("1291")
+                .contaDestino(null)
+                .valor(new BigDecimal("900.00"))
+                .build();
+
+        Movimentacao m3 = Movimentacao.builder()
+                .id(UUID.fromString("647c85de-b4b4-485f-a8fa-5e977810e47d"))
+                .dataHora(LocalDateTime.of(2020, 1, 1, 12, 0, 0))
+                .tipo(TipoMovimentacao.SAQUE)
+                .contaOrigem("1291")
+                .contaDestino(null)
+                .valor(new BigDecimal("550.00"))
+                .build();
+
+        Movimentacao m4 = Movimentacao.builder()
+                .id(UUID.fromString("c579be8a-5a8d-4960-812a-d73b49a1111a"))
+                .dataHora(LocalDateTime.of(2020, 1, 1, 13, 0, 0))
+                .tipo(TipoMovimentacao.SAQUE)
+                .contaOrigem("1291")
+                .contaDestino(null)
+                .valor(new BigDecimal("350.00"))
+                .build();
+
+        Movimentacao m5 = Movimentacao.builder()
+                .id(UUID.fromString("1047a46d-d329-4f98-af06-0892263bccd6"))
+                .dataHora(LocalDateTime.of(2020, 1, 10, 15, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("1291")
+                .contaDestino(null)
+                .valor(new BigDecimal("2000.00"))
+                .build();
+
+        Movimentacao m6 = Movimentacao.builder()
+                .id(UUID.fromString("9c88fbdf-0d76-4be6-b77e-9622c2be2cb6"))
+                .dataHora(LocalDateTime.of(2020, 1, 15, 8, 0, 0))
+                .tipo(TipoMovimentacao.SAQUE)
+                .contaOrigem("1291")
+                .contaDestino(null)
+                .valor(new BigDecimal("500.00"))
+                .build();
+
+        Movimentacao m7 = Movimentacao.builder()
+                .id(UUID.fromString("8c69b96e-7925-4cb5-8875-a47dccaabae0"))
+                .dataHora(LocalDateTime.of(2020, 1, 20, 12, 0, 0))
+                .tipo(TipoMovimentacao.TRANSFERENCIA)
+                .contaOrigem("1291")
+                .contaDestino("0950")
+                .valor(new BigDecimal("1700.00"))
+                .build();
+
+        Movimentacao m8 = Movimentacao.builder()
+                .id(UUID.fromString("f6fa1365-f1e9-4fc0-a8da-1716c4f765ed"))
+                .dataHora(LocalDateTime.of(2025, 1, 1, 12, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("0950")
+                .contaDestino(null)
+                .valor(new BigDecimal("1000.00"))
+                .build();
+
+        Movimentacao m9 = Movimentacao.builder()
+                .id(UUID.fromString("93611a0a-af09-4b7f-aa92-3e633a7026ee"))
+                .dataHora(LocalDateTime.of(2025, 1, 2, 10, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("0950")
+                .contaDestino(null)
+                .valor(new BigDecimal("5000.00"))
+                .build();
+
+        Movimentacao m10 = Movimentacao.builder()
+                .id(UUID.fromString("8f2a7102-b207-4697-9f99-4b80931b272a"))
+                .dataHora(LocalDateTime.of(2025, 1, 10, 10, 0, 0))
+                .tipo(TipoMovimentacao.SAQUE)
+                .contaOrigem("0950")
+                .contaDestino(null)
+                .valor(new BigDecimal("200.00"))
+                .build();
+
+        Movimentacao m11 = Movimentacao.builder()
+                .id(UUID.fromString("bae41297-12b5-48d1-8edf-23f3a09aaf96"))
+                .dataHora(LocalDateTime.of(2025, 2, 5, 10, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("0950")
+                .contaDestino(null)
+                .valor(new BigDecimal("7000.00"))
+                .build();
+
+        Movimentacao m12 = Movimentacao.builder()
+                .id(UUID.fromString("685f1e32-7756-41de-9d01-e32a1a8814b6"))
+                .dataHora(LocalDateTime.of(2025, 5, 5, 10, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("8573")
+                .contaDestino(null)
+                .valor(new BigDecimal("1000.00"))
+                .build();
+
+        Movimentacao m13 = Movimentacao.builder()
+                .id(UUID.fromString("ae1a2cbb-8631-467c-aabb-3fac63acbb6b"))
+                .dataHora(LocalDateTime.of(2025, 5, 6, 10, 0, 0))
+                .tipo(TipoMovimentacao.SAQUE)
+                .contaOrigem("8573")
+                .contaDestino(null)
+                .valor(new BigDecimal("2000.00"))
+                .build();
+
+        Movimentacao m14 = Movimentacao.builder()
+                .id(UUID.fromString("170e5950-44a8-4f50-ad90-331c76e1b4f0"))
+                .dataHora(LocalDateTime.of(2025, 1, 6, 10, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("5887")
+                .contaDestino(null)
+                .valor(new BigDecimal("150000.00"))
+                .build();
+
+        Movimentacao m15 = Movimentacao.builder()
+                .id(UUID.fromString("0f96f1b4-81b9-4d40-a312-4c5d082c78cc"))
+                .dataHora(LocalDateTime.of(2025, 1, 7, 10, 0, 0))
+                .tipo(TipoMovimentacao.DEPOSITO)
+                .contaOrigem("7617")
+                .contaDestino(null)
+                .valor(new BigDecimal("1500.00"))
+                .build();
+
+        repository.saveAll(List.of(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15));
     }
 }

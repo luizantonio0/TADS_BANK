@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tb_conta")
+@Table(name = "tb_conta", schema = "public")
 @Data
 @Audited
 public class Conta {

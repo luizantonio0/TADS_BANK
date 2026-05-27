@@ -16,16 +16,16 @@ import java.util.UUID;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, UUID>, RevisionRepository<Cliente, UUID, Integer> {
 
-    Optional<Cliente> findByCpf(String cpf);
-    boolean existsByCpf(String cpf);
-    boolean existsByEmail(String email);
-    List<Cliente> findByCpfGerenteAndAprovado(String cpfGerente, boolean aprovado);
-    List<Cliente> findByCpfIn(List<String> cpf);
-    @Query("SELECT c FROM Cliente c WHERE c.cpfGerente = :cpfGerente " +
-           "AND (c.cpf LIKE %:termo% OR c.nome LIKE %:termo%) " +
-           "ORDER BY c.nome ASC")
-    List<Cliente> findByGerente(@Param("cpfGerente") String cpfGerente, 
-                                             @Param("termo") String termo);
+       Optional<Cliente> findByCpf(String cpf);
+       boolean existsByCpf(String cpf);
+       boolean existsByEmail(String email);
+       List<Cliente> findByCpfGerenteAndAprovado(String cpfGerente, boolean aprovado);
+       List<Cliente> findByCpfIn(List<String> cpf);
+       @Query("SELECT c FROM Cliente c WHERE c.cpfGerente = :cpfGerente " +
+              "AND (c.cpf LIKE %:termo% OR c.nome LIKE %:termo%) " +
+              "ORDER BY c.nome ASC")
+       List<Cliente> findByGerente(@Param("cpfGerente") String cpfGerente, 
+                                                 @Param("termo") String termo);
 
 }
         

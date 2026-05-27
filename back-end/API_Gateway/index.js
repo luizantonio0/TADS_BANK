@@ -9,6 +9,7 @@ import { handleGerenteDashboard } from './compositions/gerenteDashboardCompositi
 import { handleMelhoresClientes } from './compositions/melhoresClientesComposition.js';
 import { handleConsultaCliente } from './compositions/clienteComposition.js';
 import { handleExtratoFull } from './compositions/extratoComposition.js';
+import { handleReboot } from './compositions/rebootComposition.js';
 
 const app = express();
 const PORT = 3000;
@@ -67,6 +68,10 @@ app.use(async (req, res, next) => {
         if(targetRoute.profiles !== "*" && !targetRoute.profiles.toUpperCase().split(",").includes(claims.profile.toUpperCase())) {
             return res.status(401).json("Você não tem permissão para performar essa ação.");
         }
+    }
+
+    if(targetRoute.name == "reboot") {
+        return await handleReboot(res);
     }
 
     if(targetRoute.name == "buscarGerentes" && req.query.numero == "dashboard") {

@@ -11,6 +11,7 @@ import com.bantads.cliente.exception.HttpException;
 import com.bantads.cliente.service.ClienteService;
 import com.bantads.cliente.service.OrchestrationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,7 +65,7 @@ public class ClienteController {
     @PostMapping
     public CompletableFuture<ResponseEntity<ClienteCreateResponseDTO>> save(@RequestBody ClienteRequestDTO dto) throws Exception {    
         return orchestrationService.startCriarCliente(dto)
-            .thenApply(ResponseEntity::ok)
+            .thenApply(c -> ResponseEntity.status(201).body(c))
             .orTimeout(30, TimeUnit.SECONDS);
     }
 
@@ -103,6 +104,12 @@ public class ClienteController {
         return orchestrationService.startAtualizarCliente(cpfNormalizado, dto)
                 .thenApply(ResponseEntity::ok)
                 .orTimeout(15, TimeUnit.HOURS);
+    }
+
+    @GetMapping("/reboot")
+    public ResponseEntity<?> reboot() {
+        clienteService.reboot();
+        return ResponseEntity.ok("");
     }
 
 }        

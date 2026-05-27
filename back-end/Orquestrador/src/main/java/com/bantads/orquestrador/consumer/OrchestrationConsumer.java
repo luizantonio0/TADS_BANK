@@ -5,6 +5,8 @@ import com.bantads.shared.dto.OrchestrationCommandResultDTO;
 import com.bantads.shared.dto.OrchestrationConfirmDTO;
 import com.bantads.shared.dto.OrchestrationErrorDTO;
 import com.bantads.shared.dto.OrchestrationRequestResultDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -50,16 +52,17 @@ public class OrchestrationConsumer {
                 }
                 if (ended) {
                     orchestration.setFinished(true);
-                    rabbitTemplate.convertAndSend(
-                            "orchestration.finished",
-                            "orchestration.finished",
-                            new OrchestrationRequestResultDTO(
-                                    dto.idOrchestration(),
-                                    orchestration.isFailed(),
-                                    orchestration.getPayloads(),
-                                    orchestration.getErrors())
-                    );
-                    System.out.println("Escreveu na orchestration.finished");
+                    var res =  new OrchestrationRequestResultDTO(
+                        dto.idOrchestration(),
+                        orchestration.isFailed(),
+                        orchestration.getPayloads(),
+                        orchestration.getErrors());
+                    
+                    ObjectMapper mapper = new ObjectMapper();
+                    String jsonPrettied = mapper.writerWithDefaultPrettyPrinter()
+                                              .writeValueAsString(res);
+                    System.out.println(jsonPrettied);
+                    rabbitTemplate.convertAndSend("orchestration.finished", "orchestration.finished", res);
                     if(orchestration.isAutoConfirm()) {
                         rabbitTemplate.convertAndSend(
                                 "orchestration.confirm",

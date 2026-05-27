@@ -90,11 +90,11 @@ public class OrchestrationService {
         var idOrchestration = UUID.randomUUID();
 
         if (repository.existsByCpf(dto.cpf().trim())) {
-            throw new BadRequestException("CPF já cadastrado!");
+            throw new HttpException(409, "CPF já cadastrado!");
         }
 
         if (repository.existsByEmail(dto.email().trim())) {
-            throw new BadRequestException("Email já está em uso!");
+            throw new HttpException(409, "Email já está em uso!");
         }
 
         try {
@@ -132,8 +132,7 @@ public class OrchestrationService {
             var gerenteOutput = mapper.readValue(result.payloads().get("ms-gerente"), DefinirGerenteOutputDTO.class);
             var clienteDTO = mapper.readValue(result.payloads().get("ms-cliente"), CreateClienteOutputDTO.class);
 
-            var clienteOptional = repository.findByCpf(clienteDTO.cpf().replaceAll("[^0-9]", ""));
-            ;
+            var clienteOptional = repository.findByCpf(clienteDTO.cpf().replaceAll("[^0-9]", ""));;
             if (clienteOptional.isEmpty()) {
                 throw new NotFoundException("Cliente não encontrado");
             }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tb_movimentacao")
+@Table(name = "tb_movimentacao", schema = "public")
 @Data
 @Builder
 @NoArgsConstructor

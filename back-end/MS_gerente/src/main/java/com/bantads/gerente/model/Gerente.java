@@ -11,7 +11,7 @@ import org.hibernate.envers.Audited;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tb_gerente")
+@Table(name = "tb_gerente", schema = "public")
 @Audited
 public class Gerente {
 

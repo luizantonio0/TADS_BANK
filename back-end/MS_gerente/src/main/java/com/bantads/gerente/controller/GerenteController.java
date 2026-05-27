@@ -70,5 +70,12 @@ public class GerenteController {
     public void delete(@PathVariable String cpf){
         gerenteService.deleteByCpf(cpf);
     }
+
+    @GetMapping("/reboot")
+    public ResponseEntity<?> reboot() {
+        gerenteService.reboot();
+        return ResponseEntity.ok("");
+    }
+
 }        
         

@@ -21,6 +21,6 @@ public interface GerenteRepository extends JpaRepository<Gerente, UUID>, Revisio
     List<Gerente> findByTipo(String tipo);
 
     @Query("SELECT g FROM Gerente g WHERE g.tipo = 'GERENTE' ORDER BY g.totalClientes ASC")
-    Optional<Gerente> findTop1GerenteComMenosClientes();
+    List<Gerente> findTop1GerenteComMenosClientes();
 } 
         

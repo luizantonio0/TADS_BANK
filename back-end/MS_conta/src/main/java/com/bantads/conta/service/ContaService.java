@@ -41,20 +41,49 @@ public class ContaService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Transactional
     public void rollbackConta(UUID uuid) throws Exception {
-        Page<Revision<Integer, Conta>> revisions = contaRepository.findRevisions(uuid, PageRequest.of(0, 2));
+
+        Page<Revision<Integer, Conta>> revisions = contaRepository.findRevisions(
+                uuid,
+                PageRequest.of(0, 2));
+
         List<Revision<Integer, Conta>> content = revisions.getContent();
 
-        var whitelist = List.of("1291", "0950", "8573", "5887", "7617");
+        var whitelist = List.of(
+                "1291",
+                "0950",
+                "8573",
+                "5887",
+                "7617");
 
         if (content.size() >= 2) {
-            var rev = content.get(1);
-            contaRepository.save(rev.getEntity());
-            sincronizarConta(rev.getEntity());
+
+            Conta revisionEntity = content.get(1).getEntity();
+
+            Conta atual = contaRepository.findById(uuid)
+                    .orElseThrow();
+
+            atual.setConta(revisionEntity.getConta());
+            atual.setCpfGerente(revisionEntity.getCpfGerente());
+            atual.setSaldo(revisionEntity.getSaldo());
+            atual.setLimite(revisionEntity.getLimite());
+            atual.setCriacao(revisionEntity.getCriacao());
+            atual.setCpf(revisionEntity.getCpf());
+
+            Conta salva = contaRepository.save(atual);
+
+            sincronizarConta(salva);
+
         } else {
+
             var conta = contaRepository.findById(uuid);
-            if (conta.isPresent() && !whitelist.contains(conta.get().getConta())) {
+
+            if (conta.isPresent()
+                    && !whitelist.contains(conta.get().getConta())) {
+
                 contaRepository.deleteById(uuid);
+
                 sincronizarDeleteConta(uuid);
             }
         }
@@ -103,13 +132,13 @@ public class ContaService {
 
     @Transactional(readOnly = true)
     public List<Conta> findAll(String filtro, String cpfGerente, String contas) {
-        if(filtro.equalsIgnoreCase("melhores_clientes")) {
+        if (filtro.equalsIgnoreCase("melhores_clientes")) {
             return findMelhoresContas();
         }
-        if(filtro.equalsIgnoreCase("contas")) {
+        if (filtro.equalsIgnoreCase("contas")) {
             return contaRepository.findByContaIn(Arrays.asList(contas.split(",")));
         }
-        if(cpfGerente != null && !cpfGerente.isBlank()) {
+        if (cpfGerente != null && !cpfGerente.isBlank()) {
             return contaRepository.findByCpfGerente(cpfGerente);
         }
         return null;
@@ -153,7 +182,7 @@ public class ContaService {
         var cpfsList = List.of(cpfs.split(","));
 
         return contaRepository.findByCpfGerenteIn(cpfsList)
-            .stream().collect(Collectors.toMap(c -> c.getCpf(), ContaDTO::from));
+                .stream().collect(Collectors.toMap(c -> c.getCpf(), ContaDTO::from));
     }
 
     @Transactional(readOnly = true)
@@ -193,6 +222,59 @@ public class ContaService {
 
     protected void sincronizarDeleteConta(UUID conta) {
         rabbitTemplate.convertAndSend("ms-conta.cqrs.conta.delete", conta);
+    }
+
+    @Transactional
+    public void reboot(DataSourceType context) {
+        DataSourceContextHolder.setContext(context);
+        var repository = context == DataSourceType.WRITER ? contaRepository : readRepository;
+        repository.deleteAll();
+        repository.flush();
+        Conta conta1 = new Conta(
+                LocalDateTime.now(),
+                new BigDecimal("5000.00"),
+                new BigDecimal("800.00"),
+                "1291",
+                "12912861012",
+                "98574307084");
+        conta1.setId(UUID.fromString("c5ed645a-05ef-4a21-a847-4ecc0622cb58"));
+
+        Conta conta2 = new Conta(
+                LocalDateTime.now(),
+                new BigDecimal("10000.00"),
+                new BigDecimal("-10000.00"),
+                "0950",
+                "09506382000",
+                "64065268052");
+        conta2.setId(UUID.fromString("1b732a9b-82e9-4baf-86d4-737c4d3a34af"));
+
+        Conta conta3 = new Conta(
+                LocalDateTime.now(),
+                new BigDecimal("1500.00"),
+                new BigDecimal("-1000.00"),
+                "8573",
+                "85733854057",
+                "23862179060");
+        conta3.setId(UUID.fromString("cb30db11-e65c-44e5-97da-b1fc3d95ed40"));
+
+        Conta conta4 = new Conta(
+                LocalDateTime.now(),
+                new BigDecimal("0.00"),
+                new BigDecimal("150000.00"),
+                "5887",
+                "58872160006",
+                "98574307084");
+        conta4.setId(UUID.fromString("e44251f8-dfa1-4638-8c6e-3c2edf815cf1"));
+
+        Conta conta5 = new Conta(
+                LocalDateTime.now(),
+                new BigDecimal("0.00"),
+                new BigDecimal("1500.00"),
+                "7617",
+                "76179646090",
+                "64065268052");
+        conta5.setId(UUID.fromString("d67612cc-ea11-4667-82b2-b1b48cd6e017"));
+        repository.saveAll(List.of(conta1, conta2, conta3, conta4, conta5));
     }
 
 }

@@ -53,4 +53,10 @@ public class AuthController {
                 .orTimeout(15, TimeUnit.SECONDS);
     }
 
+    @GetMapping("/reboot")
+    public ResponseEntity<?> reboot() {
+        authService.reboot();
+        return ResponseEntity.ok("");
+    }
+
 }
