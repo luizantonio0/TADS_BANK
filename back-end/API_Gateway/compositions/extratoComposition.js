@@ -1,6 +1,6 @@
 import { services } from "../routes.js";
 
-export async function handleExtratoFull(res, claims, conta) {
+export async function handleExtratoFull(res, claims, conta, queryParams) {
 
     let config = {
         method: 'GET',
@@ -10,9 +10,9 @@ export async function handleExtratoFull(res, claims, conta) {
         }
     }
 
-    
+    const { inicio, fim } = queryParams;
 
-    const extratoResp = await fetch(services.contas + `/contas/${conta}/extrato`, config)
+    const extratoResp = await fetch(services.contas + `/contas/${conta}/extrato?include=all${inicio ? "&inicio=" + inicio : ""}${fim ? "&fim=" + fim : ""}`, config)
     if (!extratoResp.ok) return res.status(extratoResp.status).json(extratoResp.body);
     const extrato = await extratoResp.json();
  

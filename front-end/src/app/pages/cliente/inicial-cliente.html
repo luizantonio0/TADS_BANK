@@ -1,6 +1,7 @@
-<modal-depositar-sacar [control]="modalSacarControl" [numeroConta]="currentAccount.numeroConta" tipo="withdraw" (close)="fecharModalOperacao()" />
-<modal-depositar-sacar [control]="modalDepositarControl" [numeroConta]="currentAccount.numeroConta" tipo="deposit" (close)="fecharModalOperacao()"/>
-<modal-transferir [control]="modalTransferirControl" [numeroConta]="currentAccount.numeroConta" (close)="fecharModalOperacao()"/>
+<modal-depositar-sacar [callback]="this.atualizarExtrato.bind(this)" [control]="modalSacarControl" [numeroConta]="currentAccount.numeroConta" tipo="SAQUE" (close)="fecharModalOperacao()" />
+
+<modal-depositar-sacar [callback]="this.atualizarExtrato.bind(this)" [control]="modalDepositarControl" [numeroConta]="currentAccount.numeroConta" tipo="DEPOSITO" (close)="fecharModalOperacao()"/>
+<modal-transferir [callback]="this.atualizarExtrato.bind(this)" [control]="modalTransferirControl" [numeroConta]="currentAccount.numeroConta" (close)="fecharModalOperacao()"/>
 <modal-alterar-perfil [control]="modalAlterarPerfilControl" [cliente]="cliente" (close)="fecharModalPerfil()"/>
 
 <div class="h-main-screen flex gap-x-4">
@@ -8,15 +9,15 @@
     <div class="h-full w-full mb-4 ">
       <div style="backdrop-filter: blur(12px);"
            class="w-full bg-white/60 border border-white/40 h-full shadow-lg items-center rounded-xl flex flex-col justify-center group/main">
-        
+
         <h1 class="text-xl font-light text-gray-500 mb-2 transition-all duration-700 group-hover/main:text-gray-700">
           Olá, <span class="font-bold text-gray-800 tracking-tight">{{ currentAccount.name.split(' ')[0]}}</span>
         </h1>
 
         @if (clienteCarregado) {
           <div class="cursor-default transition-all duration-300 hover:scale-105 active:scale-95 flex flex-col items-center">
-            <h1 class="text-6xl font-bold tracking-tighter transition-colors duration-300" 
-                [class.text-red-600]="currentAccount.balance < 0" 
+            <h1 class="text-6xl font-bold tracking-tighter transition-colors duration-300"
+                [class.text-red-600]="currentAccount.balance < 0"
                 [class.text-primary]="currentAccount.balance >= 0"
                 style="text-shadow: 0 4px 20px rgba(0,0,0,0.05);">
               {{ currentAccount.balance | currency: 'BRL' }}
@@ -29,7 +30,7 @@
           <span class="material-symbols-outlined text-gray-400 text-xs">lock</span>
           <p class="text-2xs font-black text-gray-600 tracking-widest uppercase">Conta {{ currentAccount.numeroConta || '-' }}</p>
         </div>
-        
+
         <div class="grid grid-cols-4 gap-3 mt-10">
           <button class="h-12 px-6 text-sm font-medium items-center gap-x-2 flex justify-center rounded-lg bg-white border border-gray-200 shadow-sm hover:border-primary/50 hover:text-primary hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95" [disabled]="!currentAccount.numeroConta" (click)="modalSacarControl = true">
             <span class="material-symbols-outlined text-lg">arrow_upward</span>
@@ -70,8 +71,6 @@
     </div>
   </div>
   <div class="py-6 w-150">
-    @if (currentAccount.numeroConta) {
-      <extrato [accountNumber]="currentAccount.numeroConta" [accountName]="currentAccount.name" />
-    }
+    <extrato #extrato [accountNumber]="currentAccount.numeroConta" [accountName]="currentAccount.name" />
   </div>
 </div>

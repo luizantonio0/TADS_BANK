@@ -15,6 +15,7 @@ export class ModalTransferir {
   private toastr = inject(ToastService);
   private contaService = inject(ContaService);
 
+  @Input({ required: true }) callback!: () => void;
   @Input({ required: true }) control!: boolean;
   @Input({ required: true }) numeroConta!: string;
   @Output() close = new EventEmitter();
@@ -52,6 +53,7 @@ export class ModalTransferir {
           this.toastr.success(
             `Transferência de R$ ${valor} para a conta ${contaDestino} realizada com sucesso!`,
           );
+          this.callback();
           this.form.reset();
           this.onClose();
         },

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { Extrato } from "./extrato/extrato";
 import { ModalDepositarSacar } from "./modal-depositar-sacar/modal-depositar-sacar";
 import { ModalTransferir } from "./modal-transferir/modal-transferir";
@@ -19,6 +19,8 @@ export class InicialCliente implements OnInit {
   private loadingService = inject(LoadingService);
   private toastService = inject(ToastService);
   private cdRef = inject(ChangeDetectorRef);
+
+  @ViewChild('extrato') extrato!: Extrato;
 
   @Input() cliente?: Cliente;
 
@@ -45,6 +47,12 @@ export class InicialCliente implements OnInit {
     }
 
     this.carregarClienteLogado();
+  }
+
+  atualizarExtrato(): void {
+    if (this.currentAccount?.numeroConta) {
+      this.extrato.buscarExtrato(this.currentAccount.numeroConta);
+    }
   }
 
   carregarClienteLogado() {

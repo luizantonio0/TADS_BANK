@@ -17,9 +17,9 @@ export class ModalDepositarSacar {
   private cdr = inject(ChangeDetectorRef)
   private contaService = inject(ContaService)
 
-
+  @Input({ required: true }) callback!: () => void;
   @Input({ required: true }) control!: boolean;
-  @Input({ required: true }) tipo!: 'deposit' | 'withdraw';
+  @Input({ required: true }) tipo!: 'DEPOSITO' | 'SAQUE';
   @Input() numeroConta!: string;
 
   @Output() close = new EventEmitter();
@@ -49,12 +49,13 @@ export class ModalDepositarSacar {
         this.toastr.error('Informe um valor válido para a operação');
         return;
       }
-      
-      if (this.tipo === 'deposit') {
+
+      if (this.tipo === 'DEPOSITO') {
         this.contaService.depositar(this.numeroConta, valor).subscribe({
           next: (res) => {
             this.toastr.success(`Depósito de R$ ${valor} realizado com sucesso!`);
             this.form.reset();
+            this.callback();
             this.onClose();
             this.cdr.detectChanges();
           },
@@ -68,6 +69,7 @@ export class ModalDepositarSacar {
           next: (res) => {
             this.toastr.success(`Saque de R$ ${valor} realizado com sucesso!`);
             this.form.reset();
+            this.callback();
             this.onClose();
             this.cdr.detectChanges();
           },
@@ -75,8 +77,7 @@ export class ModalDepositarSacar {
             this.toastr.error("Erro ao realizar saque");
             console.error(err)
           }
-        })
-        this.onClose()
+        });
       }
     }
   }

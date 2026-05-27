@@ -158,9 +158,9 @@ public class MovimentacaoService {
         var ultimaMovimentacao = ultimaMovimentacaoOpt.get();
         var conta = contaOpt.get();
 
-        LocalDateTime dataInicio = inicio.isBefore(primeiraMovimentacao.getDataHora().toLocalDate()) 
+        LocalDateTime dataInicio = inicio == null ? LocalDateTime.MIN : inicio.isBefore(primeiraMovimentacao.getDataHora().toLocalDate()) 
             ? primeiraMovimentacao.getDataHora().toLocalDate().atStartOfDay() : inicio.atStartOfDay();
-        LocalDateTime dataFim = fim.isAfter(ultimaMovimentacao.getDataHora().toLocalDate()) 
+        LocalDateTime dataFim = fim == null ? LocalDateTime.MAX : fim.isAfter(ultimaMovimentacao.getDataHora().toLocalDate()) 
             ? ultimaMovimentacao.getDataHora().toLocalDate().atTime(LocalTime.MAX) : fim.atTime(LocalTime.MAX);
 
         List<Movimentacao> anteriores = movimentacaoRepository.findByContaBefore(numConta, dataInicio);

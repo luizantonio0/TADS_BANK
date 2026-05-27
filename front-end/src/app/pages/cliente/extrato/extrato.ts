@@ -46,35 +46,55 @@ export class Extrato implements OnInit, OnChanges {
     }
   }
 
-  buscarExtrato() {
-    if (!this.accountNumber) return;
+  buscarExtrato(contaNum?: string) {
+      console.log(this.accountNumber ?? contaNum);
+
+    if (!(this.accountNumber??contaNum)) return;
 
     const de = this.converterDataParaAPI(this.formFiltroData.value.dataDe);
     const ate = this.converterDataParaAPI(this.formFiltroData.value.dataAte);
 
-    this.loadService.withLoadingObservable(this.contaService.extrato(this.accountNumber, de, ate)).subscribe({
-      next: res => {
-        const groupedMap = res.movimentacoes.reduce((acc, mov) => {
-          const date = mov.data_hora.split('T')[0];
-          if (!acc[date]) {
-            acc[date] = [];
-          }
-          acc[date].push(mov);
-          return acc;
-        }, {} as Record<string, any[]>);
-        this.transactionGroups = Object.entries(groupedMap).map(([dia, movimentacoes]) => ({
-          dia,
-          movimentacoes,
-          saldo: res.saldos_consolidados[dia] || 0
-        })).sort((a, b) => b.dia.localeCompare(a.dia));
-        this.cdRef.detectChanges();
-      }
-    });
+    const accountNumber = this.accountNumber??contaNum;
+
+    this.loadService
+      .withLoadingObservable(this.contaService.extrato(accountNumber, de, ate))
+      .subscribe({
+        next: (res) => {
+          const groupedMap = res.movimentacoes.reduce(
+            (acc, mov) => {
+              const date = mov.data_hora.split('T')[0];
+              if (!acc[date]) {
+                acc[date] = [];
+              }
+              acc[date].push(mov);
+              return acc;
+            },
+            {} as Record<string, any[]>,
+          );
+
+          this.transactionGroups = Object.entries(groupedMap)
+            .map(([dia, movimentacoes]) => {
+              // Ordena as movimentações de cada dia da mais recente para a mais antiga
+              const movimentacoesOrdenadas = movimentacoes.sort((a, b) =>
+                b.data_hora.localeCompare(a.data_hora),
+              );
+
+              return {
+                dia,
+                movimentacoes: movimentacoesOrdenadas,
+                saldo: res.saldos_consolidados[dia] || 0,
+              };
+            })
+            // Ordena os dias do mais recente para o mais antigo
+            .sort((a, b) => b.dia.localeCompare(a.dia));
+
+          this.cdRef.detectChanges();
+        },
+      });
   }
 
   private converterDataParaAPI(data: string): string {
     if (!data || data.length < 10) return '';
-    // Converte de dd/MM/yyyy para yyyy-MM-dd
     const [dia, mes, ano] = data.split('/');
     return `${ano}-${mes}-${dia}`;
   }

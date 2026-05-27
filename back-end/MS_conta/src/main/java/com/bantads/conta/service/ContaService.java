@@ -90,17 +90,12 @@ public class ContaService {
         return contaRepository.findByCpfIn(cpf);
     }
 
-<<<<<<< HEAD
     @Transactional(readOnly = true)
     public List<Conta> findByContaNum(List<String> contas) {
         return contaRepository.findByCpfIn(contas);
     }
 
-
     @Transactional(readOnly = true)
-=======
-    @Transactional
->>>>>>> b1a4c2eeb2797e27829411f2235a01a7d5cfd850
     public Conta getConta(String numConta) {
         return contaRepository.findByConta(numConta)
                 .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));

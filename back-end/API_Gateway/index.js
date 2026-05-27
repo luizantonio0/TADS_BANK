@@ -88,7 +88,7 @@ app.use(async (req, res, next) => {
 
     if(targetRoute.name == "extrato" && req.query.include == "all") {
         let conta = parsedRoute.params.conta;
-        return await handleExtratoFull(res, claims, conta);
+        return await handleExtratoFull(res, claims, conta, req.query);
     }
 
     return createProxyMiddleware({

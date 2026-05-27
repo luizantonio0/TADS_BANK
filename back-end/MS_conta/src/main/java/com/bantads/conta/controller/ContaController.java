@@ -74,7 +74,7 @@ public class ContaController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{conta}/transferencia")
+    @PostMapping("/{conta}/transferir")
     public ResponseEntity<Void> transferir(
             @RequestHeader("X-User-Id") String cpfLogado,
             @PathVariable("conta") String conta,
@@ -96,6 +96,7 @@ public class ContaController {
     @GetMapping("/{numConta}/extrato")
     public ResponseEntity<ExtratoResponseDTO> getExtrato(
             @PathVariable String numConta,
+            @RequestParam(name = "include", required = false) String include,
             @RequestParam(name = "inicio", required = false, defaultValue = "1971-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam(name = "fim", required = false, defaultValue = "2100-01-01") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) throws HttpException{
         return ResponseEntity.ok(movimentacaoService.getExtrato(numConta, inicio, fim));

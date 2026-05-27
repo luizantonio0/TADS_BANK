@@ -19,15 +19,11 @@ export const routes = [
     { name: "criarGerente", method: 'POST', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
     { name: "buscarGerentes", method: 'GET', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' }, 
 
-<<<<<<< HEAD
     { name: "buscarContas", method: 'GET', path: '/contas', target: services.contas, public: false, profiles: 'ADMINISTRADOR,GERENTE' },
     { name: "transferirSaldo", method: 'POST', path: '/contas/:conta/transferir', target: services.contas, public: false, profiles: 'CLIENTE' },
     { name: "depositarSaldo", method: 'POST', path: '/contas/:conta/depositar', target: services.contas, public: false, profiles: 'CLIENTE' },
     { name: "sacarSaldo", method: 'POST', path: '/contas/:conta/sacar', target: services.contas, public: false, profiles: 'CLIENTE' },
-    { name: "extrato", method: 'GET', path: '/contas/:conta/extrato', target: services.contas, public: false, profiles: 'CLIENTE' }
-=======
-    { name: "buscarContas", method: 'GET', path: '/contas', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR,GERENTE' },
+    { name: "extrato", method: 'GET', path: '/contas/:conta/extrato', target: services.contas, public: false, profiles: 'CLIENTE' },
     { name: "depositar", method: 'POST', path: '/contas/:conta/depositar', target: services.contas, public: false, profiles: 'CLIENTE' },
     { name: "sacar", method: 'POST', path: '/contas/:conta/sacar', target: services.contas, public: false, profiles: 'CLIENTE' }
->>>>>>> b1a4c2eeb2797e27829411f2235a01a7d5cfd850
 ]
