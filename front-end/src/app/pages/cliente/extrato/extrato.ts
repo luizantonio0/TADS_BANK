@@ -62,7 +62,7 @@ export class Extrato implements OnInit, OnChanges {
         next: (res) => {
           const groupedMap = res.movimentacoes.reduce(
             (acc, mov) => {
-              const date = mov.data_hora.split('T')[0];
+              const date = mov.data.split('T')[0];
               if (!acc[date]) {
                 acc[date] = [];
               }
@@ -76,7 +76,7 @@ export class Extrato implements OnInit, OnChanges {
             .map(([dia, movimentacoes]) => {
               // Ordena as movimentações de cada dia da mais recente para a mais antiga
               const movimentacoesOrdenadas = movimentacoes.sort((a, b) =>
-                b.data_hora.localeCompare(a.data_hora),
+                b.data.localeCompare(a.data),
               );
 
               return {

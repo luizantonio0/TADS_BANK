@@ -32,7 +32,7 @@ public class SagaCreateCredentialsStrategy implements SagaCommandStrategy {
             var creds = authService.createCredentials(dto.email(), dto.cpf(), encoder.encode(dto.password()), dto.profile());
             redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:credentials", creds.getId());
             
-            //emailService.sendEmail(dto.email(), "Bem vindo ao BANTADS!", "Seja bem vindo ao banco mais tecnológico do mundo!\nUtilize a senha " + dto.password() + " para entrar na sua conta.");
+            emailService.sendEmail(dto.email(), "Bem vindo ao BANTADS!", "Seja bem vindo ao banco mais tecnológico do mundo!\nUtilize a senha " + dto.password() + " para entrar na sua conta.");
 
         } catch (Exception ex) {
             throw ex;

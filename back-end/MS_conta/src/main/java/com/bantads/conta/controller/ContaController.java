@@ -32,11 +32,12 @@ public class ContaController {
 
     @GetMapping
     public ResponseEntity<List<ContaDTO>> findAll(
-        @RequestParam(name = "filtro", required = false) String filtro,
-        @RequestParam(name = "contas", required = false) String contas,
-        @RequestHeader("X-User-Id") String cpfLogado
+        @RequestParam(name = "filtro", required = false, defaultValue = "") String filtro,
+        @RequestParam(name = "contas", required = false, defaultValue = "") String contas,
+        @RequestHeader("X-User-Id") String cpfLogado,
+        @RequestHeader("X-User-Profile") String profile
     ) throws Exception {
-        return new ResponseEntity<>(contaService.findAll(filtro, cpfLogado, contas).stream().map(ContaDTO::from).toList(), HttpStatus.OK);
+        return new ResponseEntity<>(contaService.findAll(filtro, cpfLogado, profile, contas).stream().map(ContaDTO::from).toList(), HttpStatus.OK);
     }
 
     @GetMapping("/cliente/{cpf}")
@@ -59,29 +60,35 @@ public class ContaController {
     }
 
     @PostMapping("/{conta}/depositar")
-    public ResponseEntity<Void> depositar(
+    public ResponseEntity<MovimentacaoResultDTO> depositar(
             @RequestHeader("X-User-Id") String cpfLogado,
             @PathVariable("conta") String conta,
             @RequestBody DepositoDTO dto) throws HttpException {
-        movimentacaoService.depositar(conta, cpfLogado, dto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(movimentacaoService.depositar(conta, cpfLogado, dto));
+    }
+
+    @PostMapping("/{conta}/saldo")
+    public ResponseEntity<SaldoDTO> getSaldo(
+            @PathVariable("conta") String conta,
+            @RequestHeader("X-User-Id") String cpfLogado,
+            @RequestHeader("X-User-Profile") String profile) throws HttpException {
+        var c = contaService.findConta(conta, cpfLogado, profile);
+        return ResponseEntity.ok(new SaldoDTO(c.getCpf(), c.getConta(), c.getSaldo()));
     }
 
     @PostMapping("/{conta}/sacar")
-    public ResponseEntity<Void> sacar(
+    public ResponseEntity<MovimentacaoResultDTO> sacar(
             @PathVariable("conta") String conta,
             @RequestBody SaqueDTO dto) {
-        movimentacaoService.sacar(conta, dto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(movimentacaoService.sacar(conta, dto));
     }
 
     @PostMapping("/{conta}/transferir")
-    public ResponseEntity<Void> transferir(
+    public ResponseEntity<MovimentacaoResultDTO> transferir(
             @RequestHeader("X-User-Id") String cpfLogado,
             @PathVariable("conta") String conta,
             @RequestBody TransferenciaDTO dto) throws HttpException {
-        movimentacaoService.transferir(conta, cpfLogado, dto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(movimentacaoService.transferir(conta, cpfLogado, dto));
     }
 
     @GetMapping("/{numConta}")

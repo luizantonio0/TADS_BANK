@@ -19,7 +19,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID>, Revisio
        Optional<Cliente> findByCpf(String cpf);
        boolean existsByCpf(String cpf);
        boolean existsByEmail(String email);
-       List<Cliente> findByCpfGerenteAndAprovado(String cpfGerente, boolean aprovado);
+       List<Cliente> findByCpfGerenteAndAprovadoOrderByCriacaoAsc(String cpfGerente, boolean aprovado);
        List<Cliente> findByCpfIn(List<String> cpf);
        @Query("SELECT c FROM Cliente c WHERE c.cpfGerente = :cpfGerente " +
               "AND (c.cpf LIKE %:termo% OR c.nome LIKE %:termo%) " +

@@ -15,6 +15,7 @@ import com.bantads.cliente.dto.saga.input.GetGerenteInputDTO;
 import com.bantads.cliente.dto.saga.input.RejeitarClienteInputDTO;
 import com.bantads.cliente.dto.saga.output.*;
 import com.bantads.cliente.exception.BadRequestException;
+import com.bantads.cliente.exception.ForbiddenException;
 import com.bantads.cliente.exception.HttpException;
 import com.bantads.cliente.exception.InternalServerErrorException;
 import com.bantads.cliente.exception.NotFoundException;
@@ -174,8 +175,10 @@ public class OrchestrationService {
             throw new NotFoundException("Cliente não encontrado");
         }
 
+        System.out.println(cliente.get().getCpfGerente() + " - " + cpfGerente);
+
         if (cliente.get().getCpfGerente() == null || !cliente.get().getCpfGerente().equalsIgnoreCase(cpfGerente)) {
-            throw new UnauthorizedException("Você não tem permissão para isso.");
+            throw new ForbiddenException("Você não tem permissão para isso.");
         }
 
         if (cliente.get().isAprovado()) {

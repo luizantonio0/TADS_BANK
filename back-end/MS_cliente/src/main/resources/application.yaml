@@ -37,5 +37,5 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 mail:
-  username: test@gmail.com
-  password: 1234
+  username: ${GMAIL_USERNAME}
+  password: ${GMAIL_PASSWORD}

@@ -39,7 +39,7 @@ public class MovimentacaoService {
     private RabbitTemplate rabbitTemplate;
 
     @Transactional
-    public void depositar(String conta, String cpfLogado, DepositoDTO dto) throws HttpException {
+    public MovimentacaoResultDTO depositar(String conta, String cpfLogado, DepositoDTO dto) throws HttpException {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
         var contaDestino = contaRepository.findByConta(conta)
                 .orElseThrow(() -> new BadRequestException("Conta de depósito não encontrada"));
@@ -52,7 +52,7 @@ public class MovimentacaoService {
         contaRepository.save(contaDestino);
 
         var movimentacao = Movimentacao.builder()
-                .dataHora(LocalDateTime.now())
+                .dataHora(LocalDateTime.now().withNano(0))
                 .tipo(TipoMovimentacao.DEPOSITO)
                 .valor(valor)
                 .contaOrigem(conta)
@@ -61,10 +61,12 @@ public class MovimentacaoService {
         movimentacaoRepository.save(movimentacao);
         sincronizarMovimentacao(movimentacao);
         sincronizarConta(contaDestino);
+
+        return new MovimentacaoResultDTO(contaDestino.getConta(), movimentacao.getDataHora(), contaDestino.getSaldo(), null, null);
     }
 
     @Transactional
-    public void sacar(String conta, SaqueDTO dto) {
+    public MovimentacaoResultDTO sacar(String conta, SaqueDTO dto) {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
         var contaDestino = contaRepository.findByConta(conta)
                 .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
@@ -77,7 +79,7 @@ public class MovimentacaoService {
         contaDestino.setSaldo(contaDestino.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));
 
         var movimentacao = Movimentacao.builder()
-                .dataHora(LocalDateTime.now())
+                .dataHora(LocalDateTime.now().withNano(0))
                 .tipo(TipoMovimentacao.SAQUE)
                 .valor(valor)
                 .contaOrigem(conta)
@@ -88,10 +90,12 @@ public class MovimentacaoService {
 
         sincronizarMovimentacao(movimentacao);
         sincronizarConta(contaDestino);
+
+        return new MovimentacaoResultDTO(contaDestino.getConta(), movimentacao.getDataHora(), contaDestino.getSaldo(), null, null);
     }
 
     @Transactional
-    public void transferir(String conta, String cpfLogado, TransferenciaDTO dto) throws HttpException {
+    public MovimentacaoResultDTO transferir(String conta, String cpfLogado, TransferenciaDTO dto) throws HttpException {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
         var origem = contaRepository.findByConta(conta)
                 .orElseThrow(() -> new BadRequestException("Conta de origem não encontrada"));
@@ -119,7 +123,7 @@ public class MovimentacaoService {
         contaRepository.save(destino);
 
         var movimentacao = Movimentacao.builder()
-                .dataHora(LocalDateTime.now())
+                .dataHora(LocalDateTime.now().withNano(0))
                 .tipo(TipoMovimentacao.TRANSFERENCIA)
                 .valor(valor)
                 .contaOrigem(conta)
@@ -131,6 +135,8 @@ public class MovimentacaoService {
         sincronizarConta(origem);
         sincronizarConta(destino);
         sincronizarMovimentacao(movimentacao);
+
+        return new MovimentacaoResultDTO(origem.getConta(), movimentacao.getDataHora(), origem.getSaldo(), dto.valor(), destino.getConta());
     }
 
     protected void sincronizarMovimentacao(Movimentacao movimentacao) {
@@ -216,8 +222,8 @@ public class MovimentacaoService {
                 }
 
                 dtos.add(new MovimentacaoDTO(
-                        m.getDataHora(),
-                        m.getTipo().name(),
+                        m.getDataHora().withNano(0),
+                        m.getTipo().nome(),
                         m.getContaOrigem(),
                         m.getContaDestino(),
                         valor));

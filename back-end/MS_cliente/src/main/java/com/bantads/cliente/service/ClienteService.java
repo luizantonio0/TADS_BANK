@@ -20,6 +20,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,6 @@ public class ClienteService {
 
     public List<Cliente> findClientes(String cpfLogado, String profileLogado, String filtro, String nome)
             throws HttpException {
-        System.out.println(cpfLogado + " " + profileLogado + " " + filtro);
 
         var isGerente = profileLogado.equalsIgnoreCase("GERENTE");
         var isAdmin = profileLogado.equalsIgnoreCase("ADMINISTRADOR");
@@ -55,11 +55,11 @@ public class ClienteService {
         if (filtro.equals("para_aprovar")) {
             if (!isGerente)
                 throw new ForbiddenException("Você não tem permissão para efetuar esta operação");
-            return clienteRepository.findByCpfGerenteAndAprovado(cpfLogado, false);
+            return clienteRepository.findByCpfGerenteAndAprovadoOrderByCriacaoAsc(cpfLogado, false);
         }
 
         if (isAdmin) {
-            return clienteRepository.findAll();
+            return clienteRepository.findAll(Sort.by("criacao").descending());
         }
 
         return null;

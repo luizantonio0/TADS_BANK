@@ -1,36 +1,36 @@
 <div>
     <div class="flex items-center mb-3">
         @if (transaction.tipo === 'TRANSFERENCIA') {
-            @if(transaction.conta_destino == accountNumber) {
+            @if(transaction.destino == accountNumber) {
             <span class="material-symbols-outlined text-blue-500">arrow_downward</span>
             <div class="ms-3">
                 <p class="text-sm font-medium">{{ transaction.nome_origem }}</p>
-                <p class="text-xs text-gray-400">Transferência recebida - {{ transaction.data_hora| date: 'dd/MM/yyyy - HH:mm' }}</p>
+                <p class="text-xs text-gray-400">Transferência recebida - {{ transaction.data| date: 'dd/MM/yyyy - HH:mm' }}</p>
             </div>
             } @else {
             <span class="material-symbols-outlined text-red-400">arrow_upward</span>
             <div class="ms-3">
                 <p class="text-sm font-medium">{{ transaction.nome_destino }}</p>
-                <p class="text-xs text-gray-400">Transferência enviada - {{ transaction.data_hora | date: 'dd/MM/yyyy - HH:mm' }}</p>
+                <p class="text-xs text-gray-400">Transferência enviada - {{ transaction.data | date: 'dd/MM/yyyy - HH:mm' }}</p>
             </div>
             }
         } @else if (transaction.tipo === 'DEPOSITO'){
             <span class="material-symbols-outlined text-blue-500">arrow_downward</span>
             <div class="ms-3">
                 <p class="text-sm font-medium">Depósito em caixa eletrônico</p>
-                <p class="text-xs text-gray-400">Depósito - {{ transaction.data_hora | date: 'dd/MM/yyyy - HH:mm' }}</p>
+                <p class="text-xs text-gray-400">Depósito - {{ transaction.data | date: 'dd/MM/yyyy - HH:mm' }}</p>
             </div>
         } @else if (transaction.tipo === 'SAQUE'){
             <span class="material-symbols-outlined text-red-400">arrow_upward</span>
             <div class="ms-3">
                 <p class="text-sm font-medium">Saque em caixa eletrônico</p>
-                <p class="text-xs text-gray-400">Saque - {{ transaction.data_hora | date: 'dd/MM/yyyy - HH:mm' }}</p>
+                <p class="text-xs text-gray-400">Saque - {{ transaction.data | date: 'dd/MM/yyyy - HH:mm' }}</p>
             </div>
         }
         <div class="ms-auto font-semibold text-sm" 
-            [class.text-blue-500]="transaction.tipo === 'DEPOSITO' || transaction.conta_destino == accountNumber" 
-            [class.text-red-400]="transaction.tipo === 'SAQUE' || transaction.conta_origem == accountNumber">
-            @if (transaction.tipo === 'SAQUE' || (transaction.tipo == "TRANSFERENCIA" && transaction.conta_origem == accountNumber)) {
+            [class.text-blue-500]="transaction.tipo === 'DEPOSITO' || transaction.destino == accountNumber" 
+            [class.text-red-400]="transaction.tipo === 'SAQUE' || transaction.origem == accountNumber">
+            @if (transaction.tipo === 'SAQUE' || (transaction.tipo == "TRANSFERENCIA" && transaction.origem == accountNumber)) {
                 -
             }{{ transaction.valor | currency:'BRL' }}
         </div>

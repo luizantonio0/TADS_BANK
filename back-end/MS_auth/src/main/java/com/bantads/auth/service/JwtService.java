@@ -41,7 +41,7 @@ public class JwtService {
     }
 
     public void revokeAllTokens(String cpf) {
-        tokenRepository.deleteByCpf(cpf);
+        //tokenRepository.deleteByCpf(cpf);
     }
 
     public TokenClaimsDTO extractUsuario(String token) {

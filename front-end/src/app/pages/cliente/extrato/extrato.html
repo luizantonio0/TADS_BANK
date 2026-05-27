@@ -44,7 +44,7 @@
                         group.saldo | currency:'BRL' }}</span>
                 </span>
             </div>
-            @for(item of group.movimentacoes; track item.data_hora) {
+            @for(item of group.movimentacoes; track item.data) {
             <transaction-feed-item [transaction]="item" [accountNumber]="accountNumber" />
             } @empty {
             <p class="text-sm text-gray-500">Nenhuma transação nesse dia.</p>

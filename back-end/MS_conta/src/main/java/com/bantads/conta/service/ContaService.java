@@ -6,6 +6,8 @@ import com.bantads.conta.dto.ContaCreateInputDTO;
 import com.bantads.conta.dto.ContaDTO;
 import com.bantads.conta.dto.SaldoGerenteDTO;
 import com.bantads.conta.dto.cqrs.CQRSSyncEntity;
+import com.bantads.conta.exception.ForbiddenException;
+import com.bantads.conta.exception.HttpException;
 import com.bantads.conta.exception.NotFoundException;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.model.Movimentacao;
@@ -41,52 +43,35 @@ public class ContaService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Transactional
     public void rollbackConta(UUID uuid) throws Exception {
-
-        Page<Revision<Integer, Conta>> revisions = contaRepository.findRevisions(
-                uuid,
-                PageRequest.of(0, 2));
-
+        Page<Revision<Integer, Conta>> revisions = contaRepository.findRevisions(uuid, PageRequest.of(0, 2));
         List<Revision<Integer, Conta>> content = revisions.getContent();
 
-        var whitelist = List.of(
-                "1291",
-                "0950",
-                "8573",
-                "5887",
-                "7617");
+        var whitelist = List.of("1291", "0950", "8573", "5887", "7617");
 
         if (content.size() >= 2) {
-
-            Conta revisionEntity = content.get(1).getEntity();
-
-            Conta atual = contaRepository.findById(uuid)
-                    .orElseThrow();
-
-            atual.setConta(revisionEntity.getConta());
-            atual.setCpfGerente(revisionEntity.getCpfGerente());
-            atual.setSaldo(revisionEntity.getSaldo());
-            atual.setLimite(revisionEntity.getLimite());
-            atual.setCriacao(revisionEntity.getCriacao());
-            atual.setCpf(revisionEntity.getCpf());
-
-            Conta salva = contaRepository.save(atual);
-
-            sincronizarConta(salva);
-
+            var rev = content.get(1);
+            contaRepository.save(rev.getEntity());
+            sincronizarConta(rev.getEntity());
         } else {
-
             var conta = contaRepository.findById(uuid);
-
-            if (conta.isPresent()
-                    && !whitelist.contains(conta.get().getConta())) {
-
+            if (conta.isPresent() && !whitelist.contains(conta.get().getConta())) {
                 contaRepository.deleteById(uuid);
-
                 sincronizarDeleteConta(uuid);
             }
         }
+    }
+
+    public Conta findConta(String conta, String cpfLogado, String profile) throws HttpException {
+        var contaOpt = contaRepository.findByConta(conta);
+        if (contaOpt.isEmpty()) {
+            throw new NotFoundException("Conta não encontrada");
+        }
+        var contaEntity = contaOpt.get();
+        if (!contaEntity.getCpf().equals(cpfLogado) && !profile.equalsIgnoreCase("ADMINISTRADOR") && !contaEntity.getCpfGerente().equals(cpfLogado)) {
+            throw new ForbiddenException("Você não tem permissão para acessar essa conta");
+        }
+        return contaEntity;
     }
 
     @Transactional(readOnly = true)
@@ -124,6 +109,7 @@ public class ContaService {
         return contaRepository.findByCpfIn(contas);
     }
 
+
     @Transactional(readOnly = true)
     public Conta getConta(String numConta) {
         return contaRepository.findByConta(numConta)
@@ -131,17 +117,17 @@ public class ContaService {
     }
 
     @Transactional(readOnly = true)
-    public List<Conta> findAll(String filtro, String cpfGerente, String contas) {
-        if (filtro.equalsIgnoreCase("melhores_clientes")) {
+    public List<Conta> findAll(String filtro, String cpfGerente, String profile, String contas) {
+        if(filtro.equalsIgnoreCase("melhores_clientes")) {
             return findMelhoresContas();
         }
-        if (filtro.equalsIgnoreCase("contas")) {
+        if(filtro.equalsIgnoreCase("contas")) {
             return contaRepository.findByContaIn(Arrays.asList(contas.split(",")));
         }
-        if (cpfGerente != null && !cpfGerente.isBlank()) {
+        if(cpfGerente != null && !profile.equalsIgnoreCase("ADMINISTRADOR") && !cpfGerente.isBlank()) {
             return contaRepository.findByCpfGerente(cpfGerente);
         }
-        return null;
+        return contaRepository.findAll();
     }
 
     public Conta atualizarLimite(String cpf, BigDecimal salario) {
@@ -182,7 +168,7 @@ public class ContaService {
         var cpfsList = List.of(cpfs.split(","));
 
         return contaRepository.findByCpfGerenteIn(cpfsList)
-                .stream().collect(Collectors.toMap(c -> c.getCpf(), ContaDTO::from));
+            .stream().collect(Collectors.toMap(c -> c.getCpf(), ContaDTO::from));
     }
 
     @Transactional(readOnly = true)

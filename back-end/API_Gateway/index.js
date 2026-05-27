@@ -10,6 +10,7 @@ import { handleMelhoresClientes } from './compositions/melhoresClientesCompositi
 import { handleConsultaCliente } from './compositions/clienteComposition.js';
 import { handleExtratoFull } from './compositions/extratoComposition.js';
 import { handleReboot } from './compositions/rebootComposition.js';
+import { handleRelatorioCliente } from './compositions/clienteRelatorioComposition.js';
 
 const app = express();
 const PORT = 3000;
@@ -66,9 +67,11 @@ app.use(async (req, res, next) => {
             return res.status(authResp.status).json({error: claims.error})
         }
         if(targetRoute.profiles !== "*" && !targetRoute.profiles.toUpperCase().split(",").includes(claims.profile.toUpperCase())) {
-            return res.status(401).json("Você não tem permissão para performar essa ação.");
+            return res.status(403).json("Você não tem permissão para performar essa ação.");
         }
     }
+
+    console.log(targetRoute.name + ":" + JSON.stringify(req.query) + ":" + (claims ? claims.cpf : ''))
 
     if(targetRoute.name == "reboot") {
         return await handleReboot(res);
@@ -80,6 +83,10 @@ app.use(async (req, res, next) => {
 
     if(targetRoute.name == "buscarClientes" && req.query.filtro == "melhores_clientes") {
         return await handleMelhoresClientes(res, claims);
+    }
+
+    if(targetRoute.name == "buscarClientes" && req.query.filtro == "adm_relatorio_clientes") {
+        return await handleRelatorioCliente(res, claims);
     }
 
     if(targetRoute.name == "buscarClientes" && !req.query.filtro) {

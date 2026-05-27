@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record MovimentacaoDTO(
-    @JsonProperty("data_hora") LocalDateTime dataHora,
+    @JsonProperty("data") LocalDateTime dataHora,
     String tipo,
-    @JsonProperty("conta_origem") String contaOrigem,
-    @JsonProperty("conta_destino") String contaDestino,
+    @JsonProperty("origem") String contaOrigem,
+    @JsonProperty("destino") String contaDestino,
     BigDecimal valor
 ) {}

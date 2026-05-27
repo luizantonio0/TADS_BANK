@@ -6,9 +6,9 @@ export interface ExtratoResponse {
 }
 
 export interface Movimentacao {
-    data_hora: string,
+    data: string,
     operacao: string,
-    conta_origem: string,
-    conta_destino: string,
+    origem: string,
+    destino: string,
     valor: number
 }

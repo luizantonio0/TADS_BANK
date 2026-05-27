@@ -5,10 +5,10 @@ export interface ContaResponse {
 }
 
 export interface Movimentacao {
-    data_hora: string,
+    data: string,
     tipo: string,
-    conta_origem: string,
-    conta_destino: string | null,
+    origem: string,
+    destino: string | null,
     valor: number;
     nome_origem?: string,
     nome_destino: string;
