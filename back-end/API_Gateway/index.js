@@ -77,7 +77,7 @@ app.use(async (req, res, next) => {
         return await handleReboot(res);
     }
 
-    if(targetRoute.name == "buscarGerentes" && req.query.numero == "dashboard") {
+    if(targetRoute.name == "buscarGerentes" && req.query.filtro == "dashboard") {
         return await handleGerenteDashboard(res, claims);
     }
 
