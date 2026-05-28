@@ -42,7 +42,7 @@ public class ClienteService {
     @Autowired
     private ClienteMapper mapper;
 
-    public List<Cliente> findClientes(String cpfLogado, String profileLogado, String filtro, String nome)
+    public List<Cliente> findClientes(String cpfLogado, String profileLogado, String filtro, String nome, String orderBy)
             throws HttpException {
 
         var isGerente = profileLogado.equalsIgnoreCase("GERENTE");
@@ -59,7 +59,12 @@ public class ClienteService {
         }
 
         if (isAdmin) {
-            return clienteRepository.findAll(Sort.by("criacao").descending());
+            var sort = switch(orderBy) {
+                case "criacao" -> Sort.by("criacao").descending();
+                case "nome" -> Sort.by("nome").ascending();
+                default -> Sort.by("criacao").descending();
+            };
+            return clienteRepository.findAll(sort);
         }
 
         return null;

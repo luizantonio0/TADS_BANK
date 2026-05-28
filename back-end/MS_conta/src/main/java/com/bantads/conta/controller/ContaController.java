@@ -67,7 +67,7 @@ public class ContaController {
         return ResponseEntity.ok(movimentacaoService.depositar(conta, cpfLogado, dto));
     }
 
-    @PostMapping("/{conta}/saldo")
+    @GetMapping("/{conta}/saldo")
     public ResponseEntity<SaldoDTO> getSaldo(
             @PathVariable("conta") String conta,
             @RequestHeader("X-User-Id") String cpfLogado,

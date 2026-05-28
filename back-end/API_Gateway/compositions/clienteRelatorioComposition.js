@@ -12,7 +12,7 @@ export async function handleRelatorioCliente(res, claims) {
 
     if(claims.profile != "ADMINISTRADOR") return res.status(403).json({ error: "Você não tem permissão para isso." });
 
-    const clienteResp = await fetch(services.clientes + `/clientes`, config)
+    const clienteResp = await fetch(services.clientes + `/clientes?sortBy=nome`, config)
     if (!clienteResp.ok) return res.status(clienteResp.status).json(clienteResp.body);
     const clientes = await clienteResp.json()
 

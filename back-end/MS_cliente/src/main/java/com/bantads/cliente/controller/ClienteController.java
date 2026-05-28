@@ -31,10 +31,11 @@ public class ClienteController {
     public ResponseEntity<List<ClienteDTO>> findAll(
         @RequestParam(name = "filtro", required = false, defaultValue = "") String filtro,
         @RequestParam(name = "nome", required = false, defaultValue = "") String nome,
+        @RequestParam(name = "sortBy", required = false, defaultValue = "") String sortBy,
         @RequestHeader("X-User-Id") String cpfLogado,
         @RequestHeader("X-User-Profile") String profileLogado
     ) throws HttpException {
-        return ResponseEntity.ok(clienteService.findClientes(cpfLogado, profileLogado, filtro, nome).stream().map(ClienteDTO::from).toList());
+        return ResponseEntity.ok(clienteService.findClientes(cpfLogado, profileLogado, filtro, nome, sortBy).stream().map(ClienteDTO::from).toList());
     }
 
     @GetMapping("/relation")
