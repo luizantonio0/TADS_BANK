@@ -128,6 +128,8 @@ services:
       timeout: 3s
       retries: 30
       start_period: 60s
+    volumes:
+      - ./back-end/Orquestrador:/app
     networks:
       - tadsbank
 
@@ -152,6 +154,8 @@ services:
       start_period: 60s
     ports:
       - "8055:8055"
+    volumes:
+      - ./back-end/MS_auth:/app
     networks:
       - auth
       - tadsbank
@@ -174,6 +178,8 @@ services:
       timeout: 3s
       retries: 30
       start_period: 60s
+    volumes:
+      - ./back-end/MS_cliente:/app
     ports:
       - "4729:4729"
     networks:
@@ -195,6 +201,8 @@ services:
       timeout: 3s
       retries: 30
       start_period: 60s
+    volumes:
+      - ./back-end/MS_gerente:/app
     ports:
       - "2563:2563" 
     networks:
@@ -221,6 +229,8 @@ services:
       timeout: 3s
       retries: 30
       start_period: 60s
+    volumes:
+      - ./back-end/MS_conta:/app  
     networks:
       - conta
       - tadsbank
