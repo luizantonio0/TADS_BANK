@@ -14,11 +14,12 @@ import java.util.UUID;
 @Repository
 public interface GerenteRepository extends JpaRepository<Gerente, UUID>, RevisionRepository<Gerente, UUID, Integer> {
     Optional<Gerente> findByCpf(String cpf);
+    Optional<Gerente> findByEmail(String email);
     boolean existsByCpf(String cpf);
     boolean existsByEmail(String email);
     void deleteByCpf(String cpf);
 
-    List<Gerente> findByTipo(String tipo);
+    List<Gerente> findByTipoOrderByNomeAsc(String tipo);
 
     @Query("SELECT g FROM Gerente g WHERE g.tipo = 'GERENTE' ORDER BY g.totalClientes ASC, g.cpf ASC")
     List<Gerente> findTop1GerenteComMenosClientes();

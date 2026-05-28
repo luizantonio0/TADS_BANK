@@ -5,7 +5,6 @@ import com.bantads.auth.dto.saga.CredentialsUpdateInputDTO;
 import com.bantads.auth.exception.BadRequestException;
 import com.bantads.auth.service.AuthService;
 import com.bantads.auth.strategy.SagaCommandStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

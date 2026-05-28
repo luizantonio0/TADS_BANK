@@ -26,12 +26,10 @@ public class SagaUpdateGerenteStrategy implements SagaCommandStrategy {
         AtualizaGerenteDTO _dto = mapper.readValue(cmd.payload(), AtualizaGerenteDTO.class);
 
         var dto = new AtualizaGerenteDTO(
+            null,
                 _dto.nome(),
                 _dto.email(),
-                _dto.senha(),
-                _dto.telefone(),
-                _dto.tipo(),
-                null
+                _dto.senha()
         );
 
         var gerente = gerenteService.updateByCpf(_dto.cpf(), dto);

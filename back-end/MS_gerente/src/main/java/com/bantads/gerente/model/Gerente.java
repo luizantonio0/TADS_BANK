@@ -32,11 +32,6 @@ public class Gerente {
     @Column(name = "email", nullable = false, length = 128)
     private String email;
 
-    @NotBlank
-    @Size(min = 3, max = 128)
-    @Column(name = "telefone", nullable = false, length = 11)
-    private String telefone;
-
 
     @Column(nullable = false)
     private String tipo;
@@ -50,7 +45,6 @@ public class Gerente {
     public Gerente(AtualizaGerenteDTO atualizaGerenteDTO) {
         this.nome = atualizaGerenteDTO.nome();
         this.email = atualizaGerenteDTO.email();
-        this.telefone = atualizaGerenteDTO.telefone();
     }
 
     public Gerente(CriaGerenteDTO criaGerenteDTO) {
@@ -58,7 +52,6 @@ public class Gerente {
         this.cpf = criaGerenteDTO.cpf();
         this.email = criaGerenteDTO.email();
         this.tipo = criaGerenteDTO.tipo().name();
-        this.telefone = criaGerenteDTO.telefone();
         this.totalClientes = 0;
     }
 
@@ -94,16 +87,8 @@ public class Gerente {
         return tipo;
     }
 
-    public String getTelefone() {
-        return telefone;
-    }
-
     public Integer getTotalClientes() {
         return totalClientes;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
     }
 
     public void setCpf(String cpf) {

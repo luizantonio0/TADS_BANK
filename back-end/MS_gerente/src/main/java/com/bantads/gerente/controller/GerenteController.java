@@ -46,23 +46,27 @@ public class GerenteController {
     }
 
     @PutMapping("/{cpf}")
-    public ResponseEntity<GerenteAtualizadoDTO> update(@PathVariable String cpf , @RequestBody AtualizaGerenteDTO atualizaGerenteDTO) throws Exception {
+    public CompletableFuture<ResponseEntity<GerenteAtualizadoDTO>> update(
+        @PathVariable("cpf") String cpf , 
+        @RequestBody AtualizaGerenteDTO atualizaGerenteDTO
+    ) throws Exception {
+        cpf = cpf.replaceAll("[^0-9]", "");
         var dto = new AtualizaGerenteDTO(
+                cpf,
                 atualizaGerenteDTO.nome(),
                 atualizaGerenteDTO.email(),
-                atualizaGerenteDTO.senha(),
-                atualizaGerenteDTO.telefone(),
-                atualizaGerenteDTO.tipo(),
-                null
+                atualizaGerenteDTO.senha()
         );
 
-        if (atualizaGerenteDTO.senha() == null) {
+        if (atualizaGerenteDTO.senha() == null || atualizaGerenteDTO.senha().isBlank()) {
             var gerente = gerenteService.updateByCpf(cpf, dto);
-            return new ResponseEntity<>(new GerenteAtualizadoDTO(gerente), HttpStatus.OK);
+            return CompletableFuture.completedFuture(new ResponseEntity<>(new GerenteAtualizadoDTO(gerente), HttpStatus.OK));
 
         }
 
-        return new ResponseEntity<>(orchestrationService.startAtualizarGerente(cpf, dto).get(), HttpStatus.OK);
+        return orchestrationService.startAtualizarGerente(cpf, dto)
+                .thenApply(ResponseEntity::ok)
+                .orTimeout(30, TimeUnit.SECONDS);
 
     }
     

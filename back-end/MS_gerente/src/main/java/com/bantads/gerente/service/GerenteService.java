@@ -9,7 +9,7 @@ import com.bantads.gerente.model.Gerente;
 import com.bantads.gerente.repository.GerenteRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import com.bantads.gerente.mapper.GerenteMapper;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,13 +23,10 @@ import java.util.UUID;
 @Service
 public class GerenteService {
     private final GerenteRepository gerenteRepository;
-    private final GerenteMapper gerenteMapper;
     private final ValidatorService validatorService;
 
-    public GerenteService(GerenteRepository gerenteRepository, GerenteMapper gerenteMapper,
-            ValidatorService validatorService) {
+    public GerenteService(GerenteRepository gerenteRepository, ValidatorService validatorService) {
         this.gerenteRepository = gerenteRepository;
-        this.gerenteMapper = gerenteMapper;
         this.validatorService = validatorService;
     }
 
@@ -63,7 +60,7 @@ public class GerenteService {
     }
 
     public List<Gerente> findGerentes() {
-        return this.gerenteRepository.findByTipo("GERENTE");
+        return this.gerenteRepository.findByTipoOrderByNomeAsc("GERENTE");
     }
 
     @Transactional
@@ -127,7 +124,6 @@ public class GerenteService {
             gerenteAtual.setCpf(revisaoAnterior.getCpf());
             gerenteAtual.setNome(revisaoAnterior.getNome());
             gerenteAtual.setEmail(revisaoAnterior.getEmail());
-            gerenteAtual.setTelefone(revisaoAnterior.getTelefone());
             gerenteAtual.setTipo(GerenteTipo.valueOf(revisaoAnterior.getTipo()));
             gerenteAtual.setTotalClientes(
                     revisaoAnterior.getTotalClientes());
@@ -156,8 +152,7 @@ public class GerenteService {
         Gerente gerente = gerenteRepository.findByCpf(cpf)
                 .orElseThrow(() -> new NotFoundException("Gerente não encontrado!"));
 
-        gerenteMapper.ataualizaGerentePeloDto(atualizaGerenteDTO, gerente);
-
+        gerente.setNome(atualizaGerenteDTO.nome());
         gerente.setEmail(email);
 
         gerenteRepository.save(gerente);
@@ -182,7 +177,6 @@ public class GerenteService {
         g1.setCpf("98574307084");
         g1.setNome("Geniéve");
         g1.setEmail("ger1@bantads.com.br");
-        g1.setTelefone("11994289229");
         g1.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
         g1.setTotalClientes(2);
 
@@ -190,7 +184,6 @@ public class GerenteService {
         g2.setCpf("64065268052");
         g2.setNome("Godophredo");
         g2.setEmail("ger2@bantads.com.br");
-        g2.setTelefone("19942849924");
         g2.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
         g2.setTotalClientes(2);
 
@@ -198,7 +191,6 @@ public class GerenteService {
         g3.setCpf("23862179060");
         g3.setNome("Gyândula");
         g3.setEmail("ger3@bantads.com.br");
-        g3.setTelefone("84988422433");
         g3.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
         g3.setTotalClientes(1);
 
@@ -206,7 +198,6 @@ public class GerenteService {
         g4.setCpf("40501740066");
         g4.setNome("Adamântio");
         g4.setEmail("adm1@bantads.com.br");
-        g4.setTelefone("12994429024");
         g4.setTipo(com.bantads.gerente.enums.GerenteTipo.ADMINISTRADOR);
         g4.setTotalClientes(0);
 

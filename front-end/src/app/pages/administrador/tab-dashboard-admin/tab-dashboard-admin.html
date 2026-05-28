@@ -3,7 +3,7 @@
     <span class="material-symbols-outlined">dashboard</span>
     Dashboard de Gerentes
   </h2>
-  <div class="my-8 w-full grid grid-cols-4 text-white text-xl gap-x-2">
+  <div class="my-4 w-full grid grid-cols-4 text-white text-xl gap-x-2">
     <div class="w-full p-4 rounded-md space-y-2 bg-indigo shadow-md shadow-gray-300">
       <p class="text-3xl font-extrabold">{{ gerentes.length }}</p>
       <div class="flex gap-x-1 items-center">
@@ -33,7 +33,13 @@
       </div>
     </div>
   </div>
-  <data-grid [columns]="columns" [supplier]="carregarGerentes.bind(this)">
+
+  <button (click)="exibirModalAdicionar=true" class="bg-green-500 flex items-center justify-center gap-x-2 text-lg font-medium transition-colors mb-4">
+    <span class="material-symbols-outlined">add</span>
+    <span>Adicionar Gerente ou Administrador</span>
+  </button>
+
+  <data-grid #gridGerentes [columns]="columns" [supplier]="carregarGerentes.bind(this)">
     <ng-template #desktopRow let-item>
       <td>{{ item.gerente.nome }}</td>
       <td>{{ item.gerente.cpf | cpf }}</td>
@@ -54,6 +60,17 @@
           {{ item.saldo_negativo | currency: 'BRL'}}
         </div>
       </td>
+      <td>
+        <div class="flex [&>span]:cursor-pointer [&>span]:text-indigo gap-x-1">
+          <span class="material-symbols-outlined">search</span>
+          <span class="material-symbols-outlined" (click)="openEdit(item.gerente)">edit</span>
+          <span class="material-symbols-outlined" (click)="openDelete(item.gerente)">delete</span>
+        </div>
+      </td>
     </ng-template>
   </data-grid>
 </div>
+
+<app-modal-editar-gerente [gerente]="gerente!" [control]="exibirModalEditar" (close)="closeCallback()" (submited)="submitEdit($event)"/>
+<app-modal-excluir-gerente [control]="exibirModalExcluir" (close)="closeCallback()"/>
+<app-modal-adicionar-gerente [control]="exibirModalAdicionar" (close)="closeCallback()" (submited)="submitCreate($event)"/>

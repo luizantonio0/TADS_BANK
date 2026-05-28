@@ -7,11 +7,9 @@ public record CriaGerenteDTO(
         String email,
         String cpf,
         String senha,
-        String telefone,
         GerenteTipo tipo
 ) {
         public CriaGerenteDTO {
                 cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
-                telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
         }
 }

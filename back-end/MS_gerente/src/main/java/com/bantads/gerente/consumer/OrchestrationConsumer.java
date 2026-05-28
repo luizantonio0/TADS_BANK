@@ -35,7 +35,10 @@ public class OrchestrationConsumer {
 
     @RabbitListener(queues = "ms-gerente.orchestration.finished")
     public void onFinished(OrchestrationRequestResultDTO dto) {
-        if(orchestrationService.isCriarCliente(dto.idOrchestration())) {
+        if(orchestrationService.isAtualizarGerente(dto.idOrchestration())) {
+            orchestrationService.finishAtualizarGerente(dto);
+        }
+        if(orchestrationService.isCriarGerente(dto.idOrchestration())) {
             orchestrationService.finishCriarGerente(dto);
         }
     }

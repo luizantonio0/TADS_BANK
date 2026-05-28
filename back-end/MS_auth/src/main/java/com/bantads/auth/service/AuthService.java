@@ -268,7 +268,7 @@ public class AuthService {
         if (credentialsRepository.existsByEmail(email)) {
             throw new BadRequestException("Email já está em uso.");
         }
-        var cred = credentialsRepository.findById(cpf);
+        var cred = credentialsRepository.findByCpf(cpf);
 
         if (cred.isPresent()) {
             cred.get().setEmail(email);

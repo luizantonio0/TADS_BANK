@@ -38,7 +38,11 @@ public class OrchestrationService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public boolean isCriarCliente(UUID id) {
+    public boolean isCriarGerente(UUID id) {
+        return criarGerenteRequests.containsKey(id);
+    }
+
+    public boolean isAtualizarGerente(UUID id) {
         return criarGerenteRequests.containsKey(id);
     }
 
@@ -64,36 +68,29 @@ public class OrchestrationService {
         }
     }
 
-    public CompletableFuture<GerenteAtualizadoDTO> startAtualizarGerente(String _cpf, AtualizaGerenteDTO _dto) throws Exception{
-        var cpf = _cpf.replaceAll("[^0-9]", "");
+    public CompletableFuture<GerenteAtualizadoDTO> startAtualizarGerente(String cpf, AtualizaGerenteDTO dto) throws Exception{
 
-        if(!repository.existsByCpf(cpf)) {
-            throw new IllegalArgumentException("Gerente não encontrado!");
+        var gerente = repository.findByCpf(cpf).orElseThrow(() -> new IllegalArgumentException("Gerente não encontrado!"));
+
+        if(dto.email() != null && repository.existsByEmail(dto.email())) {
+            var donoEmail = repository.findByEmail(dto.email()).get();
+            if(donoEmail.getCpf() != cpf) {
+                throw new HttpException(409, "Gerente com email já cadastrado!");
+            }
         }
-
-        if(_dto.email() != null && repository.existsByEmail(_dto.email())) {
-            throw new IllegalArgumentException("Gerente com email já cadastrado!");
-        }
-
-        var dto = new AtualizaGerenteDTO(
-                _dto.nome(),
-                _dto.email(),
-                _dto.senha(),
-                _dto.telefone(),
-                _dto.tipo(),
-                cpf
-        );
 
         var orchestrationId = UUID.randomUUID();
         var mapper = new ObjectMapper();
 
         var authDTO = new CredentialsUpdateInputDTO(cpf, dto.email(), dto.senha());
 
-        var request = new OrchestrationRequestDTO(orchestrationId, true, List.of(
-                new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "UpdateCredentials", mapper.writeValueAsString(authDTO)),
-                new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "AtualizarGerente", mapper.writeValueAsString(dto))
-        ));
+        var cmdAuth = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "UpdateCredentials", mapper.writeValueAsString(authDTO));
+        var cmdGerente = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "AtualizarGerente", mapper.writeValueAsString(dto));
 
+        var atualizarLogin = (dto.senha() != null && !dto.senha().isBlank()) || (dto.email() != null && !dto.email().isBlank() && !dto.email().equalsIgnoreCase(gerente.getEmail()));
+
+        var request = new OrchestrationRequestDTO(orchestrationId, true, atualizarLogin ? List.of(cmdAuth, cmdGerente) : List.of(cmdGerente));
+                
         var completable = new CompletableFuture<GerenteAtualizadoDTO>();
         atualizarGerenteRequests.put(orchestrationId, completable);
         rabbitTemplate.convertAndSend("orchestration.orchestrate", request);
@@ -101,6 +98,36 @@ public class OrchestrationService {
         return completable;
     }
 
+    public void finishAtualizarGerente(OrchestrationRequestResultDTO result) {
+        CompletableFuture<GerenteAtualizadoDTO> completableFuture = null;
+
+        try {
+
+            completableFuture = atualizarGerenteRequests.get(result.idOrchestration());
+            prepareResult(result, atualizarGerenteRequests, "ms-gerente");
+            
+            ObjectMapper mapper = new ObjectMapper();
+            GerenteDTO gerenteDTO = mapper.readValue(result.payloads().get("ms-gerente"), GerenteDTO.class);
+
+            var dto = new GerenteAtualizadoDTO(
+                gerenteDTO.cpf(),
+                gerenteDTO.nome(),
+                gerenteDTO.email(),
+                gerenteDTO.tipo()
+            );
+
+            completableFuture.complete(dto);
+
+        } catch (Exception ex) {
+            if (completableFuture != null) {
+                completableFuture.completeExceptionally(ex);
+            }
+        } finally {
+            if (result != null && criarGerenteRequests.containsKey(result.idOrchestration())) {
+                atualizarGerenteRequests.remove(result.idOrchestration());
+            }
+        }
+    }
 
 
     public CompletableFuture<GerenteCriadoDTO> startCriarGerente(CriaGerenteDTO dto) throws Exception {

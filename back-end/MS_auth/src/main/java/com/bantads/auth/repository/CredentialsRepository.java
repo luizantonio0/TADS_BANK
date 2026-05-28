@@ -14,5 +14,6 @@ import java.util.Optional;
 @JaversSpringDataAuditable
 public interface CredentialsRepository extends MongoRepository<Credentials, String> {
     Optional<Credentials> findByEmail(@Param("email") String email);
+    Optional<Credentials> findByCpf(@Param("cpf") String cpf);
     boolean existsByEmail(String email);
 }
