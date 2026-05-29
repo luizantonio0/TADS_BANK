@@ -13,11 +13,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneric(Exception ex) {
+        ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Algo deu errado. Tente novamente mais tarde."));
     }
 
     @ExceptionHandler(HttpException.class)
     public ResponseEntity<?> handleHttpException(HttpException ex) {
+        ex.printStackTrace();
         var status = HttpStatus.valueOf(ex.getStatusCode());
         String msg = status.is5xxServerError() ? "Algo deu errado. Tente novamente mais tarde." : ex.getMessage();
         return ResponseEntity.status(status).body(Map.of("error", msg));

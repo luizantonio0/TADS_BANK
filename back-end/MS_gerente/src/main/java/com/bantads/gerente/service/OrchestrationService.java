@@ -1,5 +1,6 @@
 package com.bantads.gerente.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
 import com.bantads.gerente.dto.saga.CredentialsUpdateInputDTO;
+import com.bantads.gerente.dto.saga.CriaGerenteComClienteDTO;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -132,15 +135,16 @@ public class OrchestrationService {
                 completableFuture.completeExceptionally(ex);
             }
         } finally {
-            if (result != null && criarGerenteRequests.containsKey(result.idOrchestration())) {
+            if (result != null && atualizarGerenteRequests.containsKey(result.idOrchestration())) {
                 atualizarGerenteRequests.remove(result.idOrchestration());
             }
         }
     }
 
-    public CompletableFuture<GerenteCriadoDTO> startCriarGerentePasso1(CriaGerenteDTO dto) throws Exception {
+    public CompletableFuture<GerenteCriadoDTO> startCriarGerente(CriaGerenteDTO dto) throws Exception {
         var idOrchestration = UUID.randomUUID();
         var cpf = dto.cpf().replaceAll("[^0-9]", "");
+
         if(repository.existsByCpf(cpf)) {
             throw new HttpException(409, "Gerente com CPF já cadastrado!");
         }
@@ -153,17 +157,18 @@ public class OrchestrationService {
         var mapper = new ObjectMapper();
         var authDTO = new CredentialsCreateInputDTO(dto.email(), cpf, dto.senha(), dto.tipo().getNome());
 
-        var commands = List.of(
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "CreateCredentials", mapper.writeValueAsString(authDTO)),
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "CreateGerente", mapper.writeValueAsString(dto))
+        var commands = new ArrayList<OrchestrationCommandDTO>();
+        commands.add(
+            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "CreateCredentials", mapper.writeValueAsString(authDTO))
         );
 
         var gerComMaisClientes = repository.findGerentesComMaisClientes();
         if(gerComMaisClientes.size() > 0 && gerComMaisClientes.get(0).getClientes().size() > 1) {
+            String cpfCliente = null;
             if(gerComMaisClientes.size() == 1) {
                 
                 var gerenteComMaisClientes = gerComMaisClientes.get(0);
-                var cpfCliente = gerenteComMaisClientes.getClientes().get(0);
+                cpfCliente = gerenteComMaisClientes.getClientes().get(0);
                 
                 gerenteComMaisClientes.decrementTotalClientes();
                 gerenteComMaisClientes.getClientes().remove(cpfCliente);
@@ -184,9 +189,7 @@ public class OrchestrationService {
                         "ms-cliente",
                         "AlterarGerenteCliente",
                         mapper.writeValueAsString(dtoAlterarGerente)));
-
             } else {
-
                 var menorSaldoCpf = new AtomicReference<String>("");
                 for(var g : gerComMaisClientes) {
                     if(menorSaldoCpf.get().equals("")) {
@@ -201,7 +204,7 @@ public class OrchestrationService {
                 }
 
                 var menorSaldo = gerComMaisClientes.stream().filter(x -> x.getCpf().equals(menorSaldoCpf.get())).findFirst().get();
-                var cpfCliente = menorSaldo.getClientes().get(0);
+                cpfCliente = menorSaldo.getClientes().get(0);
                 
                 menorSaldo.decrementTotalClientes();
                 menorSaldo.getClientes().remove(cpfCliente);
@@ -222,6 +225,11 @@ public class OrchestrationService {
                         "AlterarGerenteCliente",
                         mapper.writeValueAsString(dtoAlterarGerente)));
             }
+            var dtoGerente = new CriaGerenteComClienteDTO(dto.nome(), dto.email(), cpf, dto.tipo(), cpfCliente);
+            commands.add(new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "CreateGerente", mapper.writeValueAsString(dtoGerente)));
+        } else {
+            var dtoGerente = new CriaGerenteComClienteDTO(dto.nome(), dto.email(), cpf, dto.tipo(), null);
+           commands.add(new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "CreateGerente", mapper.writeValueAsString(dtoGerente))); 
         }
 
         var request = new OrchestrationRequestDTO(orchestrationId, false, commands);
@@ -235,7 +243,6 @@ public class OrchestrationService {
 
     public void finishCriarGerente(OrchestrationRequestResultDTO result) {
         CompletableFuture<GerenteCriadoDTO> completableFuture = null;
-        // manda as novas atribuições de contas
         try {
 
             completableFuture = criarGerenteRequests.get(result.idOrchestration());

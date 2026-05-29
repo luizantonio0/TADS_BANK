@@ -57,12 +57,13 @@ public class Gerente {
         this.email = atualizaGerenteDTO.email();
     }
 
-    public Gerente(CriaGerenteDTO criaGerenteDTO) {
+    public Gerente(CriaGerenteDTO criaGerenteDTO, List<String> clientes) {
         this.nome = criaGerenteDTO.nome();
         this.cpf = criaGerenteDTO.cpf();
         this.email = criaGerenteDTO.email();
         this.tipo = criaGerenteDTO.tipo().name();
         this.totalClientes = 0;
+        this.clientes = clientes;
     }
 
     public void incrementTotalClientes() {
@@ -119,6 +120,10 @@ public class Gerente {
 
     public void setTotalClientes(Integer totalClientes) {
         this.totalClientes = totalClientes;
+    }
+
+    public void setClientes(List<String> clientes) {
+        this.clientes = clientes;
     }
 }
         

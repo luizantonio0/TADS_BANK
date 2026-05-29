@@ -11,10 +11,11 @@ import { handleConsultaCliente } from './compositions/clienteComposition.js';
 import { handleExtratoFull } from './compositions/extratoComposition.js';
 import { handleReboot } from './compositions/rebootComposition.js';
 import { handleRelatorioCliente } from './compositions/clienteRelatorioComposition.js';
-import { handleCriarGerente } from './compositions/criarGerenteComposition.js';
 
 const app = express();
 const PORT = 3000;
+
+app.use(express.json());
 
 app.use(cors({
     origin: 'http://localhost:4200',
@@ -81,11 +82,17 @@ app.use(async (req, res, next) => {
     if(targetRoute.name == "criarGerente") {
         if(claims.profile != "ADMINISTRADOR") return res.status(403).json({ error: "Você não tem permissão para isso." });
 
-        const menoresSaldosResp = await fetch(services.contas + `/contas/relation/saldoNegativo`, config)
+        const menoresSaldosResp = await fetch(services.contas + `/contas/relation/saldoNegativo`, {
+            method: 'GET',
+            headers: {
+                'X-User-Id': claims.cpf,
+                'X-User-Profile': claims.profile
+            }
+        })
         if (!menoresSaldosResp.ok) return res.status(menoresSaldosResp.status).json(menoresSaldosResp.body);
         const saldosNegativos = await menoresSaldosResp.json();
-
         req.body.saldos_negativos = saldosNegativos;
+        console.log(req.body)
     }
 
     if(targetRoute.name == "buscarGerentes" && req.query.filtro == "dashboard") {
@@ -126,6 +133,12 @@ app.use(async (req, res, next) => {
                 if (claims) {
                     proxyReq.setHeader("X-User-Id", claims.cpf);
                     proxyReq.setHeader("X-User-Profile", claims.profile);
+                }
+                if (req.body && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
+                    const bodyData = JSON.stringify(req.body);
+                    proxyReq.setHeader('Content-Type', 'application/json');
+                    proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+                    proxyReq.write(bodyData);
                 }
             }
         }

@@ -31,7 +31,7 @@ public class GerenteService {
     }
 
     @Transactional
-    public Gerente novoGerente(CriaGerenteDTO criaGerenteDTO) throws BadRequestException {
+    public Gerente novoGerente(CriaGerenteDTO criaGerenteDTO, List<String> clientes) throws BadRequestException {
 
         String cpf = validatorService.cpfValidator(criaGerenteDTO.cpf()).orElseThrow(
                 () -> new BadRequestException("Cpf informado não é válido"));
@@ -44,7 +44,7 @@ public class GerenteService {
         }
 
         @Valid
-        Gerente gerente = new Gerente(criaGerenteDTO);
+        Gerente gerente = new Gerente(criaGerenteDTO, clientes);
         gerente.setCpf(cpf);
         gerente.setEmail(email);
 
@@ -179,6 +179,7 @@ public class GerenteService {
         g1.setCpf("98574307084");
         g1.setNome("Geniéve");
         g1.setEmail("ger1@bantads.com.br");
+        g1.setClientes(List.of("12912861012", "58872160006"));
         g1.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
         g1.setTotalClientes(2);
 
@@ -186,6 +187,7 @@ public class GerenteService {
         g2.setCpf("64065268052");
         g2.setNome("Godophredo");
         g2.setEmail("ger2@bantads.com.br");
+        g2.setClientes(List.of("76179646090", "09506382000"));
         g2.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
         g2.setTotalClientes(2);
 
@@ -193,6 +195,7 @@ public class GerenteService {
         g3.setCpf("23862179060");
         g3.setNome("Gyândula");
         g3.setEmail("ger3@bantads.com.br");
+        g3.setClientes(List.of("85733854057"));
         g3.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
         g3.setTotalClientes(1);
 
