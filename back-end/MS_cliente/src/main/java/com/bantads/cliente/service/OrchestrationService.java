@@ -107,7 +107,7 @@ public class OrchestrationService {
                             new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente",
                                     "CreateCliente", mapper.writeValueAsString(dto)),
                             new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente",
-                                    "IncrementClientesGerente", mapper.writeValueAsString(dto))));
+                                    "IncrementClientesGerente", mapper.writeValueAsString(dto.cpf()))));
 
             var completable = new CompletableFuture<ClienteCreateResponseDTO>();
             criarClienteResponses.put(idOrchestration, completable);
@@ -327,7 +327,7 @@ public class OrchestrationService {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            var gerenteDTO = new GetGerenteInputDTO(cliente.get().getCpfGerente());
+            var gerenteDTO = new GetGerenteInputDTO(cliente.get().getCpfGerente(), cpfCliente);
             var clienteDTO = new RejeitarClienteInputDTO(cpfCliente, dto.motivo());
 
             var request = new OrchestrationRequestDTO(

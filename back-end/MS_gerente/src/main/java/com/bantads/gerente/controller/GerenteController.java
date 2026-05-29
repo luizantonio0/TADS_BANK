@@ -41,7 +41,7 @@ public class GerenteController {
     @PostMapping
     public CompletableFuture<ResponseEntity<GerenteCriadoDTO>> save(@RequestBody CriaGerenteDTO criaGerenteDTO) throws Exception{
             return orchestrationService.startCriarGerente(criaGerenteDTO)
-                .thenApply(ResponseEntity::ok)
+                .thenApply((c) -> ResponseEntity.status(201).body(c))
                 .orTimeout(30, TimeUnit.SECONDS);
     }
 
@@ -57,13 +57,6 @@ public class GerenteController {
                 atualizaGerenteDTO.email(),
                 atualizaGerenteDTO.senha()
         );
-
-        if (atualizaGerenteDTO.senha() == null || atualizaGerenteDTO.senha().isBlank()) {
-            var gerente = gerenteService.updateByCpf(cpf, dto);
-            return CompletableFuture.completedFuture(new ResponseEntity<>(new GerenteAtualizadoDTO(gerente), HttpStatus.OK));
-
-        }
-
         return orchestrationService.startAtualizarGerente(cpf, dto)
                 .thenApply(ResponseEntity::ok)
                 .orTimeout(30, TimeUnit.SECONDS);

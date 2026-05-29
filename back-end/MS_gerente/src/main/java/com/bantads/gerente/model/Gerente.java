@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.envers.Audited;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -38,6 +40,14 @@ public class Gerente {
 
     @Column(nullable = false)
     private Integer totalClientes;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "tb_gerente_clientes",
+        joinColumns = @JoinColumn(name = "gerente_id")
+    )
+    @Column(name = "cpf")
+    private List<String> clientes = new ArrayList<>();
 
     public Gerente() {
     }
@@ -89,6 +99,10 @@ public class Gerente {
 
     public Integer getTotalClientes() {
         return totalClientes;
+    }
+
+    public List<String> getClientes() {
+      return clientes;
     }
 
     public void setCpf(String cpf) {

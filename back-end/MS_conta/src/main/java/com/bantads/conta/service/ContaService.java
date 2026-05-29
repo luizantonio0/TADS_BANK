@@ -172,6 +172,19 @@ public class ContaService {
     }
 
     @Transactional(readOnly = true)
+    public Map<String, BigDecimal> findSaldosNegativos() {
+        var cpfsList = contaRepository.findDistinctGerentes();
+
+        var map = new HashMap<String, BigDecimal>();
+        for(var g : cpfsList) {
+            var menorSaldo = contaRepository.sumSaldosNegativosByCpfGerente(g);
+            map.put(g, menorSaldo);
+        }
+
+        return map;
+    }
+
+    @Transactional(readOnly = true)
     public Map<String, SaldoGerenteDTO> findSaldosByGerentes(String cpfs) {
         var cpfsList = cpfs.split(",");
         var maps = new HashMap<String, SaldoGerenteDTO>();

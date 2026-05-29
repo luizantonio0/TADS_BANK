@@ -64,7 +64,7 @@ public class GerenteService {
     }
 
     @Transactional
-    public void incrementarCliente(UUID idGerente) {
+    public void incrementarCliente(UUID idGerente, String cpfCliente) {
 
         Optional<Gerente> gerente = gerenteRepository.findById(idGerente);
 
@@ -74,12 +74,13 @@ public class GerenteService {
         Gerente gerenteAtualizado = gerente.get();
 
         gerenteAtualizado.incrementTotalClientes();
+        gerenteAtualizado.getClientes().add(cpfCliente);
 
         gerenteRepository.save(gerenteAtualizado);
     }
 
     @Transactional
-    public void decrementarCliente(UUID idGerente) {
+    public void decrementarCliente(UUID idGerente, String cpfCliente) {
 
         Optional<Gerente> gerente = gerenteRepository.findById(idGerente);
 
@@ -89,6 +90,7 @@ public class GerenteService {
         Gerente gerenteAtualizado = gerente.get();
 
         gerenteAtualizado.decrementTotalClientes();
+        gerente.get().getClientes().remove(cpfCliente);
 
         gerenteRepository.save(gerenteAtualizado);
     }

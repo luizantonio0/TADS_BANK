@@ -31,4 +31,7 @@ public interface ContaRepository extends JpaRepository<Conta, UUID>, RevisionRep
 
     @Query("SELECT COALESCE(SUM(c.saldo), 0) FROM Conta c WHERE c.cpfGerente = :cpfGerente AND c.saldo >= 0")
     BigDecimal sumSaldosPositivosByCpfGerente(@Param("cpfGerente") String cpfGerente);
+
+    @Query("SELECT DISTINCT c.cpfGerente FROM Conta c ")
+    List<String> findDistinctGerentes();
 }

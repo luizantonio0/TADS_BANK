@@ -1,5 +1,6 @@
 package com.bantads.cliente.strategy;
 
+import com.bantads.cliente.strategy.strategies.SagaAlterarGerenteClienteStrategy;
 import com.bantads.cliente.strategy.strategies.SagaAprovarClienteStrategy;
 import com.bantads.cliente.strategy.strategies.SagaAtualizarClienteStrategy;
 import com.bantads.cliente.strategy.strategies.SagaCreateClienteStrategy;
@@ -21,6 +22,8 @@ public class SagaCommandStrategyFactory {
     @Autowired private SagaGetClienteBatchStrategy getClienteBatchStrategy;
     @Autowired private SagaGetClienteStrategy getClienteStrategy;
     @Autowired private SagaGetClientesByGerentesBatchStrategy getClienteByGerenteBatchStrategy;
+    @Autowired private SagaAlterarGerenteClienteStrategy alterarGerenteClienteStrategy;
+
 
     public SagaCommandStrategy newCommand(String commandType) {
         return switch(commandType) {
@@ -30,6 +33,7 @@ public class SagaCommandStrategyFactory {
             case "UpdateCliente" -> atualizarClienteStrategy;
             case "GetCliente" -> getClienteStrategy;
             case "GetClienteBatch" -> getClienteBatchStrategy;
+            case "AlterarGerenteCliente" -> alterarGerenteClienteStrategy;
             case "GetClientesByGerentesBatch" -> getClienteByGerenteBatchStrategy;
             default -> null;
         };

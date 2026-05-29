@@ -24,7 +24,7 @@ public class SagaIncrementGerenteStrategy implements SagaCommandStrategy {
             throw new IllegalArgumentException("Nenhum gerente disponível");
         }
 
-        gerenteService.incrementarCliente(gerente.get().getId());
+        gerenteService.incrementarCliente(gerente.get().getId(), cmd.payload());
 
         redisTemplate.opsForValue().set(
                 cmd.idOrchestration().toString() + ":touched:gerente",

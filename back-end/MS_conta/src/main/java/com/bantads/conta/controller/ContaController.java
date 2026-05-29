@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import com.bantads.conta.datasource.DataSourceType;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,11 @@ public class ContaController {
             @RequestParam(name = "gerentes", required = false, defaultValue = "") String gerentes)
             throws HttpException {
         return ResponseEntity.ok(contaService.findContasByGerentes(gerentes));
+    }
+
+    @GetMapping("/relation/saldoNegativo")
+    public ResponseEntity<Map<String, BigDecimal>> findSaldosNegativos() {
+        return ResponseEntity.ok(contaService.findSaldosNegativos());
     }
 
     @GetMapping("/saldos")

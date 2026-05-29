@@ -27,7 +27,7 @@ public class SagaDecrementGerenteStrategy implements SagaCommandStrategy {
         var dto = mapper.readValue(cmd.payload(), GetGerenteInputDTO.class);
         var gerente = gerenteService.findByCpf(dto.cpf());
 
-        gerenteService.decrementarCliente(gerente.getId());
+        gerenteService.decrementarCliente(gerente.getId(), dto.cpfCliente());
 
         redisTemplate.opsForValue().set(
                 cmd.idOrchestration().toString() + ":touched:gerente",

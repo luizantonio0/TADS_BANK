@@ -1,5 +1,6 @@
 package com.bantads.conta.strategy;
 
+import com.bantads.conta.strategy.strategies.SagaAlterarGerenteContaStrategy;
 import com.bantads.conta.strategy.strategies.SagaCreateContaStrategy;
 import com.bantads.conta.strategy.strategies.SagaGetContaBatchStrategy;
 import com.bantads.conta.strategy.strategies.SagaGetContaStrategy;
@@ -19,6 +20,8 @@ public class SagaCommandStrategyFactory {
     @Autowired private SagaUpdateLimiteStrategy updateLimiteStrategy;
     @Autowired private SagaGetMelhoresContasStrategy getMelhoresContasStrategy;
     @Autowired private SagaGetContasByGerentesBatchStrategy getContasByGerenteBatchStrategy;
+    @Autowired private SagaAlterarGerenteContaStrategy alterarGerenteContaStrategy;
+
 
     public SagaCommandStrategy newCommand(String commandType) {
         return switch(commandType) {
@@ -27,6 +30,7 @@ public class SagaCommandStrategyFactory {
             case "GetContaBatch" -> getContaBatchStrategy;
             case "GetMelhoresContas" -> getMelhoresContasStrategy;
             case "GetConta" -> getContaStrategy;
+            case "AlterarGerenteConta" -> alterarGerenteContaStrategy;
             case "GetContasByGerentesBatch" -> getContasByGerenteBatchStrategy;
             default -> null;
         };
