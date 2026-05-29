@@ -20,6 +20,7 @@ export const routes = [
 
     { name: "criarGerente", method: 'POST', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
     { name: "buscarGerentes", method: 'GET', path: '/gerentes', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' }, 
+    { name: "buscarGerente", method: 'GET', path: '/gerentes/:cpf', target: services.gerentes, public: false, profiles: '*' }, 
     { name: "atualizarGerente", method: 'PUT', path: '/gerentes/:cpf', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
     { name: "removerGerente", method: 'DELETE', path: '/gerentes/:cpf', target: services.gerentes, public: false, profiles: 'ADMINISTRADOR' },
 

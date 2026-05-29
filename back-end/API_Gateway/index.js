@@ -11,6 +11,7 @@ import { handleConsultaCliente } from './compositions/clienteComposition.js';
 import { handleExtratoFull } from './compositions/extratoComposition.js';
 import { handleReboot } from './compositions/rebootComposition.js';
 import { handleRelatorioCliente } from './compositions/clienteRelatorioComposition.js';
+import { handleCriarGerente } from './compositions/criarGerenteComposition.js';
 
 const app = express();
 const PORT = 3000;
@@ -75,6 +76,16 @@ app.use(async (req, res, next) => {
 
     if(targetRoute.name == "reboot") {
         return await handleReboot(res);
+    }
+
+    if(targetRoute.name == "criarGerente") {
+        if(claims.profile != "ADMINISTRADOR") return res.status(403).json({ error: "Você não tem permissão para isso." });
+
+        const menoresSaldosResp = await fetch(services.contas + `/contas/relation/saldoNegativo`, config)
+        if (!menoresSaldosResp.ok) return res.status(menoresSaldosResp.status).json(menoresSaldosResp.body);
+        const saldosNegativos = await menoresSaldosResp.json();
+
+        req.body.saldos_negativos = saldosNegativos;
     }
 
     if(targetRoute.name == "buscarGerentes" && req.query.filtro == "dashboard") {
