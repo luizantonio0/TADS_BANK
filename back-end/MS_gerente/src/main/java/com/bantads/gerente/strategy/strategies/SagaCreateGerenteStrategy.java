@@ -29,7 +29,7 @@ public class SagaCreateGerenteStrategy implements SagaCommandStrategy {
         var mapper = new ObjectMapper();
         CriaGerenteComClienteDTO dto = mapper.readValue(cmd.payload(), CriaGerenteComClienteDTO.class);
 
-        var clientes = dto.cpf() == null ? new ArrayList<String>() : List.of(dto.cpfCliente());
+        var clientes = dto.cpfCliente() == null ? new ArrayList<String>() : List.of(dto.cpfCliente().replace("\"", ""));
         var ger = gerenteService.novoGerente(new CriaGerenteDTO(dto.nome(), dto.email(), dto.cpf(), null, dto.tipo(), null), clientes);
         redisTemplate.opsForValue().set(
             cmd.idOrchestration().toString() + ":touched:gerente",

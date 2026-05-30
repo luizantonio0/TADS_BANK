@@ -30,8 +30,15 @@ public class OrchestrationConsumer {
     @RabbitListener(queues = "orchestration.result")
     public void onCommandResult(OrchestrationCommandResultDTO dto) {
         var orchestrationKey = "orchestration:" + dto.idOrchestration().toString();
-        var orchestration = redisTemplate.opsForValue().get(orchestrationKey);
-        System.out.println("Recebeu de " + dto.sourceService());
+        Orchestration orchestration = null;
+        System.out.println();
+        try {
+            System.out.println("Recebeu de " + dto.sourceService());
+            System.out.println("Buscando key: " + orchestrationKey);
+            orchestration = redisTemplate.opsForValue().get(orchestrationKey);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         if (orchestration == null) {
             System.out.println("Orquestração não existe mais no Redis");
             return;
@@ -65,7 +72,7 @@ public class OrchestrationConsumer {
                     rabbitTemplate.convertAndSend("orchestration.finished", "orchestration.finished", res);
                     if(orchestration.isAutoConfirm()) {
                         rabbitTemplate.convertAndSend(
-                                "orchestration.confirm",
+                                "orchestration.confirm",    
                                 "orchestration.confirm",
                                 new OrchestrationConfirmDTO(
                                         dto.idOrchestration(),

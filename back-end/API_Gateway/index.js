@@ -82,7 +82,7 @@ app.use(async (req, res, next) => {
     if(targetRoute.name == "criarGerente") {
         if(claims.profile != "ADMINISTRADOR") return res.status(403).json({ error: "Você não tem permissão para isso." });
 
-        const menoresSaldosResp = await fetch(services.contas + `/contas/relation/saldoNegativo`, {
+        const menoresSaldosResp = await fetch(services.contas + `/contas/relation/saldoPositivo`, {
             method: 'GET',
             headers: {
                 'X-User-Id': claims.cpf,
@@ -90,8 +90,8 @@ app.use(async (req, res, next) => {
             }
         })
         if (!menoresSaldosResp.ok) return res.status(menoresSaldosResp.status).json(menoresSaldosResp.body);
-        const saldosNegativos = await menoresSaldosResp.json();
-        req.body.saldos_negativos = saldosNegativos;
+        const saldosPositivos = await menoresSaldosResp.json();
+        req.body.saldos_positivos = saldosPositivos;
         console.log(req.body)
     }
 

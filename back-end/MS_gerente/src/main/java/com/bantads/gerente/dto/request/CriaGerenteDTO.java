@@ -12,7 +12,7 @@ public record CriaGerenteDTO(
         String cpf,
         String senha,
         GerenteTipo tipo,
-        @JsonProperty("saldos_negativos") Map<String, BigDecimal> saldosNegativos
+        @JsonProperty("saldos_positivos") Map<String, BigDecimal> saldosPositivos
 ) {
         public CriaGerenteDTO {
                 cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;

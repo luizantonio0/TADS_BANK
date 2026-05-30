@@ -70,6 +70,13 @@ public class ClienteService {
         return null;
     }
 
+    public Cliente updateGerente(String cpfCliente, String cpfGerente) throws HttpException {
+        var cliente = clienteRepository.findByCpf(cpfCliente).orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
+        cliente.setCpfGerente(cpfGerente);
+        clienteRepository.save(cliente);
+        return cliente;
+    }
+
     public Map<String, String> findNomesByCpf(List<String> cpfs) {
         return clienteRepository.findByCpfIn(cpfs).stream()
                 .collect(Collectors.toMap(c -> c.getCpf(), c -> c.getNome()));

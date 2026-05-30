@@ -68,8 +68,10 @@ public class OrchestrationConsumer {
                 payload = mapper.writeValueAsString(obj);
             }
         } catch (HttpException ex) {
+            ex.printStackTrace();
             message = new OrchestrationErrorDTO(ex.getStatusCode(), ex.getMessage());
         } catch (Exception ex) {
+            ex.printStackTrace();
             message = new OrchestrationErrorDTO(500, ex.getMessage());
         }
 

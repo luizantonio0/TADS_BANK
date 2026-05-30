@@ -32,6 +32,5 @@ spring:
     driver-class-name: org.postgresql.Driver #
 logging:
   level:
-    org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     com.bantads.gerente: DEBUG

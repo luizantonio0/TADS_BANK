@@ -62,6 +62,13 @@ public class ContaService {
         }
     }
 
+    public Conta updateGerente(String cpfCliente, String cpfGerente) throws HttpException {
+        var conta = contaRepository.findByCpf(cpfCliente).orElseThrow(() -> new NotFoundException("Conta não encontrada"));
+        conta.setCpfGerente(cpfGerente);
+        contaRepository.save(conta);
+        return conta;
+    }
+
     public Conta findConta(String conta, String cpfLogado, String profile) throws HttpException {
         var contaOpt = contaRepository.findByConta(conta);
         if (contaOpt.isEmpty()) {
@@ -172,12 +179,12 @@ public class ContaService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, BigDecimal> findSaldosNegativos() {
+    public Map<String, BigDecimal> findSaldosPositivos() {
         var cpfsList = contaRepository.findDistinctGerentes();
 
         var map = new HashMap<String, BigDecimal>();
         for(var g : cpfsList) {
-            var menorSaldo = contaRepository.sumSaldosNegativosByCpfGerente(g);
+            var menorSaldo = contaRepository.sumSaldosPositivosByCpfGerente(g);
             map.put(g, menorSaldo);
         }
 

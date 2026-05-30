@@ -24,8 +24,7 @@ public class SagaAlterarGerenteContaStrategy implements SagaCommandStrategy {
             ObjectMapper mapper = new ObjectMapper();
             AlterarGerenteDTO dto = mapper.readValue(cmd.payload(), AlterarGerenteDTO.class);
 
-            var conta = contaService.findByCpf(dto.cpfCliente());
-            conta.setCpfGerente(dto.cpfGerente());
+            var conta = contaService.updateGerente(dto.cpfCliente(), dto.cpfGerente());
 
             redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:conta", conta.getId().toString());
             return null;

@@ -35,6 +35,7 @@ public class OrchestratorService {
 
         var orchestrationKey = "orchestration:" + orchestration.getId().toString();
 
+        System.out.println("Setou key: " + orchestrationKey);
         redisTemplate.opsForValue().set(orchestrationKey, orchestration);
 
         for(var cmd : orchestration.getCommands()) {

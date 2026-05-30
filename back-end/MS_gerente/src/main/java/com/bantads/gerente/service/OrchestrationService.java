@@ -153,13 +153,12 @@ public class OrchestrationService {
             throw new HttpException(409, "Gerente com email já cadastrado!");
         }
 
-        var orchestrationId = UUID.randomUUID();
         var mapper = new ObjectMapper();
         var authDTO = new CredentialsCreateInputDTO(dto.email(), cpf, dto.senha(), dto.tipo().getNome());
 
         var commands = new ArrayList<OrchestrationCommandDTO>();
         commands.add(
-            new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "CreateCredentials", mapper.writeValueAsString(authDTO))
+            new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-auth", "CreateCredentials", mapper.writeValueAsString(authDTO))
         );
 
         var gerComMaisClientes = repository.findGerentesComMaisClientes();
@@ -192,16 +191,19 @@ public class OrchestrationService {
             } else {
                 var menorSaldoCpf = new AtomicReference<String>("");
                 for(var g : gerComMaisClientes) {
+                    System.out.println(g.getCpf() + " - " + dto.saldosPositivos().get(g.getCpf()));
                     if(menorSaldoCpf.get().equals("")) {
                         menorSaldoCpf.set(g.getCpf());
                         continue;
                     }
-                    var atual = dto.saldosNegativos().get(menorSaldoCpf.get());
-                    var comparando = dto.saldosNegativos().get(g.getCpf());
+                    var atual = dto.saldosPositivos().get(menorSaldoCpf.get());
+                    var comparando = dto.saldosPositivos().get(g.getCpf());
                     if(comparando.compareTo(atual) < 0) {
                         menorSaldoCpf.set(g.getCpf());
                     }
                 }
+
+                System.out.println(menorSaldoCpf + " DOOU");
 
                 var menorSaldo = gerComMaisClientes.stream().filter(x -> x.getCpf().equals(menorSaldoCpf.get())).findFirst().get();
                 cpfCliente = menorSaldo.getClientes().get(0);
@@ -226,16 +228,16 @@ public class OrchestrationService {
                         mapper.writeValueAsString(dtoAlterarGerente)));
             }
             var dtoGerente = new CriaGerenteComClienteDTO(dto.nome(), dto.email(), cpf, dto.tipo(), cpfCliente);
-            commands.add(new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "CreateGerente", mapper.writeValueAsString(dtoGerente)));
+            commands.add(new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "CreateGerente", mapper.writeValueAsString(dtoGerente)));
         } else {
             var dtoGerente = new CriaGerenteComClienteDTO(dto.nome(), dto.email(), cpf, dto.tipo(), null);
-           commands.add(new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-gerente", "CreateGerente", mapper.writeValueAsString(dtoGerente))); 
+           commands.add(new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "CreateGerente", mapper.writeValueAsString(dtoGerente))); 
         }
 
-        var request = new OrchestrationRequestDTO(orchestrationId, false, commands);
+        var request = new OrchestrationRequestDTO(idOrchestration, false, commands);
 
         var completable = new CompletableFuture<GerenteCriadoDTO>();
-        criarGerenteRequests.put(orchestrationId, completable);
+        criarGerenteRequests.put(idOrchestration, completable);
         rabbitTemplate.convertAndSend("orchestration.orchestrate", request);
 
         return completable;

@@ -53,9 +53,9 @@ public class ContaController {
         return ResponseEntity.ok(contaService.findContasByGerentes(gerentes));
     }
 
-    @GetMapping("/relation/saldoNegativo")
-    public ResponseEntity<Map<String, BigDecimal>> findSaldosNegativos() {
-        return ResponseEntity.ok(contaService.findSaldosNegativos());
+    @GetMapping("/relation/saldoPositivo")
+    public ResponseEntity<Map<String, BigDecimal>> findSaldosPositivos() {
+        return ResponseEntity.ok(contaService.findSaldosPositivos());
     }
 
     @GetMapping("/saldos")

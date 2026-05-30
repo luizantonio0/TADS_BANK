@@ -24,8 +24,7 @@ public class SagaAlterarGerenteClienteStrategy implements SagaCommandStrategy {
             ObjectMapper mapper = new ObjectMapper();
             AlterarGerenteDTO dto = mapper.readValue(cmd.payload(), AlterarGerenteDTO.class);
 
-            var cliente = clienteService.findByCpf(dto.cpfCliente());
-            cliente.setCpfGerente(dto.cpfGerente());
+            var cliente = clienteService.updateGerente(dto.cpfCliente(), dto.cpfGerente());
 
             redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cliente.getId().toString());
             return null;

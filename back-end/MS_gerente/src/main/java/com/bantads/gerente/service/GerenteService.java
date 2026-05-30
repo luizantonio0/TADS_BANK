@@ -47,6 +47,7 @@ public class GerenteService {
         Gerente gerente = new Gerente(criaGerenteDTO, clientes);
         gerente.setCpf(cpf);
         gerente.setEmail(email);
+        gerente.setTotalClientes(clientes.size());
 
         return gerenteRepository.save(gerente);
     }
@@ -74,7 +75,7 @@ public class GerenteService {
         Gerente gerenteAtualizado = gerente.get();
 
         gerenteAtualizado.incrementTotalClientes();
-        gerenteAtualizado.getClientes().add(cpfCliente);
+        gerenteAtualizado.getClientes().add(cpfCliente.replace("\"", ""));
 
         gerenteRepository.save(gerenteAtualizado);
     }
