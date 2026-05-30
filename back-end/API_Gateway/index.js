@@ -11,6 +11,7 @@ import { handleConsultaCliente } from './compositions/clienteComposition.js';
 import { handleExtratoFull } from './compositions/extratoComposition.js';
 import { handleReboot } from './compositions/rebootComposition.js';
 import { handleRelatorioCliente } from './compositions/clienteRelatorioComposition.js';
+import { handleAtualizarCliente } from './compositions/atualizarClienteComposition.js';
 
 const app = express();
 const PORT = 3000;
@@ -92,7 +93,11 @@ app.use(async (req, res, next) => {
         if (!menoresSaldosResp.ok) return res.status(menoresSaldosResp.status).json(menoresSaldosResp.body);
         const saldosPositivos = await menoresSaldosResp.json();
         req.body.saldos_positivos = saldosPositivos;
-        console.log(req.body)
+    }
+
+    if(targetRoute.name == "atualizarCliente") {
+        let cpf = parsedRoute.params.cpf;
+        return handleAtualizarCliente(req, res, claims, cpf);
     }
 
     if(targetRoute.name == "buscarGerentes" && req.query.filtro == "dashboard") {

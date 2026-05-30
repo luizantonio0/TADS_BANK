@@ -2,8 +2,6 @@ import { services } from "../routes.js";
 
 export async function handleGerenteDashboard(res, claims) {
 
-    console.log(1)
-
     let config = {
         method: 'GET',
         headers: {

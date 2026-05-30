@@ -29,8 +29,4 @@ spring:
     url: jdbc:postgresql://postgres:5432/ms_gerente
     username: admin
     password: password
-    driver-class-name: org.postgresql.Driver #
-logging:
-  level:
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    com.bantads.gerente: DEBUG
+    driver-class-name: org.postgresql.Driver

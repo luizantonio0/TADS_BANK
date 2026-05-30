@@ -5,6 +5,7 @@ import com.bantads.gerente.dto.GerenteDTO;
 import com.bantads.gerente.dto.request.AtualizaGerenteDTO;
 import com.bantads.gerente.dto.response.GerenteAtualizadoDTO;
 import com.bantads.gerente.dto.response.GerenteCriadoDTO;
+import com.bantads.gerente.dto.saga.GerenteDeletadoDTO;
 import com.bantads.gerente.service.GerenteService;
 import com.bantads.gerente.service.OrchestrationService;
 
@@ -60,12 +61,13 @@ public class GerenteController {
         return orchestrationService.startAtualizarGerente(cpf, dto)
                 .thenApply(ResponseEntity::ok)
                 .orTimeout(30, TimeUnit.SECONDS);
-
     }
     
     @DeleteMapping("/{cpf}")
-    public void delete(@PathVariable String cpf){
-        gerenteService.deleteByCpf(cpf);
+    public CompletableFuture<ResponseEntity<GerenteDeletadoDTO>> delete(@PathVariable("cpf") String cpf) throws Exception {
+        return orchestrationService.startDeletarGerente(cpf)
+            .thenApply(ResponseEntity::ok)
+            .orTimeout(30, TimeUnit.SECONDS);
     }
 
     @GetMapping("/reboot")

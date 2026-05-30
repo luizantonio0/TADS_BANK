@@ -108,7 +108,8 @@ public class OrchestrationConsumer {
             if(touchedLog != null)
                 clienteService.rollbackLogStatus(UUID.fromString(touchedLog));
             if(touchedCliente != null)
-                clienteService.rollbackCliente(UUID.fromString(touchedCliente));
+                for (var c : touchedCliente.split(","))
+                    clienteService.rollbackCliente(UUID.fromString(c));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -29,6 +29,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException.NotFound;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -257,7 +258,7 @@ public class OrchestrationService {
         var idOrchestration = UUID.randomUUID();
         var cliente = repository.findByCpf(cpf);
         if (cliente.isEmpty()) {
-            throw new IllegalArgumentException("Cliente não encontrado");
+            throw new NotFoundException("Cliente não encontrado");
         }
 
         try {
@@ -265,11 +266,12 @@ public class OrchestrationService {
             var contaDTO = new AtualizarLimiteInputDTO(cpf, dto.salario());
             var clienteDTO = AtualizarClienteInputDTO.from(cpf, dto);
 
-            List<OrchestrationCommandDTO> commands = List.of(
+            List<OrchestrationCommandDTO> commands = new ArrayList<>();
+            commands.add(
                     new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-cliente",
                             "UpdateCliente", mapper.writeValueAsString(clienteDTO)));
 
-            if (cliente.get().isAprovado()) {
+            if (cliente.get().isAprovado() && dto.salario().compareTo(cliente.get().getSalario()) != 0) {
                 commands.add(new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-conta",
                         "UpdateLimite", mapper.writeValueAsString(contaDTO)));
             }

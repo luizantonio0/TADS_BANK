@@ -24,13 +24,9 @@ export async function handleExtratoFull(res, claims, conta, queryParams) {
         }
     }
 
-    console.log(contasExtrato);
-
     const contasResp = await fetch(services.contas + `/contas?filtro=contas&contas=${contasExtrato.join(",")}`, config)
     if (!contasResp.ok) return res.status(contasResp.status).json(contasResp.body);
     const contas = await contasResp.json();
-
-    console.log(contas);
 
     const mapContas = contas.reduce((map, conta) => {
         map.set(conta.conta, conta); 
@@ -42,8 +38,6 @@ export async function handleExtratoFull(res, claims, conta, queryParams) {
     const clientesResp = await fetch(services.clientes + `/clientes/nomes?filtro=${cpfs.join(",")}`, config)
     if (!clientesResp.ok) return res.status(clientesResp.status).json(clientesResp.body);
     const clientes = await clientesResp.json();
-
-    console.log(mapContas)
 
     for(let mov of extrato.movimentacoes) {
         if(mov.tipo == "TRANSFERENCIA") {

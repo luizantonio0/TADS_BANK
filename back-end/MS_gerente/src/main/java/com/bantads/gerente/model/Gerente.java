@@ -41,7 +41,7 @@ public class Gerente {
     @Column(nullable = false)
     private Integer totalClientes;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "tb_gerente_clientes",
         joinColumns = @JoinColumn(name = "gerente_id")

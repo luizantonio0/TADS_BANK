@@ -78,7 +78,8 @@ public class RabbitConsumer {
         }
 
         try {
-            contaService.rollbackConta(UUID.fromString(touched));
+            for(var c : touched.split(","))
+                contaService.rollbackConta(UUID.fromString(c));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -56,12 +56,20 @@ public class GerenteService {
         return gerenteRepository.findById(id);
     }
 
+    @Transactional
     public void deleteByCpf(String cpf) {
         this.gerenteRepository.deleteByCpf(cpf);
     }
 
     public List<Gerente> findGerentes() {
         return this.gerenteRepository.findByTipoOrderByNomeAsc("GERENTE");
+    }
+
+    public Gerente atribuirClientes(String cpfGerente, List<String> clientes) throws NotFoundException {
+        var gerente = this.findByCpf(cpfGerente);
+        gerente.getClientes().addAll(clientes);
+        gerente.setTotalClientes(gerente.getClientes().size());
+        return gerente;
     }
 
     @Transactional

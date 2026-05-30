@@ -31,6 +31,7 @@ public class SagaUpdateLimiteStrategy implements SagaCommandStrategy {
             AtualizarLimiteInputDTO dto = mapper.readValue(cmd.payload(), AtualizarLimiteInputDTO.class);
 
             var conta = contaService.atualizarLimite(dto.cpf(), dto.salario());
+            
             redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:conta", conta.getId().toString());
             return new ContaCreateOutputDTO(conta.getCpf(), conta.getConta(), new BigDecimal(0), conta.getLimite());
         } catch (Exception ex) {

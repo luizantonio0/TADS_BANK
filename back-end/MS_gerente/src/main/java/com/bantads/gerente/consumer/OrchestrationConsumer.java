@@ -41,6 +41,9 @@ public class OrchestrationConsumer {
         if(orchestrationService.isCriarGerente(dto.idOrchestration())) {
             orchestrationService.finishCriarGerente(dto);
         }
+        if(orchestrationService.isDeletarGerente(dto.idOrchestration())) {
+            orchestrationService.finishDeletarGerente(dto);
+        }
     }
 
     @RabbitListener(queues = "ms-gerente.command")
@@ -95,7 +98,8 @@ public class OrchestrationConsumer {
         }
 
         try {
-            gerenteService.rollbackGerente(UUID.fromString(touched));
+            for(var c : touched.split(","))
+                gerenteService.rollbackGerente(UUID.fromString(c));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

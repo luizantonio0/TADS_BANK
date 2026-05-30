@@ -12,6 +12,7 @@ public class SagaCommandStrategyFactory {
     @Autowired private SagaGetGerenteStrategy getGerenteStrategy;
     @Autowired private SagaCreateGerenteStrategy createGerenteStrategy;
     @Autowired private SagaUpdateGerenteStrategy updateGerenteStrategy;
+    @Autowired private SagaDeletarGerenteStrategy deletarGerenteStrategy;
 
     public SagaCommandStrategy newCommand(String commandType) {
         return switch(commandType) {
@@ -20,6 +21,7 @@ public class SagaCommandStrategyFactory {
             case "GetGerente" -> getGerenteStrategy;
             case "CreateGerente" -> createGerenteStrategy;
             case "AtualizarGerente" -> updateGerenteStrategy;
+            case "DeletarGerente" -> deletarGerenteStrategy;
             default -> throw new IllegalStateException("Unexpected value: " + commandType);
         };
     }

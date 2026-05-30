@@ -138,12 +138,19 @@ public class ContaService {
     }
 
     public Conta atualizarLimite(String cpf, BigDecimal salario) {
-        var optConta = contaRepository.findByConta(cpf);
+        var optConta = contaRepository.findByCpf(cpf);
         if (optConta.isEmpty()) {
             throw new IllegalArgumentException("Conta não encontrada");
         }
+
         var conta = optConta.get();
-        conta.setLimite(salario.divide(new BigDecimal(2), RoundingMode.UNNECESSARY));
+        var newLimite = salario.divide(new BigDecimal(2), RoundingMode.UNNECESSARY);
+        if (conta.getSaldo().compareTo(BigDecimal.ZERO) < 0) {
+            // RF04: Se o novo limite for menor que o seu saldo negativo neste momento, 
+            // então seu limite será ajustado para seu saldo negativo
+            newLimite = conta.getSaldo().abs();
+        }
+        conta.setLimite(newLimite);
         contaRepository.save(conta);
 
         sincronizarConta(conta);
