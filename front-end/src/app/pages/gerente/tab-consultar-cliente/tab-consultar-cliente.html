@@ -1,118 +1,100 @@
-<p class="text-2xl font-bold text-primary mb-4">Consultar cliente:</p>
-<div>
-    <div class="flex gap-x-2 w-64">
-        <input [(ngModel)]="cpf" mask="000.000.000-00" [dropSpecialCharacters]="true" name="cpf" placeholder="Digite o CPF">
-        <button class="w-8! h-8!" type="button" (click)="submit()">
-            <span class="material-symbols-outlined">search</span>
-        </button>
+<div class="p-4 bg-white border border-primary rounded-lg shadow-md h-full">
+    <div class="flex flex-col mb-6 gap-4">
+        <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined">person_search</span> Consultar Cliente
+        </h2>
+        
+        <div class="flex relative w-full md:w-96">
+            <input [(ngModel)]="cpf" (ngModelChange)="onCpfChange()" mask="000.000.000-00" [dropSpecialCharacters]="true" name="cpf" 
+                placeholder="Digite o CPF do cliente" (keyup.enter)="submit()"
+                class="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-lg">
+            <button type="button" (click)="submit()" 
+                class="absolute right-1 top-1 bottom-1 px-3 bg-primary text-white rounded-md hover:bg-opacity-90 flex items-center justify-center transition-colors">
+                <span class="material-symbols-outlined text-[24px]">search</span>
+            </button>
+        </div>
     </div>
+
     @if(cliente != null) {
-        <div class="grid grid-cols-12 w-3/5 gap-2 mt-4">
-
-            <div class="col-span-6">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">account_circle</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Nome</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.nome}}</p>
-            </div>
-
-            <div class="col-span-3">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">description</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">CPF</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.cpf | cpf}}</p>
-            </div>
-
-            <div class="col-span-3">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">description</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Conta</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.conta}}</p>
-            </div>
-
-            <div class="col-span-6">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">mail</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">E-mail</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.email}}</p>
-            </div>
-
-            <div class="col-span-6">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">phone</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Telefone</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.telefone??'' | telefone}}</p>
-            </div>
-
-            <div class="col-span-4">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">finance</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Salário</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.salario | currency: 'BRL'}}</p>
-            </div>
-
-            <div class="col-span-4">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">payments</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Saldo</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.saldo | currency: 'BRL'}}</p>
-            </div>
-
-            <div class="col-span-4">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">finance</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Limite</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.limite | currency: 'BRL'}}</p>
-            </div>
-
-            <div class="col-span-6">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">location_on</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Endereço</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.endereco}}</p>
-            </div>
-
-            <div class="col-span-4">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">location_on</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Endereço</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.cidade}}</p>
-            </div>
-
-            <div class="col-span-2">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">location_on</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Estado</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.estado}}</p>
-            </div>
-
-            <div class="col-span-6">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">badge</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Gerente</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.gerente_nome ?? 'Pendente'}}</p>
-            </div>
-
-            <div class="col-span-6">
-                <span class="flex gap-x-0.5 items-center text-primary">
-                    <span class="material-symbols-outlined text-[18px]!">contact_mail</span>
-                    <span class="flex font-semibold gap-x-1 text-[14px] text-md">Gerente - Email</span>
-                </span>
-                <p class="text-[14px] p-1.5 w-full border border-primary rounded-md bg-yellow-50">{{cliente.gerente_email ?? 'Pendente'}}</p>
-            </div>
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm mt-4">
             
+            <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-200">
+                <div class="bg-primary/10 p-3 rounded-full text-primary">
+                    <span class="material-symbols-outlined text-4xl">account_circle</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">{{cliente.nome}}</h3>
+                    <p class="text-sm text-gray-500 font-medium">CPF: {{cliente.cpf | cpf}}</p>
+                </div>
+                <div class="ml-auto flex flex-col items-end">
+                    <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">Conta Corrente</span>
+                    <span class="text-lg font-bold text-primary bg-primary/5 px-3 py-1 rounded-md">{{cliente.conta}}</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div class="space-y-4">
+                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">contact_mail</span> Contato
+                    </h4>
+                    
+                    <div>
+                        <span class="block text-xs text-gray-500">E-mail</span>
+                        <p class="text-base font-medium text-gray-800">{{cliente.email}}</p>
+                    </div>
+                    <div>
+                        <span class="block text-xs text-gray-500">Telefone</span>
+                        <p class="text-base font-medium text-gray-800">{{cliente.telefone??'Não informado' | telefone}}</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">account_balance</span> Financeiro
+                    </h4>
+                    
+                    <div>
+                        <span class="block text-xs text-gray-500">Salário</span>
+                        <p class="text-base font-medium text-gray-800">{{cliente.salario | currency: 'BRL'}}</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div>
+                            <span class="block text-xs text-gray-500">Saldo Atual</span>
+                            <p class="text-lg font-bold" [class.text-green-600]="(cliente.saldo || 0) >= 0" [class.text-red-600]="(cliente.saldo || 0) < 0">
+                                {{cliente.saldo | currency: 'BRL'}}
+                            </p>
+                        </div>
+                        <div>
+                            <span class="block text-xs text-gray-500">Limite</span>
+                            <p class="text-sm font-medium text-gray-800">{{cliente.limite | currency: 'BRL'}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">location_on</span> Localização e Vínculo
+                    </h4>
+                    
+                    <div>
+                        <span class="block text-xs text-gray-500">Endereço Completo</span>
+                        <p class="text-base font-medium text-gray-800">{{cliente.endereco}}</p>
+                        <p class="text-sm text-gray-600">{{cliente.cidade}} - {{cliente.estado}}</p>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-200">
+                        <span class="block text-xs text-gray-500">Gerente Responsável</span>
+                        <p class="text-base font-bold text-primary">{{cliente.gerente_nome ?? 'Pendente'}}</p>
+                        <p class="text-xs text-gray-500">{{cliente.gerente_email ?? ''}}</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    } @else if (buscaRealizada) {
+        <div class="mt-8 text-center text-gray-500 py-12 border-2 border-dashed border-gray-200 rounded-xl">
+            <span class="material-symbols-outlined text-4xl mb-2 text-gray-300">search_off</span>
+            <p>Nenhum cliente encontrado com este CPF.</p>
         </div>
     }
 </div>

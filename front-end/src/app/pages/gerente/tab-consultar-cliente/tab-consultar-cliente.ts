@@ -24,12 +24,18 @@ export class TabConsultarCliente implements OnInit {
   @Input() cpfInicial: string = '';
   cpf = "";
   cliente: Cliente | null = null;
+  buscaRealizada = false;
 
   ngOnInit(): void {
     if (this.cpfInicial) {
       this.cpf = this.cpfInicial;
       this.submit();
     }
+  }
+
+  onCpfChange() {
+    this.buscaRealizada = false;
+    this.cliente = null;
   }
 
   submit() {
@@ -40,13 +46,15 @@ export class TabConsultarCliente implements OnInit {
 
     this.loadingService.withLoadingObservable(this.clienteService.getCliente(this.cpf)).subscribe({
       next: (response) => {
-        this.toastService.success('Informações preenchidas com sucesso.');
         this.cliente = response;
+        this.buscaRealizada = true;
         this.cdRef.detectChanges();
-
       },
       error: (error) => {
+        this.cliente = null;
+        this.buscaRealizada = true;
         this.toastService.error(error.error?.error || "Algo deu errado");
+        this.cdRef.detectChanges();
       },
     })
     
