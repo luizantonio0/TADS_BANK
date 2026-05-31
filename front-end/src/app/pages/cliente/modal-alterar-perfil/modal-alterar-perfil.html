@@ -26,11 +26,11 @@
             <div class="grid gap-x-2 gap-y-2 grid-cols-12 mt-8">
                 <div class="col-span-2">
                     <label for="cep">CEP<span class="req-ast">*</span></label>
-                    <input formControlName="cep" mask="000000-000" [dropSpecialCharacters]="true" name="cep"
+                    <input formControlName="cep" mask="00000-000" [dropSpecialCharacters]="true" name="cep"
                         placeholder="Digite seu CEP">
                 </div>
                 <div class="col-span-10 flex flex-col justify-end w-fit items-center">
-                    <span
+                    <span (click)="buscarCep()"
                         class="material-symbols-outlined text-primary h-8 border-gray-200 border p-1 rounded-md cursor-pointer bg-gray-100">search</span>
                 </div>
                 <div class="col-span-8">
@@ -39,7 +39,7 @@
                 </div>
                 <div class="col-span-4">
                     <label for="numero">Número<span class="req-ast">*</span></label>
-                    <input name="numero" placeholder="Digite o número" disabled>
+                    <input formControlName="numero" (keydown)="onlyNumbers($event)" name="numero" placeholder="Digite o número">
                 </div>
                 <div class="col-span-4">
                     <label for="estado">Estado<span class="req-ast">*</span></label>
