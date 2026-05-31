@@ -24,6 +24,7 @@ export class TabManterGerentes implements OnInit {
   exibirModalEditar: boolean = false;
   exibirModalExcluir: boolean = false;
   exibirModalAdicionar: boolean = false;
+  gerenteSelecionado?: Gerente;
 
   ngOnInit(): void {
     this.carregarGerentes();
@@ -31,18 +32,23 @@ export class TabManterGerentes implements OnInit {
 
   carregarGerentes(): Promise<Gerente[]> {
     return this.loadService.withLoading(() =>
-      firstValueFrom(this.gerenteService.getGerentes()).catch((httpError) => {
+      firstValueFrom(this.gerenteService.getGerentes()).then((res) => {
+        this.gerentes = res;
+        return res;
+      }).catch((httpError) => {
         this.toastService.error(httpError.error?.error || 'Algo deu errado');
         throw httpError;
       }),
     );
   }
 
-  abrirModalEdicao() {
+  abrirModalEdicao(gerente: Gerente) {
+    this.gerenteSelecionado = gerente;
     this.exibirModalEditar = true;
   }
 
-  abrirModalExcluir() {
+  abrirModalExcluir(gerente: Gerente) {
+    this.gerenteSelecionado = gerente;
     this.exibirModalExcluir = true;
   }
 
