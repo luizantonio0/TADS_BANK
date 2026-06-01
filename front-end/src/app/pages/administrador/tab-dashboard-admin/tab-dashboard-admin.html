@@ -43,6 +43,7 @@
     <ng-template #desktopRow let-item>
       <td>{{ item.gerente.nome }}</td>
       <td>{{ item.gerente.cpf | cpf }}</td>
+      <td>{{ item.gerente.email }}</td>
       <td>{{ item.clientes.length }}</td>
       <td>
         <div [ngClass]="{
@@ -72,5 +73,5 @@
 </div>
 
 <app-modal-editar-gerente [gerente]="gerente!" [control]="exibirModalEditar" (close)="closeCallback()" (submited)="submitEdit($event)"/>
-<app-modal-excluir-gerente [control]="exibirModalExcluir" (close)="closeCallback()"/>
+<app-modal-excluir-gerente [control]="exibirModalExcluir" (close)="closeCallback()" (submited)="submitDelete()"/>
 <app-modal-adicionar-gerente [control]="exibirModalAdicionar" (close)="closeCallback()" (submited)="submitCreate($event)"/>

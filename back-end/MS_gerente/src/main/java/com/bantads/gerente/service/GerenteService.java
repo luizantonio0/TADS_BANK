@@ -69,6 +69,7 @@ public class GerenteService {
         var gerente = this.findByCpf(cpfGerente);
         gerente.getClientes().addAll(clientes);
         gerente.setTotalClientes(gerente.getClientes().size());
+        gerenteRepository.save(gerente);
         return gerente;
     }
 
@@ -178,6 +179,16 @@ public class GerenteService {
 
     public Optional<Gerente> findGerenteMenosClientes() {
         return Optional.ofNullable(gerenteRepository.findTop1GerenteComMenosClientes().getFirst());
+    }
+
+    public Optional<Gerente> findGerenteMenosClientes(String exclude) {
+        for (var g : gerenteRepository.findTop1GerenteComMenosClientes()) {
+            if (g.getCpf().equals(exclude)) {
+                continue;
+            }
+            return Optional.of(g);
+        }
+        return Optional.empty();
     }
 
     @Transactional

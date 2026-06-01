@@ -25,9 +25,10 @@ export class TabDashboardAdmin implements OnInit {
   columns: DataGridColumns[] = [
     { size: 10, title: 'Nome' },
     { size: 10, title: 'CPF' },
+    { size: 14, title: 'E-mail' },
     { size: 15, title: 'Total de clientes' },
-    { size: 25, title: 'Saldos positivos (+)' },
-    { size: 25, title: 'Saldos negativos (-)' },
+    { size: 18, title: 'Saldos positivos (+)' },
+    { size: 18, title: 'Saldos negativos (-)' },
     { size: 15, title: 'Ações' },
   ]
 
@@ -78,6 +79,22 @@ export class TabDashboardAdmin implements OnInit {
     this.loadService.withLoadingObservable(this.gerenteService.editarGerente(this.gerente.cpf, form)).subscribe({
       next: (gerente) => {
         this.toastService.success('Gerente cadastrado com sucesso');
+        this.dataGrid.fetch(false);
+      },
+      error: err => {
+        this.toastService.error(err.error?.error || 'Algo deu errado');
+      }
+    })
+  }
+
+  submitDelete() {
+    debugger
+    if(!this.gerente) {
+      return;
+    }
+    this.loadService.withLoadingObservable(this.gerenteService.excluirGerente(this.gerente.cpf)).subscribe({
+      next: (gerente) => {
+        this.toastService.success('Gerente removido com sucesso');
         this.dataGrid.fetch(false);
       },
       error: err => {

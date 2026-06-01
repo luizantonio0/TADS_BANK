@@ -14,6 +14,7 @@ import com.bantads.gerente.dto.saga.CredentialsUpdateInputDTO;
 import com.bantads.gerente.dto.saga.CriaGerenteComClienteDTO;
 import com.bantads.gerente.dto.saga.DeletarGerenteInputDTO;
 import com.bantads.gerente.dto.saga.GerenteDeletadoDTO;
+import com.bantads.gerente.enums.GerenteTipo;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -175,7 +176,7 @@ public class OrchestrationService {
                         mapper.writeValueAsString(authDTO)));
 
         var gerComMaisClientes = repository.findGerentesComMaisClientes();
-        if (gerComMaisClientes.size() > 0 && gerComMaisClientes.get(0).getClientes().size() > 1) {
+        if (gerComMaisClientes.size() > 0 && gerComMaisClientes.get(0).getClientes().size() > 1 && dto.tipo() != GerenteTipo.ADMINISTRADOR) {
             String cpfCliente = null;
             if (gerComMaisClientes.size() == 1) {
 
@@ -300,7 +301,7 @@ public class OrchestrationService {
 
         String cpfGerenteDestino = null;
         if (gerente.getClientes().size() > 0) {
-            var gerenteDestino = gerenteService.findGerenteMenosClientes().get();
+            var gerenteDestino = gerenteService.findGerenteMenosClientes(cpf).get();
             cpfGerenteDestino = gerenteDestino.getCpf();
             var dtoAlterarGerente = new AlterarGerenteDTO(
                     String.join(",", gerente.getClientes()), cpfGerenteDestino);

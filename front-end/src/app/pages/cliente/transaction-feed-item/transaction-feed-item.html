@@ -1,6 +1,6 @@
 <div>
     <div class="flex items-center mb-3">
-        @if (transaction.tipo === 'TRANSFERENCIA') {
+        @if (transaction.tipo === 'transferência') {
             @if(transaction.destino == accountNumber) {
             <span class="material-symbols-outlined text-blue-500">arrow_downward</span>
             <div class="ms-3">
@@ -14,13 +14,13 @@
                 <p class="text-xs text-gray-400">Transferência enviada - {{ transaction.data | date: 'dd/MM/yyyy - HH:mm' }}</p>
             </div>
             }
-        } @else if (transaction.tipo === 'DEPOSITO'){
+        } @else if (transaction.tipo === 'depósito'){
             <span class="material-symbols-outlined text-blue-500">arrow_downward</span>
             <div class="ms-3">
                 <p class="text-sm font-medium">Depósito em caixa eletrônico</p>
                 <p class="text-xs text-gray-400">Depósito - {{ transaction.data | date: 'dd/MM/yyyy - HH:mm' }}</p>
             </div>
-        } @else if (transaction.tipo === 'SAQUE'){
+        } @else if (transaction.tipo === 'saque'){
             <span class="material-symbols-outlined text-red-400">arrow_upward</span>
             <div class="ms-3">
                 <p class="text-sm font-medium">Saque em caixa eletrônico</p>

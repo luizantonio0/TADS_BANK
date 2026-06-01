@@ -12,9 +12,10 @@ export class ModalExcluirGerente {
   private toastr = inject(ToastService)
   @Input({ required: true }) control!: boolean;
   @Output() close = new EventEmitter();
+  @Output() submited = new EventEmitter<void>();
 
   submit = () => {
-    this.toastr.success('Gerente excluído com sucesso!')
+    this.submited.emit();
     this.onClose()
   }
 
