@@ -26,7 +26,7 @@ export class ModalAlterarPerfil implements OnChanges {
   @Output() close = new EventEmitter();
 
   form = this.fb.group({
-    nome: ['', [Validators.required, Validators.minLength(10)]],
+    nome: ['', [Validators.required, Validators.minLength(5)]],
     telefone: ['', [Validators.required, Validators.minLength(10)]],
     email: ['', [Validators.required, Validators.email]],
     endereco: ['', [Validators.required]],

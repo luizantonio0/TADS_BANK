@@ -18,9 +18,9 @@ export async function handleExtratoFull(res, claims, conta, queryParams) {
  
     const contasExtrato = []
     for(let mov of extrato.movimentacoes) {
-        if(mov.tipo == "TRANSFERENCIA") {
-            contasExtrato.push(mov.conta_origem);
-            contasExtrato.push(mov.conta_destino);
+        if(mov.tipo == "transferência") {
+            contasExtrato.push(mov.origem);
+            contasExtrato.push(mov.destino);
         }
     }
 
@@ -40,9 +40,9 @@ export async function handleExtratoFull(res, claims, conta, queryParams) {
     const clientes = await clientesResp.json();
 
     for(let mov of extrato.movimentacoes) {
-        if(mov.tipo == "TRANSFERENCIA") {
-            var contaOrigem = mapContas.get(mov.conta_origem);
-            var contaDestino = mapContas.get(mov.conta_destino);
+        if(mov.tipo == "transferência") {
+            var contaOrigem = mapContas.get(mov.origem);
+            var contaDestino = mapContas.get(mov.destino);
             mov.nome_destino = clientes[contaDestino.cpf];
             mov.nome_origem = clientes[contaOrigem.cpf];
         }

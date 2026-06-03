@@ -85,7 +85,7 @@ public class ContaController {
     @PostMapping("/{conta}/sacar")
     public ResponseEntity<MovimentacaoResultDTO> sacar(
             @PathVariable("conta") String conta,
-            @RequestBody SaqueDTO dto) {
+            @RequestBody SaqueDTO dto) throws HttpException {
         return ResponseEntity.ok(movimentacaoService.sacar(conta, dto));
     }
 

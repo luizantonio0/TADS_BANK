@@ -46,8 +46,11 @@ public class ClienteController {
     }
 
     @GetMapping("/gerente/{cpf}")
-    public ResponseEntity<List<ClienteDTO>> findByGerente(@PathVariable("cpf") String cpf) throws HttpException {
-        return ResponseEntity.ok(clienteService.findClientesByGerente(cpf).stream().map(c -> ClienteDTO.from(c)).toList());
+    public ResponseEntity<List<ClienteDTO>> findByGerente(
+        @RequestParam(name = "nome", required = false, defaultValue = "") String nome,
+        @PathVariable("cpf") String cpf
+    ) throws HttpException {
+        return ResponseEntity.ok(clienteService.findClientesByGerente(cpf, nome).stream().map(c -> ClienteDTO.from(c)).toList());
     }
 
     @GetMapping("/{cpf}")

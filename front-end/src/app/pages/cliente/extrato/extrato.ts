@@ -2,14 +2,14 @@ import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, OnChange
 import { GrupoMovimentacao } from '../../../shared/models/transaction.model';
 import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
 import { TransactionFeedItem } from '../transaction-feed-item/transaction-feed-item';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoadingService } from '../../../shared/service/loading.service';
 import { ContaService } from '../../../shared/service/requests/conta.service';
 import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'extrato',
-  imports: [DatePipe, CurrencyPipe, TitleCasePipe, TransactionFeedItem, ReactiveFormsModule, NgxMaskDirective],
+  imports: [DatePipe, CurrencyPipe, TitleCasePipe, TransactionFeedItem, ReactiveFormsModule, NgxMaskDirective, FormsModule],
   templateUrl: './extrato.html'
 })
 export class Extrato implements OnInit, OnChanges {
@@ -19,11 +19,12 @@ export class Extrato implements OnInit, OnChanges {
   transactionGroups: GrupoMovimentacao[] = [];
 
   isFiltroTooltipVisible = false;
+  apenasComMovimentacao: boolean = false;
 
   @ViewChild('filtroTooltipRef') filtroTooltipRef!: ElementRef;
 
   formFiltroData: FormGroup;
-
+  
   constructor(
     private fb: FormBuilder,
     private loadService: LoadingService,
@@ -47,8 +48,6 @@ export class Extrato implements OnInit, OnChanges {
   }
 
   buscarExtrato(contaNum?: string) {
-      console.log(this.accountNumber ?? contaNum);
-
     if (!(this.accountNumber??contaNum)) return;
 
     const de = this.converterDataParaAPI(this.formFiltroData.value.dataDe);
@@ -60,7 +59,8 @@ export class Extrato implements OnInit, OnChanges {
       .withLoadingObservable(this.contaService.extrato(accountNumber, de, ate))
       .subscribe({
         next: (res) => {
-          const groupedMap = res.movimentacoes.reduce(
+          const datasMap = Object.entries(res.saldos_consolidados).map(x => x[0].split('T')[0])
+          const movimentacoesMap = res.movimentacoes.reduce(
             (acc, mov) => {
               const date = mov.data.split('T')[0];
               if (!acc[date]) {
@@ -72,20 +72,18 @@ export class Extrato implements OnInit, OnChanges {
             {} as Record<string, any[]>,
           );
 
-          this.transactionGroups = Object.entries(groupedMap)
-            .map(([dia, movimentacoes]) => {
-              // Ordena as movimentações de cada dia da mais recente para a mais antiga
+          this.transactionGroups = datasMap
+            .map((dia) => {
+              const movimentacoes = movimentacoesMap[dia] || [];
               const movimentacoesOrdenadas = movimentacoes.sort((a, b) =>
                 b.data.localeCompare(a.data),
               );
-
               return {
                 dia,
                 movimentacoes: movimentacoesOrdenadas,
                 saldo: res.saldos_consolidados[dia] || 0,
               };
             })
-            // Ordena os dias do mais recente para o mais antigo
             .sort((a, b) => b.dia.localeCompare(a.dia));
 
           this.cdRef.detectChanges();
@@ -112,4 +110,5 @@ export class Extrato implements OnInit, OnChanges {
     event.stopPropagation();
     this.isFiltroTooltipVisible = !this.isFiltroTooltipVisible;
   }
+
 }

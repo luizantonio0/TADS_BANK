@@ -1,5 +1,5 @@
 <div>
-    <div class="flex items-center mb-3">
+    <div class="flex items-center mb-2 p-2 rounded-md border" [ngClass]="isSaida() ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'">
         @if (transaction.tipo === 'transferência') {
             @if(transaction.destino == accountNumber) {
             <span class="material-symbols-outlined text-blue-500">arrow_downward</span>
@@ -27,10 +27,8 @@
                 <p class="text-xs text-gray-400">Saque - {{ transaction.data | date: 'dd/MM/yyyy - HH:mm' }}</p>
             </div>
         }
-        <div class="ms-auto font-semibold text-sm" 
-            [class.text-blue-500]="transaction.tipo === 'DEPOSITO' || transaction.destino == accountNumber" 
-            [class.text-red-400]="transaction.tipo === 'SAQUE' || transaction.origem == accountNumber">
-            @if (transaction.tipo === 'SAQUE' || (transaction.tipo == "TRANSFERENCIA" && transaction.origem == accountNumber)) {
+        <div class="ms-auto font-semibold text-sm" [ngClass]="isSaida() ? 'text-red-400' : 'text-blue-400'">
+            @if (isSaida()) {
                 -
             }{{ transaction.valor | currency:'BRL' }}
         </div>

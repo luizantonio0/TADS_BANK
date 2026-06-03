@@ -14,6 +14,7 @@ import com.bantads.cliente.dto.saga.input.CredentialsCreateInputDTO;
 import com.bantads.cliente.dto.saga.input.GetGerenteInputDTO;
 import com.bantads.cliente.dto.saga.input.RejeitarClienteInputDTO;
 import com.bantads.cliente.dto.saga.output.*;
+import com.bantads.cliente.enums.LogStatus;
 import com.bantads.cliente.exception.BadRequestException;
 import com.bantads.cliente.exception.ForbiddenException;
 import com.bantads.cliente.exception.HttpException;
@@ -21,6 +22,7 @@ import com.bantads.cliente.exception.InternalServerErrorException;
 import com.bantads.cliente.exception.NotFoundException;
 import com.bantads.cliente.exception.UnauthorizedException;
 import com.bantads.cliente.repository.ClienteRepository;
+import com.bantads.cliente.repository.LogStatusRepository;
 import com.bantads.shared.dto.OrchestrationCommandDTO;
 import com.bantads.shared.dto.OrchestrationRequestDTO;
 import com.bantads.shared.dto.OrchestrationRequestResultDTO;
@@ -29,7 +31,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException.NotFound;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -42,6 +43,9 @@ public class OrchestrationService {
 
     @Autowired
     private ClienteRepository repository;
+
+    @Autowired
+    private LogStatusRepository logStatusRepository;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -97,6 +101,12 @@ public class OrchestrationService {
 
         if (repository.existsByEmail(dto.email().trim())) {
             throw new HttpException(409, "Email já está em uso!");
+        }
+
+        var log = logStatusRepository.findByCpf(dto.cpf());
+        if (log.isPresent()) {
+            if(log.get().getStatus() == LogStatus.APROVADO) throw new BadRequestException("CPF vinculado a uma conta já aprovada.");
+            else throw new BadRequestException("CPF vinculado a uma conta já rejeitada.");
         }
 
         try {
@@ -175,8 +185,6 @@ public class OrchestrationService {
         if (cliente.isEmpty()) {
             throw new NotFoundException("Cliente não encontrado");
         }
-
-        System.out.println(cliente.get().getCpfGerente() + " - " + cpfGerente);
 
         if (cliente.get().getCpfGerente() == null || !cliente.get().getCpfGerente().equalsIgnoreCase(cpfGerente)) {
             throw new ForbiddenException("Você não tem permissão para isso.");

@@ -21,7 +21,6 @@ export class ModalRejeitarCliente {
 
   submit = () => {
     if(this.motivo.length < 5) {
-      console.log(this.motivo)
       this.toast.error("Especifique o motivo da rejeição.");
       return;
     }

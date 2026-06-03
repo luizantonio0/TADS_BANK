@@ -30,7 +30,6 @@ public class SagaAlterarGerenteClienteStrategy implements SagaCommandStrategy {
 
             List<String> idsAlterados = new ArrayList<>();
             for (var c : dto.cpfCliente().split(",")) {
-                System.out.println(c);
                 var cliente = clienteService.updateGerente(c, dto.cpfGerente());
                 idsAlterados.add(cliente.getId().toString());
             }

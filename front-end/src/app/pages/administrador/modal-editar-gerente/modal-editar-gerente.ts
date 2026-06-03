@@ -57,7 +57,6 @@ export class ModalEditarGerente {
   }
 
   submit = () => {
-    console.log(this.formCadastro.value)
     if (this.formCadastro.invalid) {
       this.toastr.error('Por favor, preencha o formulário corretamente.');
       return;

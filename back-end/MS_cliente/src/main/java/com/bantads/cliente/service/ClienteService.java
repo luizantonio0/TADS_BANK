@@ -98,8 +98,8 @@ public class ClienteService {
         return maps;
     }
 
-    public List<Cliente> findClientesByGerente(String cpf) {
-        return clienteRepository.findByGerente(cpf, "");
+    public List<Cliente> findClientesByGerente(String cpf, String termo) {
+        return clienteRepository.findByGerente(cpf, termo);
     }
 
     public List<Cliente> findByCpf(List<String> cpf) {

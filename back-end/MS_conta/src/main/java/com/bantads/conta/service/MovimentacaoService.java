@@ -7,6 +7,7 @@ import com.bantads.conta.dto.cqrs.CQRSSyncEntity;
 import com.bantads.conta.exception.BadRequestException;
 import com.bantads.conta.exception.ForbiddenException;
 import com.bantads.conta.exception.HttpException;
+import com.bantads.conta.exception.NotFoundException;
 import com.bantads.conta.model.Conta;
 import com.bantads.conta.model.Movimentacao;
 import com.bantads.conta.model.TipoMovimentacao;
@@ -66,14 +67,14 @@ public class MovimentacaoService {
     }
 
     @Transactional
-    public MovimentacaoResultDTO sacar(String conta, SaqueDTO dto) {
+    public MovimentacaoResultDTO sacar(String conta, SaqueDTO dto) throws HttpException {
         var valor = dto.valor().setScale(2, RoundingMode.HALF_UP);
         var contaDestino = contaRepository.findByConta(conta)
-                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada"));
+                .orElseThrow(() -> new NotFoundException("Conta não encontrada"));
 
         BigDecimal saldoDisponivel = contaDestino.getSaldo().add(contaDestino.getLimite());
         if (saldoDisponivel.compareTo(valor) < 0) {
-            throw new IllegalStateException("Saldo insuficiente (considerando limite)");
+            throw new BadRequestException("Saldo insuficiente (considerando limite)");
         }
 
         contaDestino.setSaldo(contaDestino.getSaldo().subtract(valor).setScale(2, RoundingMode.HALF_UP));

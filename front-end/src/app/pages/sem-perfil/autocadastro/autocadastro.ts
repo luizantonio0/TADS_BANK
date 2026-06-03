@@ -25,7 +25,6 @@ export class Autocadastro {
   private toastr = inject(ToastService);
   formCadastro: FormGroup;
 
-  //todo: não consegui testar o submit com o FormGroup e as validações ativas, esta funcionando sem os Validators
   constructor(
     private router: Router,
     private fb: FormBuilder,

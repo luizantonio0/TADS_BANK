@@ -113,7 +113,7 @@ app.use(async (req, res, next) => {
     }
 
     if(targetRoute.name == "buscarClientes" && !req.query.filtro) {
-        return await handleConsultaClientesGerente(res, claims);
+        return await handleConsultaClientesGerente(req, res, claims);
     }
 
     if(targetRoute.name == "buscarCliente" && !req.query.include) {

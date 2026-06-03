@@ -25,7 +25,7 @@ label {
   @apply block mb-0.5 text-gray-500 leading-tight font-sans text-sm font-semibold;
 }
 
-input {
+input:not([type="checkbox"]) {
   @apply border border-[#d6c9ff] rounded-md text-sm font-sans outline-none h-8 px-2 bg-gray-50 w-full text-sm;
 }
 

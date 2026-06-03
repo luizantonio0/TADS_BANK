@@ -1,6 +1,6 @@
 <modal icon="person_edit" title="Informações pessoais" [control]="control" (close)="onClose()"
     [submitDisabled]="form.invalid" [submitCallback]="() => this.submit()" submitText="Salvar alterações">
-    <div class="">
+    <div class="w-137.5">
         <form [formGroup]="form" (ngSubmit)="submit()">
             <div class="grid gap-x-2 gap-y-2 grid-cols-12">
                 <div class="col-span-12">
@@ -24,12 +24,12 @@
                 </div>
             </div>
             <div class="grid gap-x-2 gap-y-2 grid-cols-12 mt-8">
-                <div class="col-span-2">
+                <div class="col-span-3">
                     <label for="cep">CEP<span class="req-ast">*</span></label>
                     <input formControlName="cep" mask="00000-000" [dropSpecialCharacters]="true" name="cep"
                         placeholder="Digite seu CEP">
                 </div>
-                <div class="col-span-10 flex flex-col justify-end w-fit items-center">
+                <div class="col-span-9 flex flex-col justify-end w-fit items-center">
                     <span (click)="buscarCep()"
                         class="material-symbols-outlined text-primary h-8 border-gray-200 border p-1 rounded-md cursor-pointer bg-gray-100">search</span>
                 </div>

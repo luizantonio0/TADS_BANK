@@ -1,6 +1,6 @@
 import { services } from "../routes.js";
 
-export async function handleConsultaClientesGerente(res, claims) {
+export async function handleConsultaClientesGerente(req, res, claims) {
 
     let config = {
         method: 'GET',
@@ -10,7 +10,7 @@ export async function handleConsultaClientesGerente(res, claims) {
         }
     }
 
-    const clientesResp = await fetch(services.clientes + `/clientes/gerente/${claims.cpf}`, config)
+    const clientesResp = await fetch(services.clientes + `/clientes/gerente/${claims.cpf}?nome=` + req.query.nome, config)
     if (!clientesResp.ok) return res.status(clientesResp.status).json(clientesResp.body);
     const clientes = await clientesResp.json();
 
