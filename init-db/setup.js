@@ -1,4 +1,4 @@
-/*db = db.getSiblingDB('ms_auth');
+db = db.getSiblingDB('ms_auth');
 
 db.credentials.deleteMany({});
 
@@ -66,4 +66,4 @@ db.credentials.insertMany([
     profile: "CLIENTE",
     _class: "com.bantads.auth.document.Credentials"
   }
-]);*/
+]);
