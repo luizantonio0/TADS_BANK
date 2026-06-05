@@ -10,18 +10,20 @@ public record AtualizarClienteInputDTO (
     String email,
     BigDecimal salario,
     String endereco,
-    String CEP,
+    String cep,
     String cidade,
-    String estado
+    String estado,
+    String telefone
 ) {
 
     public AtualizarClienteInputDTO {
         cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
-        CEP = (CEP != null) ? CEP.replaceAll("\\D", "") : null;
+        cep = (cep != null) ? cep.replaceAll("\\D", "") : null;
+        telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
     }
 
     public static AtualizarClienteInputDTO from(String cpf, AlterarDadosClienteDTO dto) {
-        return new AtualizarClienteInputDTO(cpf, dto.nome(), dto.email(), dto.salario(), dto.endereco(), dto.CEP(), dto.cidade(), dto.estado());
+        return new AtualizarClienteInputDTO(cpf, dto.nome(), dto.email(), dto.salario(), dto.endereco(), dto.cep(), dto.cidade(), dto.estado(), dto.telefone());
     }
 
 }

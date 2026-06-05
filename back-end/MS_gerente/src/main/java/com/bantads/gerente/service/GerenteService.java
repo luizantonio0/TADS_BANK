@@ -165,6 +165,7 @@ public class GerenteService {
                 .orElseThrow(() -> new NotFoundException("Gerente não encontrado!"));
 
         gerente.setNome(atualizaGerenteDTO.nome());
+        gerente.setTelefone(atualizaGerenteDTO.telefone());
         gerente.setEmail(email);
 
         gerenteRepository.save(gerente);
@@ -201,6 +202,7 @@ public class GerenteService {
         g1.setEmail("ger1@bantads.com.br");
         g1.setClientes(List.of("12912861012", "58872160006"));
         g1.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
+        g1.setTelefone("49998925524");
         g1.setTotalClientes(2);
 
         Gerente g2 = new Gerente();
@@ -209,6 +211,7 @@ public class GerenteService {
         g2.setEmail("ger2@bantads.com.br");
         g2.setClientes(List.of("76179646090", "09506382000"));
         g2.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
+        g2.setTelefone("41903324922");
         g2.setTotalClientes(2);
 
         Gerente g3 = new Gerente();
@@ -217,12 +220,14 @@ public class GerenteService {
         g3.setEmail("ger3@bantads.com.br");
         g3.setClientes(List.of("85733854057"));
         g3.setTipo(com.bantads.gerente.enums.GerenteTipo.GERENTE);
+        g3.setTelefone("81994829002");
         g3.setTotalClientes(1);
 
         Gerente g4 = new Gerente();
         g4.setCpf("40501740066");
         g4.setNome("Adamântio");
         g4.setEmail("adm1@bantads.com.br");
+        g4.setTelefone("54994229202");
         g4.setTipo(com.bantads.gerente.enums.GerenteTipo.ADMINISTRADOR);
         g4.setTotalClientes(0);
 

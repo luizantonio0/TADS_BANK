@@ -1,38 +1,30 @@
-<app-modal-editar-gerente [control]="exibirModalEditar" [gerente]="gerenteSelecionado!" (close)="exibirModalEditar = false" />
-<app-modal-excluir-gerente [control]="exibirModalExcluir" (close)="exibirModalExcluir = false"/>
-<app-modal-adicionar-gerente [control]="exibirModalAdicionar" (close)="exibirModalAdicionar = false"/>
+<div class="bg-white rounded-lg shadow p-4">
+  <h2 class="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
+    <span class="material-symbols-outlined">group</span>
+    Listagem de Gerentes
+  </h2>
 
-<div class="p-4 bg-white border border-primary rounded-lg shadow-md">
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
-      <span class="material-symbols-outlined">manage_accounts</span> Gerenciamento de Gerentes
-    </h2>
-    <button (click)="exibirModalAdicionar = true" class="bg-primary text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-opacity-90">
-      <span class="material-symbols-outlined">person_add</span> Novo Gerente
-    </button>
-  </div>
+  <button (click)="exibirModalAdicionar=true" class="bg-green-500 flex items-center justify-center gap-x-2 text-lg font-medium transition-colors mb-4">
+    <span class="material-symbols-outlined">add</span>
+    <span>Adicionar Gerente ou Administrador</span>
+  </button>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    @for (item of gerentes; track item.cpf) {
-      <div class="border p-4 rounded-lg flex justify-between items-start hover:shadow-sm">
-        <div>
-          <p class="font-bold text-lg">{{ item.nome }}</p>
-          <p class="text-gray-600 text-sm">CPF: {{ item.cpf }}</p>
-          <p class="text-gray-600 text-sm">E-mail: {{ item.email }}</p>
+  <data-grid #gridGerentes [columns]="columns" [supplier]="carregarGerentes.bind(this)">
+    <ng-template #desktopRow let-item>
+      <td>{{ item.nome }}</td>
+      <td>{{ item.cpf | cpf }}</td>
+      <td>{{ item.email }}</td>
+      <td>{{ item.telefone | telefone }}</td>
+      <td>
+        <div class="flex [&>span]:cursor-pointer [&>span]:text-indigo gap-x-1">
+          <span class="material-symbols-outlined" (click)="openEdit(item)">edit</span>
+          <span class="material-symbols-outlined" (click)="openDelete(item)">delete</span>
         </div>
-        <div class="flex gap-2">
-          <button (click)="abrirModalEdicao(item)" class="text-primary hover:bg-primary/10 p-1 rounded" title="Editar">
-            <span class="material-symbols-outlined">edit</span>
-          </button>
-          <button (click)="abrirModalExcluir(item)" class="text-red-600 hover:bg-red-50 p-1 rounded" title="Excluir">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
-        </div>
-      </div>
-    } @empty {
-      <div class="col-span-full text-center py-8 text-gray-500">
-        Nenhum gerente encontrado no sistema.
-      </div>
-    }
-  </div>
+      </td>
+    </ng-template>
+  </data-grid>
 </div>
+
+<app-modal-editar-gerente [gerente]="gerente!" [control]="exibirModalEditar" (close)="closeCallback()" (submited)="submitEdit($event)"/>
+<app-modal-excluir-gerente [control]="exibirModalExcluir" (close)="closeCallback()" (submited)="submitDelete()"/>
+<app-modal-adicionar-gerente [control]="exibirModalAdicionar" (close)="closeCallback()" (submited)="submitCreate($event)"/>

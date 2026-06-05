@@ -38,6 +38,9 @@ public class Gerente {
     @Column(nullable = false)
     private String tipo;
 
+    @Column(nullable = false, length = 11)
+    private String telefone;
+
     @Column(nullable = false)
     private Integer totalClientes;
 
@@ -64,6 +67,15 @@ public class Gerente {
         this.tipo = criaGerenteDTO.tipo().name();
         this.totalClientes = 0;
         this.clientes = clientes;
+        this.telefone = criaGerenteDTO.telefone();
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+      this.telefone = telefone;
     }
 
     public void incrementTotalClientes() {

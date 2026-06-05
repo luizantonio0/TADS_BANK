@@ -155,8 +155,7 @@ public class MovimentacaoService {
 
         var primeiraMovimentacaoOpt = movimentacaoRepository
                 .findFirstByContaOrigemOrContaDestinoOrderByDataHoraAsc(numConta, numConta);
-        var ultimaMovimentacaoOpt = movimentacaoRepository
-                .findFirstByContaOrigemOrContaDestinoOrderByDataHoraDesc(numConta, numConta);
+        //var ultimaMovimentacaoOpt = movimentacaoRepository.findFirstByContaOrigemOrContaDestinoOrderByDataHoraDesc(numConta, numConta);
 
         Optional<Conta> contaOpt = contaRepository.findByConta(numConta);
         if (contaOpt.isEmpty()) {
@@ -168,17 +167,19 @@ public class MovimentacaoService {
         }
 
         var primeiraMovimentacao = primeiraMovimentacaoOpt.get();
-        var ultimaMovimentacao = ultimaMovimentacaoOpt.get();
+        //var ultimaMovimentacao = ultimaMovimentacaoOpt.get();
         var conta = contaOpt.get();
 
         LocalDateTime dataInicio = inicio == null ? LocalDateTime.MIN
                 : inicio.isBefore(primeiraMovimentacao.getDataHora().toLocalDate())
                         ? primeiraMovimentacao.getDataHora().toLocalDate().atStartOfDay()
                         : inicio.atStartOfDay();
-        LocalDateTime dataFim = fim == null ? LocalDateTime.MAX
+        /*LocalDateTime dataFim = fim == null ? LocalDateTime.MAX
                 : fim.isAfter(ultimaMovimentacao.getDataHora().toLocalDate())
                         ? ultimaMovimentacao.getDataHora().toLocalDate().atTime(LocalTime.MAX)
-                        : fim.atTime(LocalTime.MAX);
+                        : fim.atTime(LocalTime.MAX);*/
+
+        LocalDateTime dataFim = fim == null ? LocalDateTime.now() : fim.atTime(LocalTime.MAX);
 
         List<Movimentacao> anteriores = movimentacaoRepository.findByContaBefore(numConta, dataInicio);
         BigDecimal saldoAtual = BigDecimal.ZERO;

@@ -8,6 +8,7 @@ public record GerenteDTO(
         String nome,
         String email,
         String tipo,
+        String telefone,
         Integer totalClientes
 ) {
         public GerenteDTO {

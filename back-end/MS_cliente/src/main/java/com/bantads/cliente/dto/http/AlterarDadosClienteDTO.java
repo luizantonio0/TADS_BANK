@@ -8,11 +8,13 @@ public record AlterarDadosClienteDTO (
     String email,
     BigDecimal salario,
     String endereco,
-    String CEP,
+    String cep,
     String cidade,
-    String estado
+    String estado,
+    String telefone
 ){
     public AlterarDadosClienteDTO {
-        CEP = (CEP != null) ? CEP.replaceAll("\\D", "") : null;
+        cep = (cep != null) ? cep.replaceAll("\\D", "") : null;
+        telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
     }
 }

@@ -29,6 +29,7 @@ public class SagaUpdateGerenteStrategy implements SagaCommandStrategy {
             null,
                 _dto.nome(),
                 _dto.email(),
+                _dto.telefone(),
                 _dto.senha()
         );
 

@@ -66,6 +66,7 @@ public class ContaService {
         var conta = contaRepository.findByCpf(cpfCliente).orElseThrow(() -> new NotFoundException("Conta não encontrada"));
         conta.setCpfGerente(cpfGerente);
         contaRepository.save(conta);
+        sincronizarConta(conta);
         return conta;
     }
 

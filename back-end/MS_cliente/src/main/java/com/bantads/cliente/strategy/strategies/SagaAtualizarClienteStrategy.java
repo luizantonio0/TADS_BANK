@@ -28,9 +28,10 @@ public class SagaAtualizarClienteStrategy implements SagaCommandStrategy {
                 dto.email(),
                 dto.salario(),
                 dto.endereco(),
-                dto.CEP(),
+                dto.cep(),
                 dto.cidade(),
-                dto.estado()
+                dto.estado(),
+                dto.telefone()
         ), dto.cpf());
         redisTemplate.opsForValue().set(cmd.idOrchestration().toString() + ":touched:cliente", cli.getId().toString());
 

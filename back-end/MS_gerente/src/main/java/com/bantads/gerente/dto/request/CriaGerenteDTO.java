@@ -10,11 +10,13 @@ public record CriaGerenteDTO(
         String nome,
         String email,
         String cpf,
+        String telefone,
         String senha,
         GerenteTipo tipo,
         @JsonProperty("saldos_positivos") Map<String, BigDecimal> saldosPositivos
 ) {
         public CriaGerenteDTO {
                 cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;
+                telefone = (telefone != null) ? telefone.replaceAll("\\D", "") : null;
         }
 }

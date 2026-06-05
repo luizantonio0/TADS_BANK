@@ -1,4 +1,4 @@
-package com.bantads.gerente.dto.saga;
+package com.bantads.cliente.dto.saga.input;
 
 public record CredentialsUpdateInputDTO(String cpf, String email, String password, boolean changePassword) {
     public CredentialsUpdateInputDTO {

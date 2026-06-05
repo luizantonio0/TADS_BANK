@@ -108,7 +108,7 @@ public class OrchestrationService {
         var orchestrationId = UUID.randomUUID();
         var mapper = new ObjectMapper();
 
-        var authDTO = new CredentialsUpdateInputDTO(cpf, dto.email(), dto.senha());
+        var authDTO = new CredentialsUpdateInputDTO(cpf, dto.email(), dto.senha(), true);
 
         var cmdAuth = new OrchestrationCommandDTO(orchestrationId, UUID.randomUUID(), "ms-auth", "UpdateCredentials",
                 mapper.writeValueAsString(authDTO));
@@ -239,11 +239,11 @@ public class OrchestrationService {
                         "AlterarGerenteCliente",
                         mapper.writeValueAsString(dtoAlterarGerente)));
             }
-            var dtoGerente = new CriaGerenteComClienteDTO(dto.nome(), dto.email(), cpf, dto.tipo(), cpfCliente);
+            var dtoGerente = new CriaGerenteComClienteDTO(dto.nome(), dto.email(), cpf, dto.tipo(), cpfCliente, dto.telefone());
             commands.add(new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "CreateGerente",
                     mapper.writeValueAsString(dtoGerente)));
         } else {
-            var dtoGerente = new CriaGerenteComClienteDTO(dto.nome(), dto.email(), cpf, dto.tipo(), null);
+            var dtoGerente = new CriaGerenteComClienteDTO(dto.nome(), dto.email(), cpf, dto.tipo(), null, dto.telefone());
             commands.add(new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-gerente", "CreateGerente",
                     mapper.writeValueAsString(dtoGerente)));
         }

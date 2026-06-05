@@ -261,7 +261,7 @@ public class AuthService {
         return creds;
     }
 
-    public Credentials updateCredentials(String cpf, String email, String cryptoPw) throws BadRequestException {
+    public Credentials updateCredentials(String cpf, String email, String cryptoPw, boolean changePassword) throws BadRequestException {
         if (email == null || cpf == null || email.trim().isEmpty() || cpf.trim().isEmpty()) {
             throw new BadRequestException("Email e CPF devem ser preenchidos.");
         }
@@ -272,7 +272,9 @@ public class AuthService {
 
         if (cred.isPresent()) {
             cred.get().setEmail(email);
-            cred.get().setPassword(cryptoPw);
+            if(changePassword){ 
+                cred.get().setPassword(cryptoPw);
+            }
             credentialsRepository.save(cred.get());
         }
         return cred.get();

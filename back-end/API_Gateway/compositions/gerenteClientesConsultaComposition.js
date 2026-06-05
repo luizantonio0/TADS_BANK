@@ -18,6 +18,9 @@ export async function handleConsultaClientesGerente(req, res, claims) {
     if (!contasResp.ok) return res.status(contasResp.status).json(contasResp.body);
     const contas = (await contasResp.json());
 
+    console.log(contas);
+    console.log(clientes)
+
     for(var cliente of clientes) {
         cliente.saldo = contas[cliente.cpf].saldo;
         cliente.limite = contas[cliente.cpf].limite;

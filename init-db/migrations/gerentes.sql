@@ -16,7 +16,7 @@ CREATE TABLE public.tb_gerente (
 INSERT INTO public.tb_gerente 
 (id, cpf, nome, email, telefone, tipo, total_clientes)
 VALUES 
-(uuid_generate_v4(), '98574307084', 'Geniéve', 'ger1@bantads.com.br', '11994289229', 'GERENTE', 2),
-(uuid_generate_v4(), '64065268052', 'Godophredo', 'ger2@bantads.com.br', '19942849924', 'GERENTE', 2),
-(uuid_generate_v4(), '23862179060', 'Gyândula', 'ger3@bantads.com.br', '84988422433', 'GERENTE', 1),
-(uuid_generate_v4(), '40501740066', 'Adamântio', 'adm1@bantads.com.br', '12994429024', 'ADMINISTRADOR', 0);
+(uuid_generate_v4(), '98574307084', 'Geniéve', 'ger1@bantads.com.br', '49998925524', 'GERENTE', 2),
+(uuid_generate_v4(), '64065268052', 'Godophredo', 'ger2@bantads.com.br', '41903324922', 'GERENTE', 2),
+(uuid_generate_v4(), '23862179060', 'Gyândula', 'ger3@bantads.com.br', '81994829002', 'GERENTE', 1),
+(uuid_generate_v4(), '40501740066', 'Adamântio', 'adm1@bantads.com.br','54994229202', 'ADMINISTRADOR', 0);

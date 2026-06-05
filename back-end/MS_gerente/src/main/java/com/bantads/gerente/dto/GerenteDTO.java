@@ -9,6 +9,7 @@ public record GerenteDTO(
         String nome,
         String email,
         String tipo,
+        String telefone,
         Integer totalClientes) {
 
     public GerenteDTO {
@@ -23,6 +24,7 @@ public record GerenteDTO(
                 gerente.getNome(),
                 gerente.getEmail(),
                 gerente.getTipo(),
+                gerente.getTelefone(),
                 includeTotalClientes ? gerente.getTotalClientes() : null);
     }
 }

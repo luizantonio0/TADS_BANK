@@ -2,9 +2,9 @@
   [submitCallback]="submit" (close)="onClose()">
 
   <form [formGroup]="formCadastro">
-    <div class="flex flex-col gap-2 min-w-75 md:min-w-112.5">
+    <div class="grid grid-cols-6 gap-2 min-w-75 max-w-75 md:min-w-112.5">
 
-      <div class="flex gap-x-4">
+      <div class="flex gap-x-4 col-span-full">
         <div class="flex items-center gap-x-1">
           <label for="tipoGerente">Gerente</label>
           <input type="radio" id="tipoGerente" formControlName="tipo" value="GERENTE" />
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-1 col-span-full">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-gray-500 text-[20px]">person</span>
           <label class="text-sm font-semibold text-gray-700">Nome Completo</label>
@@ -26,7 +26,7 @@
           placeholder="Nome do novo gerente">
       </div>
 
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-1 col-span-3">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-gray-500 text-[20px]">mail</span>
           <label class="text-sm font-semibold text-gray-700">E-mail</label>
@@ -36,7 +36,18 @@
           placeholder="email@bantads.com.br">
       </div>
 
-      <div class="grid gap-4">
+      <div class="flex flex-col gap-1 col-span-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-gray-500 text-[20px]">phone</span>
+          <label class="text-sm font-semibold text-gray-700">Telefone</label>
+        </div>
+        <input type="text" formControlName="telefone"
+               mask="(00) 00000-0000" [dropSpecialCharacters]="true"
+               class="w-full border border-gray-300 rounded-md py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary/50"
+               placeholder="Telefone do novo gerente">
+      </div>
+
+      <div class="grid gap-4 col-span-3">
         <div class="flex flex-col gap-1">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-gray-500 text-[20px]">badge</span>
@@ -48,7 +59,7 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-1 col-span-3">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-gray-500 text-[20px]">lock</span>
           <label class="text-sm font-semibold text-gray-700">Senha Inicial</label>

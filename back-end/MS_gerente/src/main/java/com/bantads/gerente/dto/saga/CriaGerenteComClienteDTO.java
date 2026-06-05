@@ -7,7 +7,8 @@ public record CriaGerenteComClienteDTO(
         String email,
         String cpf,
         GerenteTipo tipo,
-        String cpfCliente
+        String cpfCliente,
+        String telefone
 ) {
         public CriaGerenteComClienteDTO {
                 cpf = (cpf != null) ? cpf.replaceAll("\\D", "") : null;

@@ -11,6 +11,7 @@ import com.bantads.cliente.dto.saga.input.AtualizarClienteInputDTO;
 import com.bantads.cliente.dto.saga.input.AtualizarLimiteInputDTO;
 import com.bantads.cliente.dto.saga.input.ContaCreateInputDTO;
 import com.bantads.cliente.dto.saga.input.CredentialsCreateInputDTO;
+import com.bantads.cliente.dto.saga.input.CredentialsUpdateInputDTO;
 import com.bantads.cliente.dto.saga.input.GetGerenteInputDTO;
 import com.bantads.cliente.dto.saga.input.RejeitarClienteInputDTO;
 import com.bantads.cliente.dto.saga.output.*;
@@ -282,6 +283,12 @@ public class OrchestrationService {
             if (cliente.get().isAprovado() && dto.salario().compareTo(cliente.get().getSalario()) != 0) {
                 commands.add(new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-conta",
                         "UpdateLimite", mapper.writeValueAsString(contaDTO)));
+            }
+
+            if(cliente.get().isAprovado() && !dto.email().equalsIgnoreCase(cliente.get().getEmail())) {
+                var authDTO = new CredentialsUpdateInputDTO(cpf, dto.email(), null, false);
+                commands.add(new OrchestrationCommandDTO(idOrchestration, UUID.randomUUID(), "ms-auth",
+                "UpdateCredentials", mapper.writeValueAsString(authDTO)));
             }
 
             var request = new OrchestrationRequestDTO(idOrchestration, true, commands);

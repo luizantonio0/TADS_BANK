@@ -12,10 +12,11 @@ import { ModalAdicionarGerente } from '../modal-adicionar-gerente/modal-adiciona
 import { ModalExcluirGerente } from '../modal-excluir-gerente/modal-excluir-gerente';
 import { ModalEditarGerente } from '../modal-editar-gerente/modal-editar-gerente';
 import { EditarGerenteDTO } from '../../../shared/models/resquest/editgerente.model';
+import { TelefonePipe } from '../../../shared/pipe/telefone.pipe';
 
 @Component({
   selector: 'tab-dashboard-admin',
-  imports: [DataGridComponent, CurrencyPipe, CpfPipe, NgClass, ModalEditarGerente, ModalExcluirGerente, ModalAdicionarGerente],
+  imports: [DataGridComponent, CurrencyPipe, CpfPipe, NgClass, ModalEditarGerente, ModalExcluirGerente, ModalAdicionarGerente, TelefonePipe],
   templateUrl: './tab-dashboard-admin.html',
   styleUrl: './tab-dashboard-admin.css',
 })
@@ -26,10 +27,11 @@ export class TabDashboardAdmin implements OnInit {
     { size: 10, title: 'Nome' },
     { size: 10, title: 'CPF' },
     { size: 14, title: 'E-mail' },
+    { size: 10, title: 'Telefone' },
     { size: 15, title: 'Total de clientes' },
-    { size: 18, title: 'Saldos positivos (+)' },
-    { size: 18, title: 'Saldos negativos (-)' },
-    { size: 15, title: 'Ações' },
+    { size: 15, title: 'Saldos positivos (+)' },
+    { size: 16, title: 'Saldos negativos (-)' },
+    { size: 10, title: 'Ações' },
   ]
 
   exibirModalEditar: boolean = false;

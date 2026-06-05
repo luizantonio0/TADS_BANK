@@ -3,5 +3,6 @@ export interface CadastroGerenteDTO {
     cpf: string;
     email: string;
     tipo: string;
+    telefone: string;
     senha: string;
 }

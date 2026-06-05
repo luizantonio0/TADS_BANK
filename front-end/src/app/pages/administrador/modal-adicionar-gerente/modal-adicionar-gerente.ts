@@ -30,6 +30,7 @@ export class ModalAdicionarGerente {
       cpf: ['', [Validators.required, cpfValidator()]],
       nome: ['', [Validators.required, Validators.minLength(10)]],
       email: ['', [Validators.required, Validators.email]],
+      telefone: ['', [Validators.required, Validators.minLength(10)]],
       tipo: ['GERENTE', [Validators.required]],
       senha: ['', [Validators.required]],
     });

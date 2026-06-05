@@ -56,6 +56,7 @@ public class GerenteController {
                 cpf,
                 atualizaGerenteDTO.nome(),
                 atualizaGerenteDTO.email(),
+                atualizaGerenteDTO.telefone(),
                 atualizaGerenteDTO.senha()
         );
         return orchestrationService.startAtualizarGerente(cpf, dto)

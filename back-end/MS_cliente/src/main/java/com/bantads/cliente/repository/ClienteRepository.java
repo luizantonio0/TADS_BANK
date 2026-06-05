@@ -22,7 +22,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID>, Revisio
        List<Cliente> findByCpfGerenteAndAprovadoOrderByCriacaoAsc(String cpfGerente, boolean aprovado);
        List<Cliente> findByCpfIn(List<String> cpf);
        @Query("SELECT c FROM Cliente c WHERE c.cpfGerente = :cpfGerente " +
-              "AND (c.cpf LIKE %:termo% OR c.nome LIKE %:termo%) " +
+              "AND (c.cpf LIKE %:termo% OR c.nome LIKE %:termo%) AND c.aprovado = true " +
               "ORDER BY c.nome ASC")
        List<Cliente> findByGerente(@Param("cpfGerente") String cpfGerente, 
                                                  @Param("termo") String termo);

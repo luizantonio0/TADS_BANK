@@ -44,6 +44,7 @@
       <td>{{ item.gerente.nome }}</td>
       <td>{{ item.gerente.cpf | cpf }}</td>
       <td>{{ item.gerente.email }}</td>
+      <td>{{ item.gerente.telefone | telefone }}</td>
       <td>{{ item.clientes.length }}</td>
       <td>
         <div [ngClass]="{
@@ -63,7 +64,6 @@
       </td>
       <td>
         <div class="flex [&>span]:cursor-pointer [&>span]:text-indigo gap-x-1">
-          <span class="material-symbols-outlined">search</span>
           <span class="material-symbols-outlined" (click)="openEdit(item.gerente)">edit</span>
           <span class="material-symbols-outlined" (click)="openDelete(item.gerente)">delete</span>
         </div>

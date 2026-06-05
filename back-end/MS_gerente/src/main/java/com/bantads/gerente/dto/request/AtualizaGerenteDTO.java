@@ -4,5 +4,6 @@ public record AtualizaGerenteDTO(
         String cpf,
         String nome,
         String email,
+        String telefone,
         String senha
 ) {}

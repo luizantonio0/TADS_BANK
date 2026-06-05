@@ -3,6 +3,7 @@ export interface Gerente {
   nome: string;
   email: string;
   tipo: string;
+  telefone: string;
   senha?: string;
 }
 
