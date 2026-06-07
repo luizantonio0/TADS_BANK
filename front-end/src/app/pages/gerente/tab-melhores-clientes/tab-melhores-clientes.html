@@ -1,33 +1,61 @@
-<p class="text-2xl font-bold text-primary mb-4">Seus melhores clientes:</p>
-<div class="flex flex-col gap-y-2">
-    @for (item of clientes.slice(0,3); track $index) {
-    <div class="flex gap-x-8 w-full p-4 bg-primary rounded-md"
-        [ngClass]="$index == 0 ? 'bg-primary text-white' : 'bg-white text-primary border border-primary'">
-        <span class="text-8xl font-bold">{{ $index + 1}}º</span>
-        <div class="items-center justify-center">
-            <p class="text-3xl font-bold">{{ item.nome }}</p>
-            <div class="flex items-center gap-x-1 text-sm">
-                <div class="flex items-center gap-x-0.5">
-                    <span class="material-symbols-outlined text-sm!">description</span>
-                    <p class="font-semibold">CPF: </p>
-                </div>
-                <span class="font-light">{{ item.cpf | cpf }}</span>
-            </div>
-            <div class="flex items-center gap-x-1 text-sm">
-                <div class="flex items-center gap-x-0.5">
-                    <span class="material-symbols-outlined text-sm!">location_on</span>
-                    <p class="font-semibold">Cidade: </p>
-                </div>
-                <span class="font-light">{{ item.cidade }}, {{item.estado}}</span>
-            </div>
-            <div class="flex items-center gap-x-1 text-sm">
-                <div class="flex items-center gap-0.5">
-                    <span class="material-symbols-outlined text-sm!">payments</span>
-                    <p class="font-semibold">Saldo: </p>
-                </div>
-                <span class="font-light">{{ item.saldo | currency: 'BRL'}}</span>
-            </div>
+<div class="flex items-center gap-x-3 mb-6">
+  <div class="bg-primary/10 p-2 rounded-xl">
+    <span class="material-symbols-outlined text-primary text-2xl fill-1">workspace_premium</span>
+  </div>
+  <div class="flex flex-col leading-tight">
+    <p class="text-2xl font-bold text-primary tracking-tighter">Melhores Clientes</p>
+    <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest opacity-70">Top 3 Maiores Saldos em Conta</span>
+  </div>
+</div>
+
+<div class="flex flex-col gap-y-4">
+  @for (item of clientes.slice(0,3); track $index) {
+    <div class="flex items-center gap-x-6 p-5 bg-white border border-slate-200 rounded-xl shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary group">
+      
+      <div class="relative flex-none">
+        <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center border-2 border-white shadow-inner group-hover:scale-105 transition-transform">
+          <span class="text-xl font-black text-slate-400">{{ item.nome.substring(0,2).toUpperCase() }}</span>
         </div>
+        <div class="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white shadow-md"
+          [class.bg-amber-400]="$index === 0"
+          [class.bg-slate-400]="$index === 1"
+          [class.bg-orange-400]="$index === 2">
+          {{ $index + 1 }}º
+        </div>
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-bold text-slate-800 truncate tracking-tight group-hover:text-primary transition-colors">
+            {{ item.nome }}
+          </h3>
+          <div 
+            [class.bg-green-100]="(item.saldo ?? 0) >= 0"
+            [class.border-green-400]="(item.saldo ?? 0) >= 0"
+            [class.bg-red-100]="(item.saldo ?? 0) < 0"
+            [class.border-red-400]="(item.saldo ?? 0) < 0"
+            class="px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm border">
+            {{ (item.saldo ?? 0) | currency: 'BRL' }}
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-x-6">
+          <div class="flex items-center gap-x-1.5">
+            <span class="material-symbols-outlined text-sm text-primary/60">fingerprint</span>
+            <span class="text-sm font-semibold text-slate-500">{{ item.cpf | cpf }}</span>
+          </div>
+          <div class="flex items-center gap-x-1.5">
+            <span class="material-symbols-outlined text-sm text-primary/60">location_on</span>
+            <span class="text-sm font-semibold text-slate-500">{{ item.cidade }}, {{ item.estado }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-none pl-4">
+        <button (click)="onConsultar(item)" class="bg-primary/5 hover:bg-primary! text-primary hover:text-white! p-2 rounded-full transition-all duration-300 group/btn">
+            <span class="material-symbols-outlined text-xl group-hover/btn:translate-x-0.5 transition-transform">chevron_right</span>
+        </button>
+      </div>
     </div>
-    }
+  }
 </div>

@@ -1,3 +1,5 @@
+<app-spinner />
+
 <modal-depositar-sacar [callback]="this.atualizarExtrato.bind(this)" [control]="modalSacarControl" [numeroConta]="currentAccount.numeroConta" tipo="SAQUE" (close)="fecharModalOperacao()" />
 
 <modal-depositar-sacar [callback]="this.atualizarExtrato.bind(this)" [control]="modalDepositarControl" [numeroConta]="currentAccount.numeroConta" tipo="DEPOSITO" (close)="fecharModalOperacao()"/>

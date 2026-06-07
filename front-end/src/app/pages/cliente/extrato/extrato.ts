@@ -20,6 +20,7 @@ export class Extrato implements OnInit, OnChanges {
 
   isFiltroTooltipVisible = false;
   apenasComMovimentacao: boolean = false;
+  isLoading = false;
 
   @ViewChild('filtroTooltipRef') filtroTooltipRef!: ElementRef;
 
@@ -55,6 +56,9 @@ export class Extrato implements OnInit, OnChanges {
 
     const accountNumber = this.accountNumber??contaNum;
 
+    this.isLoading = true;
+    this.cdRef.detectChanges();
+
     this.loadService
       .withLoadingObservable(this.contaService.extrato(accountNumber, de, ate))
       .subscribe({
@@ -86,8 +90,13 @@ export class Extrato implements OnInit, OnChanges {
             })
             .sort((a, b) => b.dia.localeCompare(a.dia));
 
+          this.isLoading = false;
           this.cdRef.detectChanges();
         },
+        error: () => {
+          this.isLoading = false;
+          this.cdRef.detectChanges();
+        }
       });
   }
 

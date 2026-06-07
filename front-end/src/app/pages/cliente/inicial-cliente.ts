@@ -8,10 +8,11 @@ import { Cliente } from '../../shared/models/cliente.model';
 import { ClienteService } from '../../shared/service/requests/cliente.service';
 import { LoadingService } from '../../shared/service/loading.service';
 import { ToastService } from '../../shared/service/toast/toast';
+import { SpinnerComponent } from '../../components/loading/loading';
 
 @Component({
   selector: 'app-inicial-cliente',
-  imports: [Extrato, ModalDepositarSacar, ModalTransferir, CurrencyPipe, ModalAlterarPerfil],
+  imports: [Extrato, ModalDepositarSacar, ModalTransferir, CurrencyPipe, ModalAlterarPerfil, SpinnerComponent],
   templateUrl: './inicial-cliente.html',
 })
 export class InicialCliente implements OnInit {

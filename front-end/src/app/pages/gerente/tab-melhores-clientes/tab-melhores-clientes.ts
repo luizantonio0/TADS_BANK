@@ -1,5 +1,5 @@
-import { CurrencyPipe, NgClass } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CpfPipe } from '../../../shared/pipe/cpf.pipe';
 import { Cliente } from '../../../shared/models/cliente.model';
 import { ClienteService } from '../../../shared/service/requests/cliente.service';
@@ -8,12 +8,13 @@ import { ToastService } from '../../../shared/service/toast/toast';
 
 @Component({
   selector: 'tab-melhores-clientes',
-  imports: [NgClass, CpfPipe, CurrencyPipe],
+  imports: [CpfPipe, CurrencyPipe],
   templateUrl: './tab-melhores-clientes.html'
 })
 export class TabMelhoresClientes implements OnInit {
 
   clientes: Cliente[] = [];
+  @Output() consultar = new EventEmitter<string>();
 
   constructor(
     private clienteService: ClienteService, 
@@ -35,5 +36,8 @@ export class TabMelhoresClientes implements OnInit {
     });
   }
 
+  onConsultar(item: Cliente) {
+    this.consultar.emit(item.cpf);
+  }
 
 }

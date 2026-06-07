@@ -27,6 +27,14 @@ export class Header {
     this.exibirModalLogout = true;
   }
 
+  handleLogoClick() {
+    if (this.isAdmin || this.isGerente || this.isCliente) {
+      this.abrirModalLogout();
+    } else {
+      this.router.navigate(['/']);
+    }
+  }
+
   logout(): void {
     this.loadService.withLoadingObservable(this.authService.logout()).subscribe({
       next: _ => {

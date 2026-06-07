@@ -37,7 +37,14 @@
         </button>
     </div>
 
-    <div class="p-6 overflow-y-auto flex-1 min-h-0">
+    <div class="p-6 overflow-y-auto flex-1 min-h-0 relative">
+        @if (isLoading) {
+            <div class="absolute inset-0 bg-gray-50/50 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center gap-y-3">
+                <div class="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                <p class="text-xs font-bold text-primary tracking-widest uppercase animate-pulse">Carregando extrato...</p>
+            </div>
+        }
+
         @for (group of transactionGroups; track group.dia) {
         @if(!apenasComMovimentacao || group.movimentacoes.length > 0) {
             <div class="mb-6">
