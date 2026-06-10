@@ -9,7 +9,7 @@ CREATE TABLE public.tb_gerente (
     nome varchar(20) NOT NULL,
     email varchar(128) NOT NULL,
     tipo varchar(255) NOT NULL,
-    telefone varchar(11) NOT NULL,
+    telefone varchar(11) DEFAULT '',
     CONSTRAINT tb_gerente_pkey PRIMARY KEY (id)
 ); 
 
