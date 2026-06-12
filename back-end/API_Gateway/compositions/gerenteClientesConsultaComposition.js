@@ -10,7 +10,9 @@ export async function handleConsultaClientesGerente(req, res, claims) {
         }
     }
 
-    const clientesResp = await fetch(services.clientes + `/clientes/gerente/${claims.cpf}?nome=` + req.query.nome, config)
+    console.log(req.query.nome)
+
+    const clientesResp = await fetch(services.clientes + `/clientes/gerente/${claims.cpf}?nome=${req.query.nome??''}`, config)
     if (!clientesResp.ok) return res.status(clientesResp.status).json(clientesResp.body);
     const clientes = await clientesResp.json();
 

@@ -99,7 +99,7 @@ public class ClienteService {
     }
 
     public List<Cliente> findClientesByGerente(String cpf, String termo) {
-        return clienteRepository.findByGerente(cpf, termo);
+        return clienteRepository.findByGerente(cpf, termo == null ? "" : termo);
     }
 
     public List<Cliente> findByCpf(List<String> cpf) {
