@@ -60,7 +60,7 @@ export class ModalDepositarSacar {
             this.cdr.detectChanges();
           },
           error: (err) => {
-            this.toastr.error('Erro ao realizar depósito');
+            this.toastr.error(err.error?.error || 'Erro ao realizar depósito');
             console.error(err);
           }
         });
@@ -74,7 +74,7 @@ export class ModalDepositarSacar {
             this.cdr.detectChanges();
           },
           error: (err) => {
-            this.toastr.error("Erro ao realizar saque");
+            this.toastr.error(err.error?.error || 'Erro ao realizar saque');
             console.error(err)
           }
         });

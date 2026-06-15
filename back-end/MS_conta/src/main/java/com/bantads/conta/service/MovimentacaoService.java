@@ -170,7 +170,7 @@ public class MovimentacaoService {
         //var ultimaMovimentacao = ultimaMovimentacaoOpt.get();
         var conta = contaOpt.get();
 
-        LocalDateTime dataInicio = inicio == null ? LocalDateTime.MIN
+        LocalDateTime dataInicio = inicio == null ? primeiraMovimentacaoOpt.get().getDataHora().toLocalDate().atStartOfDay()
                 : inicio.isBefore(primeiraMovimentacao.getDataHora().toLocalDate())
                         ? primeiraMovimentacao.getDataHora().toLocalDate().atStartOfDay()
                         : inicio.atStartOfDay();
@@ -179,7 +179,7 @@ public class MovimentacaoService {
                         ? ultimaMovimentacao.getDataHora().toLocalDate().atTime(LocalTime.MAX)
                         : fim.atTime(LocalTime.MAX);*/
 
-        LocalDateTime dataFim = fim == null ? LocalDateTime.now() : fim.atTime(LocalTime.MAX);
+        LocalDateTime dataFim = fim == null ? LocalDateTime.now() : fim.isAfter(LocalDateTime.now().toLocalDate()) ? LocalDateTime.now() : fim.atTime(LocalTime.MAX);
 
         List<Movimentacao> anteriores = movimentacaoRepository.findByContaBefore(numConta, dataInicio);
         BigDecimal saldoAtual = BigDecimal.ZERO;

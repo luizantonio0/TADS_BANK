@@ -58,7 +58,7 @@ export class ModalTransferir {
           this.onClose();
         },
         error: (err) => {
-          this.toastr.error('Erro ao realizar transferencia');
+          this.toastr.error(err.error?.error || 'Erro ao realizar transferência');
         },
       });
     }
